@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 5 · Learning Outcomes and Active Learning · COMPSCI 879</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --maroon:#7B1416; --ink:#1F2328; --ground:#FAF8F6;
+  --slate:#5A6570; --rule:#DCD6D2; --go:#2D6A4F; --wash:#F1ECE8;
+}
+.reveal-viewport{ background-color:var(--ground) !important; color:var(--ink) !important; }
+body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
+  font-family:Lato,"Helvetica Neue",Helvetica,Arial,sans-serif; }
+.reveal .slides{ text-align:left; }
+.reveal h1{ font-size:2.05em; font-weight:900; color:var(--maroon); letter-spacing:-.01em;
+  text-transform:none; line-height:1.1; }
+.reveal h2{ font-size:1.42em; font-weight:900; color:var(--maroon); text-transform:none;
+  line-height:1.15; margin-bottom:.5em; letter-spacing:-.005em; }
+.reveal h3{ font-size:1.0em; font-weight:700; color:var(--slate); text-transform:uppercase;
+  letter-spacing:.10em; margin-bottom:.7em; }
+.reveal p,.reveal li{ font-size:.82em; line-height:1.45; }
+.reveal ul{ margin-left:.6em; } .reveal li{ margin-bottom:.42em; }
+.reveal strong{ color:var(--maroon); font-weight:900; }
+.reveal em{ color:var(--slate); font-style:italic; }
+.lede{ font-size:.95em !important; color:var(--slate); }
+.tiny{ font-size:.62em !important; color:var(--slate); line-height:1.4; }
+/* signature: the rubric strip. Lives INSIDE each section so reveal's transform scales it. */
+.reveal .slides > section{ box-sizing:border-box; padding:48px 250px 0 40px; height:620px; }
+/* fixed, so auto-animate never touches it. JS scales it to match the deck. */
+.strip{ position:fixed; background:var(--wash); border-left:1px solid var(--rule);
+  box-sizing:border-box; color:var(--slate); text-align:left; z-index:30;
+  padding:30px 18px; font-size:17px; line-height:1.32; }
+.strip .lbl{ text-transform:uppercase; letter-spacing:.10em; font-weight:900; font-size:14px;
+  color:var(--maroon); margin-bottom:18px; line-height:1.25; }
+.strip .obj{ display:flex; gap:9px; margin-bottom:18px; opacity:.40; }
+.strip .obj.on{ opacity:1; color:var(--ink); font-weight:700; }
+.strip .box{ flex:0 0 17px; height:17px; margin-top:2px; border:2px solid var(--slate);
+  border-radius:3px; box-sizing:border-box; }
+.strip .obj.on .box{ border-color:var(--go); background:var(--go); }
+
+
+/* ---- phase timer. Reusable: <div class="timer" data-phases="Think:120,Pair:120,Share:120"></div>
+   Click a phase to jump to it. Space bar runs/pauses the active phase. ---- */
+.timer{ background:#fff; border:1px solid var(--rule); border-radius:5px; padding:18px 20px;
+  margin:.6em 0 0; }
+.timer .phases{ display:flex; gap:10px; margin-bottom:14px; }
+.timer .ph{ flex:1; text-align:center; padding:9px 6px; border:2px solid var(--rule);
+  border-radius:4px; cursor:pointer; font-weight:900; font-size:15px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--slate); background:var(--wash); user-select:none; }
+.timer .ph:hover{ border-color:var(--go); }
+.timer .ph.active{ border-color:var(--go); background:var(--go); color:#fff; }
+.timer .ph.done{ opacity:.5; }
+.timer .face{ display:flex; align-items:baseline; gap:18px; }
+.timer .clock{ font-size:62px; font-weight:900; line-height:1; color:var(--ink);
+  font-variant-numeric:tabular-nums; letter-spacing:-.02em; min-width:170px; }
+.timer.running .clock{ color:var(--go); }
+.timer.low .clock{ color:var(--maroon); }
+.timer.over .clock{ color:var(--maroon); }
+.timer .hint{ font-size:15px; color:var(--slate); }
+.timer .track{ height:9px; background:var(--wash); border-radius:5px; margin-top:12px;
+  overflow:hidden; }
+.timer .fill{ height:100%; background:var(--go); width:100%; transition:width .95s linear; }
+.timer.low .fill{ background:var(--maroon); }
+.timer.compact{ padding:11px 14px; }
+.timer.compact .phases{ margin-bottom:0; position:absolute; opacity:0; pointer-events:none; }
+.timer.compact.multi .phases{ position:static; opacity:1; pointer-events:auto; margin-bottom:9px; }
+.timer.compact .clock{ font-size:40px; min-width:112px; }
+.timer.compact .track{ margin-top:8px; height:7px; }
+.timer .btn{ border:2px solid var(--go); background:#fff; color:var(--go); font-weight:900;
+  font-size:15px; text-transform:uppercase; letter-spacing:.08em; padding:8px 18px;
+  border-radius:4px; cursor:pointer; }
+.timer .btn:hover{ background:var(--go); color:#fff; }
+/* activity slides */
+.go h2{ color:var(--go); }
+.go .tag{ display:inline-block; background:var(--go); color:#fff; font-weight:900; font-size:.5em;
+  letter-spacing:.14em; text-transform:uppercase; padding:5px 12px; border-radius:3px;
+  margin-bottom:.8em; }
+.callout{ background:var(--wash); border-left:5px solid var(--maroon); padding:.8em 1.1em;
+  margin:.7em 0; font-size:.78em; line-height:1.45; }
+.two{ display:grid; grid-template-columns:1fr 1fr; gap:1.6em; }
+.card{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:.9em 1.1em; }
+.card h4{ margin:0 0 .5em; color:var(--maroon); font-size:.78em; font-weight:900;
+  text-transform:uppercase; letter-spacing:.08em; }
+.card ul{ margin:0; } .card li{ font-size:.72em; }
+.no h4{ color:#8B2E2E; } .yes h4{ color:var(--go); }
+/* simulator */
+#sim{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:16px 18px; }
+#sim .row{ display:flex; align-items:center; gap:14px; margin-bottom:9px; }
+#sim .name{ width:96px; font-weight:900; font-size:15px; color:var(--slate); }
+#sim .track{ flex:1; height:22px; background:var(--wash); border-radius:3px; position:relative; }
+#sim .bar{ position:absolute; top:0; bottom:0; border-radius:3px; transition:all .45s ease; }
+#sim .a{ background:var(--maroon); } #sim .b{ background:var(--go); }
+#sim .val{ width:48px; text-align:right; font-weight:900; font-size:15px; }
+#sim .gap{ margin-top:14px; padding-top:12px; border-top:1px solid var(--rule);
+  font-size:16px; font-weight:900; }
+#sim input[type=range]{ width:100%; margin:6px 0 2px; accent-color:var(--maroon); }
+#sim label{ font-size:13px; color:var(--slate); text-transform:uppercase; letter-spacing:.08em;
+  font-weight:900; }
+.reveal .progress{ color:var(--maroon); height:4px; }
+.reveal .slide-number{ background:transparent; color:var(--slate); font-size:15px;
+  right:auto; left:14px; bottom:10px; }
+.reveal .controls{ right:auto; left:8px; bottom:34px; color:var(--maroon); }
+</style>
+</head>
+<body>
+<div class="strip">
+  <div class="lbl">Today you should be able to</div>
+  <div class="obj" data-obj="1"><span class="box"></span><span>Write an intended learning outcome starting from a verb</span></div><div class="obj" data-obj="2"><span class="box"></span><span>Place an outcome on Bloom's taxonomy</span></div><div class="obj" data-obj="3"><span class="box"></span><span>Pick an active learning technique that fits your section</span></div>
+</div>
+
+<div class="reveal"><div class="slides">
+
+<section data-obj="0">
+<h3>COMPSCI 879 · Unit 5 · Wed Oct 7</h3>
+<h1>Learning Outcomes<br>and Active Learning</h1>
+<p class="lede">Act two: designing for learning</p>
+
+</section>
+
+<section data-obj="0">
+<h2>Where we are</h2>
+<p>Unit 4 was running a group task. Today is saying what the task is for, precisely enough that you could tell whether it worked.</p>
+<div class="callout">Your RLO Plan is due next Wednesday and asks for intended learning outcomes. You will write them in this session.</div>
+</section>
+
+<section data-obj="1">
+<h2>The problem with "understand"</h2>
+<p>"Help them understand recursion" sounds like an outcome and is not one.</p>
+<p class="lede">How would you know whether it happened?</p>
+<div class="callout">If you cannot say what the session was for, you cannot tell afterward whether it worked, so you end up judging your teaching by how it felt.</div>
+</section>
+
+<section data-obj="1">
+<h2>Start with a verb someone can watch</h2>
+<div class="two"><div class="card no"><h4>Not these</h4><ul><li>Know</li><li>Understand</li><li>Appreciate</li><li>Be familiar with</li></ul></div><div class="card yes"><h4>These</h4><ul><li>Implement</li><li>Trace</li><li>Compare</li><li>Predict</li><li>Debug</li><li>Explain</li></ul></div></div>
+<div class="callout">The test: could you design a task that shows whether the student can do it?</div>
+</section>
+
+<section data-obj="1">
+<h2>Three kinds of outcome</h2>
+<ul><li>Knowledge. What they can state.</li><li>Skills. What they can do.</li><li>Dispositions. How they approach a problem when nobody is watching.</li></ul>
+<p>CS teaching is heavy on the first two and mostly silent about the third.</p>
+<div class="callout">Dispositions are what employers describe when asked what they want: algorithmic problem solver, collaborative, effective communicator.</div>
+</section>
+
+<section data-obj="2">
+<h2>Bloom's, as a ladder</h2>
+<ul><li>Remember · Understand · Apply</li><li>Analyze · Evaluate · Create</li></ul>
+<p>A section living entirely at remember and understand is doing less than it could.</p>
+<p>A section that jumps to create without the lower rungs leaves students stranded.</p>
+
+</section>
+
+<section data-obj="1" class="go">
+<span class="tag">YOUR TURN · 5 MIN</span>
+<h2>Write one</h2>
+<p>Write an intended learning outcome for your own RLO. Start with the verb. Name whether it is knowledge, a skill, or a disposition.</p>
+<p class="lede">Then read it to your group and have them tell you whether it is observable.</p>
+<div class="timer" data-phases="Write:180,Share with group:120"></div>
+
+</section>
+
+<section data-obj="3">
+<h2>Active learning</h2>
+<p>Anything students do in a classroom besides passively listening.</p>
+<div class="card"><h4>Techniques</h4><ul><li>Think-Pair-Share</li><li>Pair programming</li><li>Jigsaw</li><li>POGIL</li><li>Case studies</li><li>Collaborative coding</li></ul></div>
+<div class="callout">The technique matters less than whether students are producing something you can see.</div>
+</section>
+
+<section data-obj="3" class="go">
+<span class="tag">IN PAIRS · 6 MIN</span>
+<h2>Match the technique</h2>
+<p>Given a scenario, which technique fits, and why not the others?</p>
+<ul><li>A concept that everyone thinks they understand and most do not</li><li>A skill that needs practice with immediate correction</li><li>A topic where students hold different and defensible positions</li></ul>
+<div class="timer" data-phases="Discuss:240,Report:120"></div>
+</section>
+
+<section data-obj="1">
+<h3>The move</h3>
+<h2>State the outcome<br>before designing the activity</h2>
+<p>It feels backward because the activity is the fun part.</p>
+<div class="callout">Same discipline as Unit 3. There you decided the criteria before applying them. Here you decide the outcome before building toward it.</div>
+</section>
+
+<section data-obj="1">
+<h2>Before next time</h2>
+<p>Write the outcome for your next discussion section before you plan it. One sentence, starting with a verb.</p>
+<p class="lede">Afterward, ask whether you could tell if it happened.</p>
+<div class="callout">If you could not, the outcome was not observable. Fix that rather than the activity.</div>
+</section>
+
+<section data-obj="0">
+<h2>This week</h2>
+<ul><li>Reflection 2 due today</li><li>RLO Plan due Wed Oct 14</li><li>Friday: Johanna Yunker on time management and streamlining teaching</li></ul>
+<p class="lede">Unit 6: equity and accessibility. Who does your activity actually work for?</p>
+</section>
+
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.min.js"></script>
+<script>
+Reveal.initialize({
+  width:1100, height:620, margin:0.04, minScale:0.2, maxScale:2.0,
+  hash:true, slideNumber:'c/t', transition:'fade', transitionSpeed:'fast', center:false,
+  controls:true, progress:true,
+  autoAnimateDuration:0.7, autoAnimateEasing:'ease-in-out'
+});
+// The strip lives outside .slides so auto-animate cannot touch it, which also means it does not
+// inherit reveal's transform. Size and place it from Reveal.getScale() instead.
+// STRIP_W and the sections' padding-right must agree: padding-right = STRIP_W + gutter.
+var STRIP_W = 210, DECK_H = 620;
+function placeStrip(){
+  var el=document.querySelector('.strip'); if(!el||!window.Reveal) return;
+  var r=document.querySelector('.reveal .slides').getBoundingClientRect(), k=Reveal.getScale();
+  el.style.width=(STRIP_W*k)+'px'; el.style.height=(DECK_H*k)+'px';
+  el.style.left=(r.right-STRIP_W*k)+'px'; el.style.top=r.top+'px';
+  el.style.fontSize=(17*k)+'px'; el.style.padding=(30*k)+'px '+(18*k)+'px';
+  el.querySelectorAll('.lbl').forEach(function(n){ n.style.fontSize=(14*k)+'px'; });
+  el.querySelectorAll('.box').forEach(function(n){
+    n.style.flexBasis=(17*k)+'px'; n.style.height=(17*k)+'px'; n.style.borderWidth=(2*k)+'px'; });
+  el.querySelectorAll('.obj').forEach(function(n){
+    n.style.marginBottom=(18*k)+'px'; n.style.gap=(9*k)+'px'; });
+}
+function syncStrip(){
+  var cur=Reveal.getCurrentSlide(); var n=cur?(cur.getAttribute('data-obj')||'0'):'0';
+  document.querySelectorAll('.strip .obj').forEach(function(o){
+    o.classList.toggle('on', o.getAttribute('data-obj')===n); });
+}
+function refreshStrip(){ placeStrip(); syncStrip(); }
+Reveal.on('ready', refreshStrip);
+Reveal.on('slidechanged', refreshStrip);
+Reveal.on('resize', function(){ setTimeout(placeStrip,0); });
+window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
+
+// ---- phase timer -------------------------------------------------------------
+// Markup:  <div class="timer" data-phases="Think:120,Pair:120,Share:120"></div>
+// Values are seconds. Click a phase chip to jump to it. Space runs or pauses the
+// timer on the current slide. It never autostarts, so a slide can be shown first.
+(function(){
+  function fmt(s){ var m=Math.floor(Math.abs(s)/60), x=Math.abs(s)%60;
+    return (s<0?'+':'')+m+':'+String(x).padStart(2,'0'); }
+  document.querySelectorAll('.timer').forEach(function(t){
+    var spec=(t.dataset.phases||'Think:120').split(',').map(function(p){
+      var b=p.split(':'); return {name:b[0].trim(), secs:parseInt(b[1],10)||60}; });
+    var i=0, left=spec[0].secs, tick=null, running=false;
+    t.innerHTML='<div class="phases"></div><div class="face">'
+      +'<span class="clock"></span><button class="btn"></button>'
+      +'<span class="hint"></span></div><div class="track"><span class="fill"></span></div>';
+    var chips=t.querySelector('.phases'), clock=t.querySelector('.clock'),
+        btn=t.querySelector('.btn'), fill=t.querySelector('.fill'),
+        hint=t.querySelector('.hint');
+    if(spec.length>1) t.classList.add('multi');
+    spec.forEach(function(p,n){
+      var c=document.createElement('span'); c.className='ph'; c.textContent=p.name;
+      c.onclick=function(){ go(n); }; chips.appendChild(c); });
+    function paint(){
+      clock.textContent=fmt(left);
+      t.classList.toggle('running',running);
+      t.classList.toggle('low', left<=15 && left>0);
+      t.classList.toggle('over', left<=0);
+      fill.style.width=Math.max(0,(left/spec[i].secs)*100)+'%';
+      btn.textContent=running?'Pause':(left===spec[i].secs?'Start':'Resume');
+      hint.textContent = left<=0 ? "time's up" : spec[i].name+' · '+fmt(spec[i].secs)+' total';
+      [].forEach.call(chips.children,function(c,n){
+        c.classList.toggle('active',n===i); c.classList.toggle('done',n<i); });
+    }
+    function stop(){ running=false; clearInterval(tick); tick=null; paint(); }
+    function run(){ if(running) return; running=true;
+      tick=setInterval(function(){ left--; paint(); },1000); paint(); }
+    function go(n){ stop(); i=n; left=spec[i].secs; paint(); }
+    btn.onclick=function(){ running?stop():run(); };
+    t.__timer={run:run, stop:stop, toggle:function(){ running?stop():run(); },
+               next:function(){ if(i<spec.length-1) go(i+1); }};
+    paint();
+  });
+  // space runs/pauses the timer on the visible slide, without hijacking it elsewhere
+  document.addEventListener('keydown',function(e){
+    if(e.key!==' '&&e.code!=='Space') return;
+    var cur=Reveal.getCurrentSlide(); if(!cur) return;
+    var t=cur.querySelector('.timer'); if(!t||!t.__timer) return;
+    e.preventDefault(); e.stopPropagation(); t.__timer.toggle();
+  },true);
+  // leaving a slide stops its timer
+  Reveal.on('slidechanged',function(ev){
+    document.querySelectorAll('.timer').forEach(function(t){
+      if(t.__timer && !ev.currentSlide.contains(t)) t.__timer.stop(); });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 3 · Assessment and Grading · COMPSCI 879</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --maroon:#7B1416; --ink:#1F2328; --ground:#FAF8F6;
+  --slate:#5A6570; --rule:#DCD6D2; --go:#2D6A4F; --wash:#F1ECE8;
+}
+.reveal-viewport{ background-color:var(--ground) !important; color:var(--ink) !important; }
+body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
+  font-family:Lato,"Helvetica Neue",Helvetica,Arial,sans-serif; }
+.reveal .slides{ text-align:left; }
+.reveal h1{ font-size:2.05em; font-weight:900; color:var(--maroon); letter-spacing:-.01em;
+  text-transform:none; line-height:1.1; }
+.reveal h2{ font-size:1.42em; font-weight:900; color:var(--maroon); text-transform:none;
+  line-height:1.15; margin-bottom:.5em; letter-spacing:-.005em; }
+.reveal h3{ font-size:1.0em; font-weight:700; color:var(--slate); text-transform:uppercase;
+  letter-spacing:.10em; margin-bottom:.7em; }
+.reveal p,.reveal li{ font-size:.82em; line-height:1.45; }
+.reveal ul{ margin-left:.6em; } .reveal li{ margin-bottom:.42em; }
+.reveal strong{ color:var(--maroon); font-weight:900; }
+.reveal em{ color:var(--slate); font-style:italic; }
+.lede{ font-size:.95em !important; color:var(--slate); }
+.tiny{ font-size:.62em !important; color:var(--slate); line-height:1.4; }
+/* signature: the rubric strip. Lives INSIDE each section so reveal's transform scales it. */
+.reveal .slides > section{ box-sizing:border-box; padding:48px 250px 0 40px; height:620px; }
+/* fixed, so auto-animate never touches it. JS scales it to match the deck. */
+.strip{ position:fixed; background:var(--wash); border-left:1px solid var(--rule);
+  box-sizing:border-box; color:var(--slate); text-align:left; z-index:30;
+  padding:30px 18px; font-size:17px; line-height:1.32; }
+.strip .lbl{ text-transform:uppercase; letter-spacing:.10em; font-weight:900; font-size:14px;
+  color:var(--maroon); margin-bottom:18px; line-height:1.25; }
+.strip .obj{ display:flex; gap:9px; margin-bottom:18px; opacity:.40; }
+.strip .obj.on{ opacity:1; color:var(--ink); font-weight:700; }
+.strip .box{ flex:0 0 17px; height:17px; margin-top:2px; border:2px solid var(--slate);
+  border-radius:3px; box-sizing:border-box; }
+.strip .obj.on .box{ border-color:var(--go); background:var(--go); }
+
+
+/* ---- phase timer. Reusable: <div class="timer" data-phases="Think:120,Pair:120,Share:120"></div>
+   Click a phase to jump to it. Space bar runs/pauses the active phase. ---- */
+.timer{ background:#fff; border:1px solid var(--rule); border-radius:5px; padding:18px 20px;
+  margin:.6em 0 0; }
+.timer .phases{ display:flex; gap:10px; margin-bottom:14px; }
+.timer .ph{ flex:1; text-align:center; padding:9px 6px; border:2px solid var(--rule);
+  border-radius:4px; cursor:pointer; font-weight:900; font-size:15px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--slate); background:var(--wash); user-select:none; }
+.timer .ph:hover{ border-color:var(--go); }
+.timer .ph.active{ border-color:var(--go); background:var(--go); color:#fff; }
+.timer .ph.done{ opacity:.5; }
+.timer .face{ display:flex; align-items:baseline; gap:18px; }
+.timer .clock{ font-size:62px; font-weight:900; line-height:1; color:var(--ink);
+  font-variant-numeric:tabular-nums; letter-spacing:-.02em; min-width:170px; }
+.timer.running .clock{ color:var(--go); }
+.timer.low .clock{ color:var(--maroon); }
+.timer.over .clock{ color:var(--maroon); }
+.timer .hint{ font-size:15px; color:var(--slate); }
+.timer .track{ height:9px; background:var(--wash); border-radius:5px; margin-top:12px;
+  overflow:hidden; }
+.timer .fill{ height:100%; background:var(--go); width:100%; transition:width .95s linear; }
+.timer.low .fill{ background:var(--maroon); }
+.timer.compact{ padding:11px 14px; }
+.timer.compact .phases{ margin-bottom:0; position:absolute; opacity:0; pointer-events:none; }
+.timer.compact.multi .phases{ position:static; opacity:1; pointer-events:auto; margin-bottom:9px; }
+.timer.compact .clock{ font-size:40px; min-width:112px; }
+.timer.compact .track{ margin-top:8px; height:7px; }
+.timer .btn{ border:2px solid var(--go); background:#fff; color:var(--go); font-weight:900;
+  font-size:15px; text-transform:uppercase; letter-spacing:.08em; padding:8px 18px;
+  border-radius:4px; cursor:pointer; }
+.timer .btn:hover{ background:var(--go); color:#fff; }
+/* activity slides */
+.go h2{ color:var(--go); }
+.go .tag{ display:inline-block; background:var(--go); color:#fff; font-weight:900; font-size:.5em;
+  letter-spacing:.14em; text-transform:uppercase; padding:5px 12px; border-radius:3px;
+  margin-bottom:.8em; }
+.callout{ background:var(--wash); border-left:5px solid var(--maroon); padding:.8em 1.1em;
+  margin:.7em 0; font-size:.78em; line-height:1.45; }
+.two{ display:grid; grid-template-columns:1fr 1fr; gap:1.6em; }
+.card{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:.9em 1.1em; }
+.card h4{ margin:0 0 .5em; color:var(--maroon); font-size:.78em; font-weight:900;
+  text-transform:uppercase; letter-spacing:.08em; }
+.card ul{ margin:0; } .card li{ font-size:.72em; }
+.no h4{ color:#8B2E2E; } .yes h4{ color:var(--go); }
+/* simulator */
+#sim{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:16px 18px; }
+#sim .row{ display:flex; align-items:center; gap:14px; margin-bottom:9px; }
+#sim .name{ width:96px; font-weight:900; font-size:15px; color:var(--slate); }
+#sim .track{ flex:1; height:22px; background:var(--wash); border-radius:3px; position:relative; }
+#sim .bar{ position:absolute; top:0; bottom:0; border-radius:3px; transition:all .45s ease; }
+#sim .a{ background:var(--maroon); } #sim .b{ background:var(--go); }
+#sim .val{ width:48px; text-align:right; font-weight:900; font-size:15px; }
+#sim .gap{ margin-top:14px; padding-top:12px; border-top:1px solid var(--rule);
+  font-size:16px; font-weight:900; }
+#sim input[type=range]{ width:100%; margin:6px 0 2px; accent-color:var(--maroon); }
+#sim label{ font-size:13px; color:var(--slate); text-transform:uppercase; letter-spacing:.08em;
+  font-weight:900; }
+.reveal .progress{ color:var(--maroon); height:4px; }
+.reveal .slide-number{ background:transparent; color:var(--slate); font-size:15px;
+  right:auto; left:14px; bottom:10px; }
+.reveal .controls{ right:auto; left:8px; bottom:34px; color:var(--maroon); }
+</style>
+</head>
+<body>
+<div class="strip">
+  <div class="lbl">Today you should be able to</div>
+  <div class="obj" data-obj="1"><span class="box"></span><span>Tell criterion from norm-referenced, and say which UMass expects</span></div>
+  <div class="obj" data-obj="2"><span class="box"></span><span>Write a rubric line two graders apply the same way</span></div>
+  <div class="obj" data-obj="3"><span class="box"></span><span>Decide a double-jeopardy case and defend it</span></div>
+</div>
+
+<div class="reveal"><div class="slides">
+
+<section data-obj="0">
+  <h3>COMPSCI 879 · Unit 3 · Wed Sep 23</h3>
+  <h1>Assessment<br>and Grading</h1>
+
+</section>
+
+<section data-obj="0">
+  <h2>Where we are</h2>
+  <p>Unit 2 was <strong>feedback</strong>. How to say something useful to a student who is stuck.</p>
+  <p>Today is the other half of that act: putting a <strong>number</strong> on the work, and being
+     able to defend it.</p>
+  <div class="callout">In the Spring version, this session came in week five. Most TAs had already
+    graded for a month by then. You are getting it before your first real stack.</div>
+</section>
+
+<section data-obj="0">
+  <h2>Today</h2>
+  <ul>
+    <li>Why we grade, and the two families of answer</li>
+    <li>What UMass actually requires of you</li>
+    <li>Building a rubric backward from the points</li>
+    <li>Three cases with no clean answer</li>
+    <li>Where GenAI is and is not allowed in your TA work</li>
+  </ul>
+</section>
+
+<section class="go" data-obj="1">
+  <span class="tag">Your turn · 2 min</span>
+  <h2>Why do we grade?</h2>
+  <p>Pick the one you actually believe. Not the one that sounds best.</p>
+  <ul>
+    <li>To let students know how they are performing</li>
+    <li>To recognize effort</li>
+    <li>To get them to complete the work</li>
+    <li>To assign a percentage or a letter</li>
+  </ul>
+  <div class="timer compact" data-phases="Decide:120"></div>
+
+</section>
+
+<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="1">
+  <h2>Two ways to grade the same answer</h2>
+  <div class="card" data-id="parts">
+    <h4>Assessment by parts</h4>
+    <ul><li>Points for components. Fast, mechanical, easy to defend line by line.</li>
+        <li>Misses whether the response actually works as a whole.</li></ul>
+  </div>
+
+</section>
+
+<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="1">
+  <h2>Two ways to grade the same answer</h2>
+  <div class="card" data-id="parts">
+    <h4>Assessment by parts</h4>
+    <ul><li>Points for components. Fast, mechanical, easy to defend line by line.</li>
+        <li>Misses whether the response actually works as a whole.</li></ul>
+  </div>
+  <div class="card" data-id="holistic" style="margin-top:1em;">
+    <h4>Holistic assessment</h4>
+    <ul><li>Judges the response as one thing. Catches what a checklist cannot.</li>
+        <li>Harder to explain to the student who lost the point.</li></ul>
+  </div>
+  <p class="tiny" style="margin-top:.8em;">Neither is wrong. Switching between them halfway through
+    a stack is.</p>
+
+</section>
+
+<section data-obj="1">
+  <h2>Norm-referenced vs criterion-referenced</h2>
+  <div class="two">
+    <div class="card no"><h4>Norm-referenced</h4>
+      <ul><li>Judged against everyone else in the room</li>
+          <li>The same work earns a different grade depending on who else enrolled</li></ul></div>
+    <div class="card yes"><h4>Criterion-referenced</h4>
+      <ul><li>Judged against a standard fixed in advance</li>
+          <li>The same work earns the same grade every time</li></ul></div>
+  </div>
+  <div class="callout"><strong>UMass expects criterion-referenced.</strong> The Undergraduate
+    Education Council says instructors should assign both item grades and final letter grades
+    against criterion-referenced standards.</div>
+</section>
+
+<section data-obj="1">
+  <h2>"Grading on a curve"</h2>
+  <p>Historically it meant norm-referenced grading.</p>
+  <p>Now it usually means <strong>adding points to lift the mean</strong>. Different thing.</p>
+  <p class="lede">Either way it is not a TA decision. Ask the instructor.</p>
+</section>
+
+<section class="go" data-obj="2">
+  <span class="tag">Think · Pair · Share · 6 min</span>
+  <h2>Case one</h2>
+  <p>The course you are TAing has <strong>no rubric</strong> for an assignment you are grading
+     tomorrow. Forty submissions. Ten points each.</p>
+  <p class="lede">What do you do today?</p>
+  <div class="timer" data-phases="Think:120,Pair:120,Share:120"></div>
+  <p class="tiny">Two minutes alone. Two with the person next to you. Then we take three answers.</p>
+
+</section>
+
+<section data-obj="2">
+  <h3>What just happened</h3>
+  <h2>That was a Think-Pair-Share</h2>
+  <p>Alone first, so everyone forms a position instead of deferring to whoever speaks fastest.
+     Then pairs, so the risk of being wrong is one person and not thirty. Then the room.</p>
+  <div class="callout"><strong>What it costs:</strong> six minutes for one question. <strong>What
+    it buys:</strong> participation from people who would never raise a hand cold, and you find out
+    what they actually think rather than what the confident student thinks.</div>
+  <p class="tiny">You can run this in a discussion section on Friday with zero preparation. It is
+    the highest-value move in this course per unit of effort.</p>
+
+</section>
+
+<section data-obj="2">
+  <h2>Build the rubric backward from the points</h2>
+  <ul>
+    <li>For <strong>each point available</strong>, write a yes-or-no item that decides whether it
+      is earned.</li>
+    <li>If you cannot phrase it as yes-or-no, it will not survive contact with a real submission.</li>
+    <li>Read <strong>half a dozen submissions before scoring any</strong>. The mistakes you did not
+      anticipate are the rubric lines you are missing.</li>
+    <li>Grade <strong>one problem at a time</strong> across all submissions, not one student at a
+      time.</li>
+  </ul>
+</section>
+
+<section data-obj="2">
+  <h2>Why the rubric line has to be specific</h2>
+  <p class="tiny" style="margin-bottom:10px;">Two graders. Ten submissions. Drag the slider and
+    watch what specificity does to the spread.</p>
+  <div id="sim">
+    <label for="spec">Rubric specificity</label>
+    <input type="range" id="spec" min="0" max="100" value="10">
+    <div class="row"><span class="name">Grader A</span>
+      <span class="track"><span class="bar a" id="barA"></span></span><span class="val" id="valA"></span></div>
+    <div class="row"><span class="name">Grader B</span>
+      <span class="track"><span class="bar b" id="barB"></span></span><span class="val" id="valB"></span></div>
+    <div class="gap">Same submission, different grader: <span id="gap"></span></div>
+  </div>
+  <p class="tiny" id="simnote" style="margin-top:8px;"></p>
+
+</section>
+
+<section class="go" data-obj="3">
+  <span class="tag">Think · Pair · Share · 6 min</span>
+  <h2>Case two: double jeopardy</h2>
+  <p>A student misremembers a function name. It costs them points in <strong>four</strong>
+     different questions.</p>
+  <p class="lede">Should it? What is the right total deduction, and how do you explain it to them?</p>
+  <div class="timer" data-phases="Think:120,Pair:120,Share:120"></div>
+
+</section>
+
+<section data-obj="3">
+  <h2>Where that usually lands</h2>
+  <ul>
+    <li>Grade cost should be <strong>proportional to the size of the misunderstanding</strong>, not
+      to how many places it surfaced.</li>
+    <li>But this is a <strong>course policy question, not yours</strong>. Ask your instructor what
+      their rule is.</li>
+    <li>Different courses answer it differently and both answers are defensible.</li>
+  </ul>
+  <div class="callout">The thing that is always yours: whatever rule you apply, apply it to
+    everyone, and write it down the first time you make the call.</div>
+</section>
+
+<section class="go" data-obj="3">
+  <span class="tag">Think · Pair · Share · 5 min</span>
+  <h2>Case three</h2>
+  <p>You and another TA grade the same assignment. Your averages differ by <strong>eight
+     percent</strong>.</p>
+  <p class="lede">A student's grade now depends on who opened their file. What now?</p>
+  <div class="timer" data-phases="Think:90,Pair:90,Share:120"></div>
+
+</section>
+
+<section data-obj="3">
+  <h2>Calibrating a grading team</h2>
+  <ul>
+    <li>Write the rubric down before anyone starts</li>
+    <li>All grade the <strong>same small sample first</strong>, then compare and reconcile</li>
+    <li>Grade anonymously where the tooling allows it</li>
+    <li>Document every judgment call as you make it, so the next grader can follow it</li>
+  </ul>
+  <p class="tiny">This is also what prevents "but my friend wrote the same thing and got full marks,"
+    which is the complaint that escalates.</p>
+</section>
+
+<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="0">
+  <h2>Feedback that does nothing</h2>
+  <div class="card no" data-id="fb">
+    <h4>Don't</h4>
+    <ul><li>"Wrong."</li>
+        <li>"Did you even read the question?"</li>
+        <li>The same canned comment on every question in the stack</li></ul>
+  </div>
+  <p class="tiny">A red X already told them they were wrong. This adds nothing and costs goodwill.</p>
+</section>
+
+<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="0">
+  <h2>Feedback worth the minute it takes</h2>
+  <div class="card yes" data-id="fb">
+    <h4>Do</h4>
+    <ul><li>Say what specifically went wrong, not that something did</li>
+        <li>Say what to do differently next time</li>
+        <li>Vary it. Different questions fail in different ways</li></ul>
+  </div>
+  <div class="callout">Two parts to grading: <strong>correctness</strong>, which students usually
+    work out themselves, and <strong>feedback</strong>, which they usually cannot. Only the second
+    one needs you.</div>
+</section>
+
+<section data-obj="0">
+  <h2>GenAI in your TA work</h2>
+  <div class="two">
+    <div class="card no"><h4>You may not</h4>
+      <ul><li>Use GenAI in TA duties without your course instructor's permission, even a
+        UMass-approved FERPA-compliant tool</li>
+        <li>Enter <strong>any</strong> student data into a non-UMass tool. Names, schedules, work</li></ul></div>
+    <div class="card yes"><h4>You may, with permission</h4>
+      <ul><li>Refresh your own understanding of a concept</li>
+        <li>Draft an explanation containing nothing identifiable about a student</li></ul></div>
+  </div>
+  <div class="callout">This course's own AI policy is more permissive than this. <strong>It does not
+    apply to your TA work.</strong> Ask the instructor of the course you assist.</div>
+
+</section>
+
+<section data-obj="0">
+  <h3>The move underneath all of it</h3>
+  <h2>Make your criteria explicit<br>before you apply them</h2>
+  <p>When a student asks why they lost two points, you have three possible answers.</p>
+  <ul>
+    <li><em>"That's what it felt like."</em> Ends badly.</li>
+    <li><em>"You did worse than the others."</em> Norm-referenced. Not what UMass asks for.</li>
+    <li><strong>"The rubric gives the point when the loop terminates, and yours doesn't."</strong>
+      Ends in a sentence.</li>
+  </ul>
+</section>
+
+<section data-obj="0">
+  <h2>Before next time</h2>
+  <p>Take one assignment you are responsible for and <strong>write the rubric you are actually
+     using</strong>. One yes-or-no line per point. Fifteen minutes.</p>
+  <p>Send it to your course instructor with one question: <em>is this what you want?</em></p>
+  <div class="callout">You are not asking permission. You are asking them to correct you now, rather
+    than after forty students have been graded against the wrong standard.</div>
+  <p class="tiny">Two of you will find out your instructor has a rubric nobody sent you.</p>
+
+</section>
+
+<section data-obj="0">
+  <h2>Sources</h2>
+  <ul class="tiny">
+    <li>Special Report of the Undergraduate Education Council, Guidelines for Assigning Grades in
+      Undergraduate Courses</li>
+    <li>Effective Rubric Design</li>
+    <li>How Do I Design Assignments</li>
+    <li>AI at UMass, TA-facing guidance</li>
+  </ul>
+  <p class="lede" style="margin-top:1.4em;">Unit 4: facilitating group work. Where you stop grading
+    what one student produced and start grading what four produced together.</p>
+</section>
+
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.min.js"></script>
+<script>
+Reveal.initialize({
+  width:1100, height:620, margin:0.04, minScale:0.2, maxScale:2.0,
+  hash:true, slideNumber:'c/t', transition:'fade', transitionSpeed:'fast', center:false,
+  controls:true, progress:true,
+  autoAnimateDuration:0.7, autoAnimateEasing:'ease-in-out'
+});
+// The strip lives outside .slides so auto-animate cannot touch it, which also means it does not
+// inherit reveal's transform. Size and place it from Reveal.getScale() instead.
+// STRIP_W and the sections' padding-right must agree: padding-right = STRIP_W + gutter.
+var STRIP_W = 210, DECK_H = 620;
+function placeStrip(){
+  var el=document.querySelector('.strip'); if(!el||!window.Reveal) return;
+  var r=document.querySelector('.reveal .slides').getBoundingClientRect(), k=Reveal.getScale();
+  el.style.width=(STRIP_W*k)+'px'; el.style.height=(DECK_H*k)+'px';
+  el.style.left=(r.right-STRIP_W*k)+'px'; el.style.top=r.top+'px';
+  el.style.fontSize=(17*k)+'px'; el.style.padding=(30*k)+'px '+(18*k)+'px';
+  el.querySelectorAll('.lbl').forEach(function(n){ n.style.fontSize=(14*k)+'px'; });
+  el.querySelectorAll('.box').forEach(function(n){
+    n.style.flexBasis=(17*k)+'px'; n.style.height=(17*k)+'px'; n.style.borderWidth=(2*k)+'px'; });
+  el.querySelectorAll('.obj').forEach(function(n){
+    n.style.marginBottom=(18*k)+'px'; n.style.gap=(9*k)+'px'; });
+}
+function syncStrip(){
+  var cur=Reveal.getCurrentSlide(); var n=cur?(cur.getAttribute('data-obj')||'0'):'0';
+  document.querySelectorAll('.strip .obj').forEach(function(o){
+    o.classList.toggle('on', o.getAttribute('data-obj')===n); });
+}
+function refreshStrip(){ placeStrip(); syncStrip(); }
+Reveal.on('ready', refreshStrip);
+Reveal.on('slidechanged', refreshStrip);
+Reveal.on('resize', function(){ setTimeout(placeStrip,0); });
+window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
+
+// ---- phase timer -------------------------------------------------------------
+// Markup:  <div class="timer" data-phases="Think:120,Pair:120,Share:120"></div>
+// Values are seconds. Click a phase chip to jump to it. Space runs or pauses the
+// timer on the current slide. It never autostarts, so a slide can be shown first.
+(function(){
+  function fmt(s){ var m=Math.floor(Math.abs(s)/60), x=Math.abs(s)%60;
+    return (s<0?'+':'')+m+':'+String(x).padStart(2,'0'); }
+  document.querySelectorAll('.timer').forEach(function(t){
+    var spec=(t.dataset.phases||'Think:120').split(',').map(function(p){
+      var b=p.split(':'); return {name:b[0].trim(), secs:parseInt(b[1],10)||60}; });
+    var i=0, left=spec[0].secs, tick=null, running=false;
+    t.innerHTML='<div class="phases"></div><div class="face">'
+      +'<span class="clock"></span><button class="btn"></button>'
+      +'<span class="hint"></span></div><div class="track"><span class="fill"></span></div>';
+    var chips=t.querySelector('.phases'), clock=t.querySelector('.clock'),
+        btn=t.querySelector('.btn'), fill=t.querySelector('.fill'),
+        hint=t.querySelector('.hint');
+    if(spec.length>1) t.classList.add('multi');
+    spec.forEach(function(p,n){
+      var c=document.createElement('span'); c.className='ph'; c.textContent=p.name;
+      c.onclick=function(){ go(n); }; chips.appendChild(c); });
+    function paint(){
+      clock.textContent=fmt(left);
+      t.classList.toggle('running',running);
+      t.classList.toggle('low', left<=15 && left>0);
+      t.classList.toggle('over', left<=0);
+      fill.style.width=Math.max(0,(left/spec[i].secs)*100)+'%';
+      btn.textContent=running?'Pause':(left===spec[i].secs?'Start':'Resume');
+      hint.textContent = left<=0 ? "time's up" : spec[i].name+' · '+fmt(spec[i].secs)+' total';
+      [].forEach.call(chips.children,function(c,n){
+        c.classList.toggle('active',n===i); c.classList.toggle('done',n<i); });
+    }
+    function stop(){ running=false; clearInterval(tick); tick=null; paint(); }
+    function run(){ if(running) return; running=true;
+      tick=setInterval(function(){ left--; paint(); },1000); paint(); }
+    function go(n){ stop(); i=n; left=spec[i].secs; paint(); }
+    btn.onclick=function(){ running?stop():run(); };
+    t.__timer={run:run, stop:stop, toggle:function(){ running?stop():run(); },
+               next:function(){ if(i<spec.length-1) go(i+1); }};
+    paint();
+  });
+  // space runs/pauses the timer on the visible slide, without hijacking it elsewhere
+  document.addEventListener('keydown',function(e){
+    if(e.key!==' '&&e.code!=='Space') return;
+    var cur=Reveal.getCurrentSlide(); if(!cur) return;
+    var t=cur.querySelector('.timer'); if(!t||!t.__timer) return;
+    e.preventDefault(); e.stopPropagation(); t.__timer.toggle();
+  },true);
+  // leaving a slide stops its timer
+  Reveal.on('slidechanged',function(ev){
+    document.querySelectorAll('.timer').forEach(function(t){
+      if(t.__timer && !ev.currentSlide.contains(t)) t.__timer.stop(); });
+  });
+})();
+// grader calibration simulator
+(function(){
+  var spec=document.getElementById('spec'); if(!spec) return;
+  var TRUE_SCORE=7.4;
+  function draw(){
+    var k=spec.value/100;
+    // with no rubric each grader drifts toward their own habit; specificity pulls them in
+    var a=TRUE_SCORE+(1-k)*1.9, b=TRUE_SCORE-(1-k)*2.1;
+    a=Math.min(10,a); b=Math.max(0,b);
+    document.getElementById('barA').style.width=(a*10)+'%';
+    document.getElementById('barB').style.width=(b*10)+'%';
+    document.getElementById('valA').textContent=a.toFixed(1);
+    document.getElementById('valB').textContent=b.toFixed(1);
+    var g=Math.abs(a-b);
+    document.getElementById('gap').textContent=g.toFixed(1)+' points apart';
+    var note=document.getElementById('simnote');
+    if(k<0.25) note.textContent='No written criteria. Each grader applies their own habit, and the student’s grade depends on who opened the file.';
+    else if(k<0.7) note.textContent='Some criteria written down. The spread narrows but judgment calls still differ.';
+    else note.textContent='Yes-or-no lines for every point. Two graders, effectively the same grade.';
+  }
+  spec.addEventListener('input',draw); draw();
+})();
+</script>
+</body>
+</html>
