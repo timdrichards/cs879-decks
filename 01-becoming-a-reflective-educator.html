@@ -39,10 +39,18 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .strip .lbl{ text-transform:uppercase; letter-spacing:.10em; font-weight:900; font-size:14px;
   color:var(--maroon); margin-bottom:18px; line-height:1.25; }
 .strip .obj{ display:flex; gap:9px; margin-bottom:18px; opacity:.40; }
+/* done sits between not-yet (.40) and current (1) so the strip reads as progress:
+   faint = still to come, mid = covered, full weight = what we are on now */
+.strip .obj.done{ opacity:.75; color:var(--ink); }
 .strip .obj.on{ opacity:1; color:var(--ink); font-weight:700; }
 .strip .box{ flex:0 0 17px; height:17px; margin-top:2px; border:2px solid var(--slate);
-  border-radius:3px; box-sizing:border-box; }
+  border-radius:3px; box-sizing:border-box; position:relative; }
 .strip .obj.on .box{ border-color:var(--go); background:var(--go); }
+.strip .obj.done .box{ border-color:var(--go); background:var(--go); }
+/* the tick is drawn, not a glyph, so it scales with Reveal.getScale() like everything else */
+.strip .obj.done .box::after{ content:""; position:absolute; left:28%; top:6%;
+  width:30%; height:62%; border:solid #fff; border-width:0 2px 2px 0;
+  transform:rotate(42deg); }
 
 
 /* ---- phase timer. Reusable: <div class="timer" data-phases="Think:120,Pair:120,Share:120"></div>
@@ -123,7 +131,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h2>You already started</h2>
 <p>Your appointment began September 7. Most of you have already stood in front of a room or sat across from a confused student.</p>
 <p>That ordering is deliberate. Today is worth more to you now than it would have been a week ago.</p>
@@ -135,14 +143,14 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <ul><li>How the course runs: schedule, work, grading</li><li>What a knowledge unit is and how to use one</li><li>Grading in the age of AI, which is the part worth staying for</li><li>What you are obliged to report, in the last ten minutes</li></ul>
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h3>Administration</h3>
 <h2>When and where</h2>
 <div class="two"><div class="card"><h4>Wednesday</h4><ul><li>4:00 to 5:15 PM</li><li>Engineering Laboratory 304</li><li>The taught session</li></ul></div><div class="card"><h4>Friday</h4><ul><li>9:05 to 9:55 AM</li><li>Morrill Science Center III 203</li><li>Studio</li></ul></div></div>
 <div class="callout">14 weeks, 25 sessions. No class Fri Oct 2, Wed Nov 11, or Fri Nov 27.</div>
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h2>What Friday is for</h2>
 <p>Most Fridays are Studio and they run the same way every time.</p>
 <ul><li>Clinic. One person's real problem from their own section that week.</li><li>Team time. Project work, with us circulating.</li><li>Share-out. A sentence per team.</li></ul>
@@ -150,39 +158,39 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h2>Attendance</h2>
 <ul><li>Compulsory at both sessions. 25 sessions, 2 points each, 50 points total.</li><li>You may miss one class, no questions asked</li><li>More than one, tell me in advance</li><li>Documented reasons are accommodated. Use the Attendance Excusal Form on Canvas.</li></ul>
 <div class="callout">Being too busy is not a reason. Everything else probably is, if you tell me.</div>
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h3>The work</h3>
 <h2>Four strands, all semester</h2>
-<div class="two"><div class="card"><h4>Reflections</h4><ul><li>Four, spread across the term</li><li>Including one video analysis of your own tutoring</li></ul></div><div class="card"><h4>Peer review of practice</h4><ul><li>You review a peer at work</li><li>A peer reviews you</li><li>Both write it up</li></ul></div></div>
-<div class="two"><div class="card"><h4>The teaching practicum</h4><ul><li>Your own TA job, all term</li><li>Change one thing about how you do it, then report back</li></ul></div><div class="card"><h4>Peer evaluation</h4><ul><li>Mid term and final</li><li>How your pod actually worked</li></ul></div></div>
+<div class="two"><div class="card"><h4>Reflections</h4><ul><li>Four across the term, one is a video of your own tutoring</li></ul></div><div class="card"><h4>Peer review of practice</h4><ul><li>You review a peer at work, and one reviews you</li></ul></div></div>
+<div class="two"><div class="card"><h4>The teaching practicum</h4><ul><li>Your own TA job, changed one thing at a time</li></ul></div><div class="card"><h4>Peer evaluation</h4><ul><li>Mid term and final, on how your pod worked</li></ul></div></div>
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h2>Everything is done in class</h2>
 <ul><li>Nothing is an exam</li><li>Almost all of it is written during a session</li><li>The practicum is the large one, and it runs on work you were doing anyway</li></ul>
 <div class="callout">Every assignment carries its own instructions for GenAI use. Those instructions are the boundary, not this slide.</div>
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h2>How grading works</h2>
 <div class="two"><div class="card"><h4>Weighted by group</h4><ul><li>Teaching practicum 40%</li><li>Reflections and discussions 20%</li><li>Peer review of practice and report 20%</li><li>Attendance and participation 10%</li><li>Peer evaluations 10%</li></ul></div><div class="card"><h4>The scale</h4><ul><li>A 93 to 100, A− 90 to 92</li><li>B+ 87, B 83, B− 80</li><li>C+ 77, C 73, C− 70</li><li>Below C is not passing for graduate students</li></ul></div></div>
 
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h2>Deadlines and late work</h2>
 <p>Everything is due at 11:59 PM on the date shown in Canvas.</p>
 <ul><li>Submissions stay open for a week past the due date</li><li>Canvas marks late work as late, and I can see it</li><li>Tell me before the deadline if you need longer. It is nearly always fine.</li></ul>
 <div class="callout">The window exists so an extension does not need paperwork. It is not a second deadline.</div>
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h3>How to use this course</h3>
 <h2>What a knowledge unit is</h2>
 <p>Each week has a page in Canvas that is the durable version of that week.</p>
@@ -190,17 +198,18 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <div class="callout">The slides are for the room. The unit page is what still makes sense in February when you have forgotten the session.</div>
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h2>Where things live</h2>
-<div class="two"><div class="card"><h4>In each week's module</h4><ul><li>The unit page</li><li>Slides, linked out</li><li>Read before Wednesday: at most two things</li><li>Reference: everything else</li><li>To do this week</li></ul></div><div class="card"><h4>Everything else</h4><ul><li>Announcements and Canvas Inbox</li><li>No textbook to buy</li></ul></div></div>
-<div class="callout">If it is marked Read, read it. If it is marked Reference, it is there when you need it and not before.</div>
+<div class="two"><div class="card"><h4>In each week's module</h4><ul><li>The unit page, which is the reading</li><li>Slides, linked out</li><li>Optional reading and reference</li><li>To do this week</li></ul></div><div class="card"><h4>Everything else</h4><ul><li>Announcements and Canvas Inbox</li><li>No textbook to buy</li></ul></div></div>
+<div class="callout">The unit page is the reading. Everything else is optional, and the unit page summarises it so you can choose.</div>
 
 </section>
 
-<section data-obj="0">
-<h2>Read before Wednesday means two things</h2>
-<p>Never more. If a week looks like ten links, eight of them are reference.</p>
-<p class="lede">I would rather you read two things than skim ten.</p>
+<section data-obj="1">
+<h2>The unit page is the reading</h2>
+<p>Everything else linked from a week is optional and is not assessed. If a week looks like ten links, all ten are there for when you want them.</p>
+<p class="lede">Each one has a summary on the unit page, so you can tell what is worth your time.</p>
+
 </section>
 
 <section data-obj="2" class="go">
@@ -237,14 +246,14 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 
 </section>
 
-<section data-obj="0">
+<section data-obj="2">
 <h3>The frame for the whole term</h3>
 <h2>You are being handed judgment,<br>not rules</h2>
 <p>Every hour of this course is a decision like the one you just made. Nobody hands you the answer.</p>
 <p>The semester is about building the judgment to make those calls and defend them.</p>
 </section>
 
-<section data-obj="0">
+<section data-obj="1">
 <h2>Before you leave: what you must report</h2>
 <p>Your reporting obligations started the day your appointment did, two weeks ago.</p>
 <ul><li>You are most likely a responsible employee under Title IX</li><li>Do not promise to keep something secret before you know what it is</li><li>Confidential resources exist: CWC, CCPH, the Faculty and Staff Assistance Program</li></ul>
@@ -253,10 +262,9 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 </section>
 
 <section data-obj="0">
-<h3>Why this matters</h3>
 <h2>Where this shows up later</h2>
 <div class="two"><div class="card"><h4>If you stay in academia</h4><ul><li>Teaching statements ask for evidence</li><li>The evidence is notes you took at the time</li></ul></div><div class="card"><h4>If you go to industry</h4><ul><li>Promotion means saying what you changed</li><li>Five years of experience, not one year five times</li></ul></div></div>
-<div class="callout">Two years from now: describe a time your teaching did not work. The people who can answer wrote it down while it was happening.</div>
+<p class="tiny">Two years from now: describe a time your teaching did not work. The people who can answer wrote it down while it was happening.</p>
 <p class="lede">And if neither is yours yet: what do you want out of the job you actually have?</p>
 
 </section>
@@ -276,7 +284,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p class="tiny">All of this is optional. The unit page summarises each one so you can decide.</p>
 </section>
 
-<section data-obj="0">
+<section data-obj="3">
 <h2>This week</h2>
 <ul><li>TA Checklist, due Wed Sep 23</li><li>Sign the TA Agreement in Canvas</li><li>Read the TA Guidelines from CICS</li><li>Reflection 1 opens, due Wed Sep 16</li></ul>
 <p class="lede">Unit 2: giving feedback, and what to say to the five students you are about to meet.</p>
@@ -308,10 +316,32 @@ function placeStrip(){
   el.querySelectorAll('.obj').forEach(function(n){
     n.style.marginBottom=(18*k)+'px'; n.style.gap=(9*k)+'px'; });
 }
+// An objective is "on" while the deck is on a slide that teaches it, and stays
+// "done" once the deck has moved past the last slide that carries it. Without the
+// done half the strip only ever shows a single lit box, which reads as a location
+// marker rather than progress through the session.
+var LAST_FOR_OBJ = null;
+function objIndex(){
+  if(LAST_FOR_OBJ) return LAST_FOR_OBJ;
+  LAST_FOR_OBJ = {};
+  var all = [].slice.call(document.querySelectorAll('.reveal .slides > section'));
+  all.forEach(function(s,i){
+    var o = s.getAttribute('data-obj');
+    if(o && o !== '0') LAST_FOR_OBJ[o] = i;
+  });
+  return LAST_FOR_OBJ;
+}
 function syncStrip(){
-  var cur=Reveal.getCurrentSlide(); var n=cur?(cur.getAttribute('data-obj')||'0'):'0';
+  var all = [].slice.call(document.querySelectorAll('.reveal .slides > section'));
+  var cur = Reveal.getCurrentSlide();
+  var here = all.indexOf(cur);
+  var n = cur ? (cur.getAttribute('data-obj')||'0') : '0';
+  var last = objIndex();
   document.querySelectorAll('.strip .obj').forEach(function(o){
-    o.classList.toggle('on', o.getAttribute('data-obj')===n); });
+    var k = o.getAttribute('data-obj');
+    o.classList.toggle('on', k === n);
+    o.classList.toggle('done', last[k] !== undefined && here > last[k]);
+  });
 }
 function refreshStrip(){ placeStrip(); syncStrip(); }
 Reveal.on('ready', refreshStrip);

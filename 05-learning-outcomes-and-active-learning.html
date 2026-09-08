@@ -39,10 +39,18 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .strip .lbl{ text-transform:uppercase; letter-spacing:.10em; font-weight:900; font-size:14px;
   color:var(--maroon); margin-bottom:18px; line-height:1.25; }
 .strip .obj{ display:flex; gap:9px; margin-bottom:18px; opacity:.40; }
+/* done sits between not-yet (.40) and current (1) so the strip reads as progress:
+   faint = still to come, mid = covered, full weight = what we are on now */
+.strip .obj.done{ opacity:.75; color:var(--ink); }
 .strip .obj.on{ opacity:1; color:var(--ink); font-weight:700; }
 .strip .box{ flex:0 0 17px; height:17px; margin-top:2px; border:2px solid var(--slate);
-  border-radius:3px; box-sizing:border-box; }
+  border-radius:3px; box-sizing:border-box; position:relative; }
 .strip .obj.on .box{ border-color:var(--go); background:var(--go); }
+.strip .obj.done .box{ border-color:var(--go); background:var(--go); }
+/* the tick is drawn, not a glyph, so it scales with Reveal.getScale() like everything else */
+.strip .obj.done .box::after{ content:""; position:absolute; left:28%; top:6%;
+  width:30%; height:62%; border:solid #fff; border-width:0 2px 2px 0;
+  transform:rotate(42deg); }
 
 
 /* ---- phase timer. Reusable: <div class="timer" data-phases="Think:120,Pair:120,Share:120"></div>
@@ -189,7 +197,6 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 </section>
 
 <section data-obj="0">
-<h3>Why this matters</h3>
 <h2>Where this shows up later</h2>
 <div class="two"><div class="card"><h4>If you stay in academia</h4><ul><li>Proposals and accreditation ask what they can do</li><li>Write "understand", get sent back</li></ul></div><div class="card"><h4>If you go to industry</h4><ul><li>This is writing acceptance criteria</li><li>"Finds last month's spend in thirty seconds"</li></ul></div></div>
 <div class="callout">What is Friday's section for? "Going over the homework" is not an answer, and you can hear it as you say it.</div>
@@ -246,10 +253,32 @@ function placeStrip(){
   el.querySelectorAll('.obj').forEach(function(n){
     n.style.marginBottom=(18*k)+'px'; n.style.gap=(9*k)+'px'; });
 }
+// An objective is "on" while the deck is on a slide that teaches it, and stays
+// "done" once the deck has moved past the last slide that carries it. Without the
+// done half the strip only ever shows a single lit box, which reads as a location
+// marker rather than progress through the session.
+var LAST_FOR_OBJ = null;
+function objIndex(){
+  if(LAST_FOR_OBJ) return LAST_FOR_OBJ;
+  LAST_FOR_OBJ = {};
+  var all = [].slice.call(document.querySelectorAll('.reveal .slides > section'));
+  all.forEach(function(s,i){
+    var o = s.getAttribute('data-obj');
+    if(o && o !== '0') LAST_FOR_OBJ[o] = i;
+  });
+  return LAST_FOR_OBJ;
+}
 function syncStrip(){
-  var cur=Reveal.getCurrentSlide(); var n=cur?(cur.getAttribute('data-obj')||'0'):'0';
+  var all = [].slice.call(document.querySelectorAll('.reveal .slides > section'));
+  var cur = Reveal.getCurrentSlide();
+  var here = all.indexOf(cur);
+  var n = cur ? (cur.getAttribute('data-obj')||'0') : '0';
+  var last = objIndex();
   document.querySelectorAll('.strip .obj').forEach(function(o){
-    o.classList.toggle('on', o.getAttribute('data-obj')===n); });
+    var k = o.getAttribute('data-obj');
+    o.classList.toggle('on', k === n);
+    o.classList.toggle('done', last[k] !== undefined && here > last[k]);
+  });
 }
 function refreshStrip(){ placeStrip(); syncStrip(); }
 Reveal.on('ready', refreshStrip);
