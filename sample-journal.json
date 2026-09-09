@@ -1,0 +1,911 @@
+{
+ "version": 3,
+ "student": {
+  "name": "Sample Journal",
+  "role": "TA",
+  "hours": 10,
+  "reserved": 3,
+  "ctx": "879",
+  "start": "2026-09-06",
+  "end": "2027-01-16",
+  "courses": [
+   {
+    "code": "COMPSCI 187",
+    "instructor": "Prof Example",
+    "hours": 7
+   }
+  ]
+ },
+ "entries": [
+  {
+   "id": 1700000000000,
+   "date": "2026-09-07",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "First course staff meeting. Met the head UCA and the other two TAs",
+   "note": ""
+  },
+  {
+   "id": 1700000000137,
+   "date": "2026-09-08",
+   "mins": 45,
+   "cat": "Other",
+   "course": "COMPSCI 187",
+   "what": "Read the syllabus properly and set up Gradescope access",
+   "note": "The syllabus says nothing at all about AI. I assumed there would be a policy."
+  },
+  {
+   "id": 1700000000274,
+   "date": "2026-09-09",
+   "mins": 90,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "First office hour. Two students, both about the setup instructions",
+   "note": ""
+  },
+  {
+   "id": 1700000000411,
+   "date": "2026-09-10",
+   "mins": 30,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Answered four questions on Ed",
+   "note": ""
+  },
+  {
+   "id": 1700000000548,
+   "date": "2026-09-14",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting",
+   "note": ""
+  },
+  {
+   "id": 1700000000685,
+   "date": "2026-09-15",
+   "mins": 120,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours, five students, all on the same install problem",
+   "note": "Five people with the identical error. That is a documentation problem, not five student problems."
+  },
+  {
+   "id": 1700000000822,
+   "date": "2026-09-16",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "First discussion section I have run on my own",
+   "note": "I talked for forty minutes of fifty. Nobody asked anything. I do not think that means they understood."
+  },
+  {
+   "id": 1700000000959,
+   "date": "2026-09-17",
+   "mins": 45,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed backlog",
+   "note": ""
+  },
+  {
+   "id": 1700000001096,
+   "date": "2026-09-18",
+   "mins": 60,
+   "cat": "Preparing materials",
+   "course": "COMPSCI 187",
+   "what": "Wrote the install fix up as an Ed post and pinned it",
+   "note": ""
+  },
+  {
+   "id": 1700000001233,
+   "date": "2026-09-21",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting",
+   "note": ""
+  },
+  {
+   "id": 1700000001370,
+   "date": "2026-09-22",
+   "mins": 120,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours, quieter",
+   "note": ""
+  },
+  {
+   "id": 1700000001507,
+   "date": "2026-09-23",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Discussion section. Tried asking a question and waiting",
+   "note": "Waited about four seconds and it felt like a minute. Someone answered. Four seconds is apparently the whole trick."
+  },
+  {
+   "id": 1700000001644,
+   "date": "2026-09-24",
+   "mins": 150,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Homework 1, 40 submissions",
+   "note": ""
+  },
+  {
+   "id": 1700000001781,
+   "date": "2026-09-25",
+   "mins": 45,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed",
+   "note": ""
+  },
+  {
+   "id": 1700000001918,
+   "date": "2026-09-26",
+   "mins": 20,
+   "cat": "Preparing materials",
+   "course": "COMPSCI 187",
+   "what": "Section worksheet for next week",
+   "note": ""
+  },
+  {
+   "id": 1700000002055,
+   "date": "2026-09-28",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting",
+   "note": ""
+  },
+  {
+   "id": 1700000002192,
+   "date": "2026-09-29",
+   "mins": 120,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours before the homework 2 deadline. Full the whole time",
+   "note": "Almost everyone opens with 'my code does not work' and nothing else. I spend the first five minutes of every conversation extracting what they already tried."
+  },
+  {
+   "id": 1700000002329,
+   "date": "2026-09-30",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Discussion section",
+   "note": ""
+  },
+  {
+   "id": 1700000002466,
+   "date": "2026-10-01",
+   "mins": 300,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Homework 2. Took five hours and I am not confident it is consistent",
+   "note": "The rubric says 'partial credit where appropriate' for the recursion question. That is not a rubric. I made a different call at 9pm than I made at 2pm and I cannot defend either."
+  },
+  {
+   "id": 1700000002603,
+   "date": "2026-10-02",
+   "mins": 60,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Regrade requests from homework 2, eleven of them",
+   "note": "Every single regrade was on the recursion question. That is the rubric, not the students."
+  },
+  {
+   "id": 1700000002740,
+   "date": "2026-10-03",
+   "mins": 45,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed, mostly regrade questions",
+   "note": ""
+  },
+  {
+   "id": 1700000002877,
+   "date": "2026-10-05",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting. Raised the homework 2 rubric problem",
+   "note": "Said it out loud with the numbers: five hours, eleven regrades, all on one question. Having the number made it a scheduling problem rather than me complaining."
+  },
+  {
+   "id": 1700000003014,
+   "date": "2026-10-06",
+   "mins": 120,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours",
+   "note": ""
+  },
+  {
+   "id": 1700000003151,
+   "date": "2026-10-07",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Discussion section",
+   "note": ""
+  },
+  {
+   "id": 1700000003288,
+   "date": "2026-10-08",
+   "mins": 90,
+   "cat": "Preparing materials",
+   "course": "COMPSCI 187",
+   "what": "Rewrote the recursion rubric line with the instructor. Three checkable sub-points instead of 'where appropriate'",
+   "note": "Took forty minutes together. Should have happened before homework 2 went out."
+  },
+  {
+   "id": 1700000003425,
+   "date": "2026-10-09",
+   "mins": 60,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Homework 3, first half",
+   "note": ""
+  },
+  {
+   "id": 1700000003562,
+   "date": "2026-10-10",
+   "mins": 45,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed",
+   "note": ""
+  },
+  {
+   "id": 1700000003699,
+   "date": "2026-10-12",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting",
+   "note": ""
+  },
+  {
+   "id": 1700000003836,
+   "date": "2026-10-13",
+   "mins": 120,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours. Started asking 'what have you tried' before looking at any code",
+   "note": "Two sessions ended with the student finding it themselves. Both said thanks in a way they do not when I find it."
+  },
+  {
+   "id": 1700000003973,
+   "date": "2026-10-14",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Discussion section",
+   "note": ""
+  },
+  {
+   "id": 1700000004110,
+   "date": "2026-10-15",
+   "mins": 120,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Homework 3, finished. Two hours against five for homework 2",
+   "note": "Same size assignment. The difference is entirely the rubric. That is the clearest evidence I have that the fix worked."
+  },
+  {
+   "id": 1700000004247,
+   "date": "2026-10-16",
+   "mins": 45,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed",
+   "note": ""
+  },
+  {
+   "id": 1700000004384,
+   "date": "2026-10-17",
+   "mins": 20,
+   "cat": "Preparing materials",
+   "course": "COMPSCI 187",
+   "what": "Practice problems for the midterm review",
+   "note": ""
+  },
+  {
+   "id": 1700000004521,
+   "date": "2026-10-19",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting, midterm logistics",
+   "note": ""
+  },
+  {
+   "id": 1700000004658,
+   "date": "2026-10-20",
+   "mins": 150,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Extra office hours before the midterm. Nonstop",
+   "note": "Nobody asked a conceptual question all session. All of it was 'is this on the exam'."
+  },
+  {
+   "id": 1700000004795,
+   "date": "2026-10-21",
+   "mins": 90,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Midterm review session, ran long",
+   "note": ""
+  },
+  {
+   "id": 1700000004932,
+   "date": "2026-10-22",
+   "mins": 150,
+   "cat": "Proctoring and exam logistics",
+   "course": "COMPSCI 187",
+   "what": "Proctored the midterm, two rooms",
+   "note": ""
+  },
+  {
+   "id": 1700000005069,
+   "date": "2026-10-23",
+   "mins": 240,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Midterm grading, my two questions across 120 papers",
+   "note": ""
+  },
+  {
+   "id": 1700000005206,
+   "date": "2026-10-24",
+   "mins": 60,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Midterm grading, second pass on the borderline scripts",
+   "note": "Third time I have changed my mind on the same answer. I should have graded question by question instead of paper by paper, and I knew that and did it anyway because it felt slower."
+  },
+  {
+   "id": 1700000005343,
+   "date": "2026-10-25",
+   "mins": 60,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed, midterm questions",
+   "note": ""
+  },
+  {
+   "id": 1700000005480,
+   "date": "2026-10-26",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting, midterm postmortem",
+   "note": ""
+  },
+  {
+   "id": 1700000005617,
+   "date": "2026-10-27",
+   "mins": 90,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours, very quiet after the midterm",
+   "note": ""
+  },
+  {
+   "id": 1700000005754,
+   "date": "2026-10-28",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Discussion section, went over the midterm",
+   "note": ""
+  },
+  {
+   "id": 1700000005891,
+   "date": "2026-10-29",
+   "mins": 45,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed",
+   "note": ""
+  },
+  {
+   "id": 1700000006028,
+   "date": "2026-10-30",
+   "mins": 30,
+   "cat": "Other",
+   "course": "COMPSCI 187",
+   "what": "Regrade window admin",
+   "note": ""
+  },
+  {
+   "id": 1700000006165,
+   "date": "2026-11-02",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting",
+   "note": ""
+  },
+  {
+   "id": 1700000006302,
+   "date": "2026-11-03",
+   "mins": 120,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours. Kept using the 'what have you tried' opener",
+   "note": "I am getting through more students per session than in September and staying later with fewer of them. Both at once, which I did not expect."
+  },
+  {
+   "id": 1700000006439,
+   "date": "2026-11-04",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Discussion section",
+   "note": ""
+  },
+  {
+   "id": 1700000006576,
+   "date": "2026-11-05",
+   "mins": 120,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Homework 4",
+   "note": ""
+  },
+  {
+   "id": 1700000006713,
+   "date": "2026-11-06",
+   "mins": 45,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed",
+   "note": ""
+  },
+  {
+   "id": 1700000006850,
+   "date": "2026-11-09",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting",
+   "note": ""
+  },
+  {
+   "id": 1700000006987,
+   "date": "2026-11-10",
+   "mins": 120,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours",
+   "note": ""
+  },
+  {
+   "id": 1700000007124,
+   "date": "2026-11-11",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Discussion section",
+   "note": ""
+  },
+  {
+   "id": 1700000007261,
+   "date": "2026-11-12",
+   "mins": 90,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Homework 5",
+   "note": ""
+  },
+  {
+   "id": 1700000007398,
+   "date": "2026-11-13",
+   "mins": 60,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed, project questions starting",
+   "note": ""
+  },
+  {
+   "id": 1700000007535,
+   "date": "2026-11-14",
+   "mins": 45,
+   "cat": "Other",
+   "course": "COMPSCI 187",
+   "what": "A student disclosed something in office hours that I had to report. Told them before they got far that I could not keep it private, then walked them to the Dean of Students page and emailed the instructor",
+   "note": "I nearly said 'of course, this is between us'. The reason I did not is that we covered it in week one. I would have got that wrong in September."
+  },
+  {
+   "id": 1700000007672,
+   "date": "2026-11-16",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting",
+   "note": ""
+  },
+  {
+   "id": 1700000007809,
+   "date": "2026-11-17",
+   "mins": 150,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours, project questions",
+   "note": ""
+  },
+  {
+   "id": 1700000007946,
+   "date": "2026-11-18",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Discussion section",
+   "note": ""
+  },
+  {
+   "id": 1700000008083,
+   "date": "2026-11-19",
+   "mins": 120,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Homework 6",
+   "note": ""
+  },
+  {
+   "id": 1700000008220,
+   "date": "2026-11-20",
+   "mins": 90,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed. The project has doubled the question volume",
+   "note": "Most of them are design questions that would be a five minute conversation and are a twenty minute thread. I should be pushing these to office hours."
+  },
+  {
+   "id": 1700000008357,
+   "date": "2026-11-21",
+   "mins": 45,
+   "cat": "Preparing materials",
+   "course": "COMPSCI 187",
+   "what": "Wrote a project FAQ from the Ed threads",
+   "note": ""
+  },
+  {
+   "id": 1700000008494,
+   "date": "2026-11-23",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting before the break",
+   "note": ""
+  },
+  {
+   "id": 1700000008631,
+   "date": "2026-11-24",
+   "mins": 90,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours, thin before Thanksgiving",
+   "note": ""
+  },
+  {
+   "id": 1700000008768,
+   "date": "2026-11-25",
+   "mins": 30,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed",
+   "note": ""
+  },
+  {
+   "id": 1700000008905,
+   "date": "2026-11-30",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting",
+   "note": ""
+  },
+  {
+   "id": 1700000009042,
+   "date": "2026-12-01",
+   "mins": 120,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours, back to full",
+   "note": ""
+  },
+  {
+   "id": 1700000009179,
+   "date": "2026-12-02",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Discussion section",
+   "note": ""
+  },
+  {
+   "id": 1700000009316,
+   "date": "2026-12-03",
+   "mins": 120,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Homework 7",
+   "note": ""
+  },
+  {
+   "id": 1700000009453,
+   "date": "2026-12-04",
+   "mins": 60,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed. The FAQ has visibly cut the repeats",
+   "note": "Same question asked eleven times before I wrote it, twice since."
+  },
+  {
+   "id": 1700000009590,
+   "date": "2026-12-05",
+   "mins": 45,
+   "cat": "Preparing materials",
+   "course": "COMPSCI 187",
+   "what": "Final project rubric read-through with the instructor",
+   "note": "Asked for the rubric two weeks early this time. That is the homework 2 lesson, applied."
+  },
+  {
+   "id": 1700000009727,
+   "date": "2026-12-07",
+   "mins": 60,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Staff meeting",
+   "note": ""
+  },
+  {
+   "id": 1700000009864,
+   "date": "2026-12-08",
+   "mins": 180,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Office hours, project crunch",
+   "note": ""
+  },
+  {
+   "id": 1700000010001,
+   "date": "2026-12-09",
+   "mins": 75,
+   "cat": "Section, lab or recitation",
+   "course": "COMPSCI 187",
+   "what": "Last discussion section",
+   "note": ""
+  },
+  {
+   "id": 1700000010138,
+   "date": "2026-12-10",
+   "mins": 180,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Final project, first 20",
+   "note": ""
+  },
+  {
+   "id": 1700000010275,
+   "date": "2026-12-11",
+   "mins": 90,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed",
+   "note": ""
+  },
+  {
+   "id": 1700000010412,
+   "date": "2026-12-12",
+   "mins": 30,
+   "cat": "Other",
+   "course": "COMPSCI 187",
+   "what": "Wrote up the install fix and the FAQ for whoever TAs this next",
+   "note": ""
+  },
+  {
+   "id": 1700000010549,
+   "date": "2026-12-14",
+   "mins": 150,
+   "cat": "Office hours and help sessions",
+   "course": "COMPSCI 187",
+   "what": "Final office hours before the exam",
+   "note": ""
+  },
+  {
+   "id": 1700000010686,
+   "date": "2026-12-15",
+   "mins": 180,
+   "cat": "Proctoring and exam logistics",
+   "course": "COMPSCI 187",
+   "what": "Proctored the final",
+   "note": ""
+  },
+  {
+   "id": 1700000010823,
+   "date": "2026-12-16",
+   "mins": 240,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Final exam grading, my questions",
+   "note": ""
+  },
+  {
+   "id": 1700000010960,
+   "date": "2026-12-17",
+   "mins": 150,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Final project, remaining 20",
+   "note": ""
+  },
+  {
+   "id": 1700000011097,
+   "date": "2026-12-18",
+   "mins": 60,
+   "cat": "Questions online and by email",
+   "course": "COMPSCI 187",
+   "what": "Ed, closing it out",
+   "note": ""
+  },
+  {
+   "id": 1700000011234,
+   "date": "2026-12-21",
+   "mins": 120,
+   "cat": "Grading",
+   "course": "COMPSCI 187",
+   "what": "Final regrades and grade checks",
+   "note": ""
+  },
+  {
+   "id": 1700000011371,
+   "date": "2026-12-22",
+   "mins": 90,
+   "cat": "Other",
+   "course": "COMPSCI 187",
+   "what": "Handover notes for next semester's TA",
+   "note": "Reading back through this, the thing I would tell them is the homework 2 week. Not that it was bad, but that having it written down is what let me fix it in week five instead of complaining about it in December."
+  },
+  {
+   "id": 1700000011508,
+   "date": "2026-12-23",
+   "mins": 30,
+   "cat": "Staff meetings",
+   "course": "COMPSCI 187",
+   "what": "Final staff meeting",
+   "note": ""
+  }
+ ],
+ "checks": {
+  "syllabus": {
+   "done": true,
+   "note": "Attendance in section is not graded, which surprises people who assume it is. Late work loses 10% a day up to three days and is then a zero, and the instructor will not make exceptions by email, only in person."
+  },
+  "ai": {
+   "done": true,
+   "note": "Students may use AI to explain a concept or to help debug code they wrote. They may not submit code they did not write, and anything AI-assisted has to be declared in a comment at the top of the file. Undeclared use is an academic honesty referral, not a grade penalty."
+  },
+  "late": {
+   "done": true,
+   "note": "10% a day for three days, then zero. I do not have authority to extend anything. If someone asks me, I send them to the instructor and tell the instructor it is coming so it is not a surprise."
+  },
+  "regrade": {
+   "done": true,
+   "note": "Within one week, through Gradescope, and it re-opens the whole question rather than just the part they queried. I regrade it, and if the change is more than two points the instructor reviews it."
+  },
+  "honesty": {
+   "done": true,
+   "note": "I do not confront the student. I screenshot what I saw, email the instructor the same day, and say nothing to anyone else including the other TAs. The instructor decides whether it goes to Academic Honesty."
+  },
+  "accom": {
+   "done": true,
+   "note": "The letters go to the instructor, not to me. What reaches me is an instruction, usually extended time or a separate room for quizzes in section. I implement it and do not assess it. If a student tells me about one I have not been told about, I believe them and check with the instructor afterwards rather than in front of them."
+  },
+  "report": {
+   "done": true,
+   "note": "I am a responsible employee. If a student starts telling me about harassment or assault I have to report it, so I say that before they get into it rather than after. The Dean of Students and the counselling centre are the confidential routes, and I keep those two links to hand."
+  },
+  "duties": {
+   "done": true,
+   "note": "Six hours: two of office hours Tuesday and Thursday, one discussion section Wednesday, grading within four days of a deadline, Ed answered within 24 hours on weekdays, and the Monday staff meeting. Agreed in writing in week one and it has held all term."
+  },
+  "space": {
+   "done": true,
+   "note": "LGRT T222, booked through the Zoom booking system for Tuesday and Thursday 2 to 3. Keypad code from CSB-W126, and I had to sign the sheet there before they would give it to me."
+  },
+  "staff": {
+   "done": true,
+   "note": "The instructor, a head UCA, two other grad TAs and three UCAs. Slack for anything quick between staff, Ed for anything a student might also need to see, email for anything that should be on the record."
+  }
+ },
+ "weeks": [
+  {
+   "of": "2026-09-06",
+   "fit": "Comfortably under",
+   "flag": ""
+  },
+  {
+   "of": "2026-09-13",
+   "fit": "Comfortably under",
+   "flag": "Still finding my feet. Section is the part I am worst at."
+  },
+  {
+   "of": "2026-09-20",
+   "fit": "About right",
+   "flag": ""
+  },
+  {
+   "of": "2026-09-27",
+   "fit": "Went well over",
+   "flag": "Homework 2 took five hours instead of the two I planned for, and produced eleven regrades, all on the same question. The rubric line for it is 'partial credit where appropriate', which is not something I can apply consistently. I want to agree it with the instructor before homework 3."
+  },
+  {
+   "of": "2026-10-04",
+   "fit": "Went over",
+   "flag": "Still catching up from last week, but the rubric conversation happened and we rewrote the line together."
+  },
+  {
+   "of": "2026-10-11",
+   "fit": "About right",
+   "flag": "Homework 3 took half the time of homework 2 for the same size assignment. The rubric was the whole difference."
+  },
+  {
+   "of": "2026-10-18",
+   "fit": "Went well over",
+   "flag": "Midterm week. Twelve hours. This was known in advance and I agreed it with the instructor, so it is not a surprise, but it is worth recording that midterm week costs roughly a week and a half."
+  },
+  {
+   "of": "2026-10-25",
+   "fit": "Comfortably under",
+   "flag": "Quiet week after the midterm. It roughly balances the week before."
+  },
+  {
+   "of": "2026-11-01",
+   "fit": "About right",
+   "flag": ""
+  },
+  {
+   "of": "2026-11-08",
+   "fit": "About right",
+   "flag": "One difficult conversation in office hours that I handled by the book. Told the instructor the same day."
+  },
+  {
+   "of": "2026-11-15",
+   "fit": "Went over",
+   "flag": "The project has doubled Ed volume. Two hours of it this week, mostly design questions that belong in office hours."
+  },
+  {
+   "of": "2026-11-22",
+   "fit": "Comfortably under",
+   "flag": "Short week."
+  },
+  {
+   "of": "2026-11-29",
+   "fit": "About right",
+   "flag": "The project FAQ has cut the repeat questions sharply."
+  },
+  {
+   "of": "2026-12-06",
+   "fit": "Went over",
+   "flag": "Final project grading started."
+  },
+  {
+   "of": "2026-12-13",
+   "fit": "Went well over",
+   "flag": "Finals week. Eleven hours. Same shape as the midterm, and again agreed in advance."
+  },
+  {
+   "of": "2026-12-20",
+   "fit": "Comfortably under",
+   "flag": "Grades in. Done."
+  }
+ ],
+ "updated": "2026-12-22T16:00:00.000Z"
+}
