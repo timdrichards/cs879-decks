@@ -322,15 +322,17 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
         <option value="879">COMPSCI 879, the TA training practicum</option>
       </select></div>
   </div>
-  <p class="hint">Choosing COMPSCI 879 fills in the three reserved hours and the Fall 2026
-  appointment dates, and turns on the reminders about weekly uploads to Canvas. Leave it on the
-  general setting for any other appointment and nothing about 879 appears anywhere.</p>
+  <p class="hint">Choosing COMPSCI 879 fills in the three reserved hours and turns on the reminders
+  about weekly uploads to Canvas. Leave it on the general setting for any other appointment and
+  nothing about 879 appears anywhere. Your appointment dates are always yours to enter, because they
+  change every semester.</p>
 
   <h3>Appointment dates</h3>
   <p class="hint">These set the span of the calendar on the dashboard and head the report, so a
   reader can see the period your hours sit inside. Days outside them are left blank on the calendar.
-  <span class="tag879">879</span> Fall 2026 runs Sunday 6 September 2026 to Saturday 16 January
-  2027.</p>
+  If you are not sure of your dates, they are on your contract. If you cannot find it, ask the TA and
+  UCA Director who hired you rather than guessing: an appointment that runs later than you think is
+  the usual reason people are surprised by what they still owe in December.</p>
   <div class="row c2">
     <div><label for="s-start">Appointment starts</label><input type="date" id="s-start"></div>
     <div><label for="s-end">Appointment ends</label><input type="date" id="s-end"></div>
@@ -1098,10 +1100,7 @@ $("w-save").onclick = async () => {
 $("s-ctx").onchange = () => {
   if ($("s-ctx").value === "879" && !parseFloat($("s-reserved").value)) $("s-reserved").value = 3;
   if ($("s-ctx").value === "general" && parseFloat($("s-reserved").value) === 3) $("s-reserved").value = 0;
-  if ($("s-ctx").value === "879"){
-    if (!$("s-start").value) $("s-start").value = "2026-09-06";
-    if (!$("s-end").value)   $("s-end").value   = "2027-01-16";
-  }
+
 };
 $("s-save").onclick = async () => {
   db.student = Object.assign({}, db.student, {
