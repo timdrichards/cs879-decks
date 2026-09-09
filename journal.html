@@ -47,6 +47,13 @@ button.tiny:hover{border-color:var(--maroon);color:var(--maroon)}
 .callout{background:var(--wash);border-left:4px solid var(--maroon);padding:.85rem 1.1rem;
   border-radius:0 3px 3px 0;margin:0 0 1.2rem;font-size:.95rem}
 .warn{border-left-color:var(--amber);background:#FFF8E5}
+.stop{border-left-color:var(--red);background:#FDF3F3}
+.ok{border-left-color:var(--go);background:#F3FAF6}
+#e-form[disabled]{opacity:.45;pointer-events:none}
+.todo{margin:.5rem 0 0;padding-left:1.15rem}
+.todo li{margin:0 0 .3rem}
+.todo li.done{color:var(--muted);list-style:none;margin-left:-1.15rem}
+.todo li.done::before{content:"\2713\00a0";color:var(--go);font-weight:800}
 table{width:100%;border-collapse:collapse;font-size:.92rem}
 th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--rule);vertical-align:top}
 th{background:var(--wash);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
@@ -104,6 +111,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 
 <!-- ============================== LOG ============================== -->
 <section id="log">
+  <div id="status"></div>
   <h2>Log what you did</h2>
   <p class="sub">A line at a time, while it is fresh. Two minutes after a shift beats an hour of
   reconstruction in December.</p>
@@ -114,6 +122,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
     an education record with rules attached.
   </div>
 
+  <fieldset id="e-form" style="border:0;padding:0;margin:0;min-width:0">
   <div class="row c4">
     <div><label for="e-date">Date</label><input type="date" id="e-date"></div>
     <div><label for="e-mins">Minutes</label><input type="number" id="e-mins" min="0" step="5" placeholder="45"></div>
@@ -134,6 +143,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
     <button class="act" id="e-add">Add entry</button>
     <span class="saved" id="e-msg"></span>
   </div>
+  </fieldset>
 
   <h3>Entries</h3>
   <div class="bar" style="margin-top:0">
@@ -578,6 +588,89 @@ function calDetail(d){
         + '</li>').join('') + '</ul>';
 }
 
+/* ---------- status panel ---------------------------------------------------
+   The Log tab is what opens, so it is the only place a reminder reliably gets
+   read. Two jobs. First, refuse to take entries until the setup is good enough
+   that they can be attributed: an entry with no name, no hours and no course is
+   data nobody can use later, and it is far cheaper to block it now than to try
+   to reconstruct it in December. Second, say what is due today. -------------*/
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function daysBetween(a,b){ return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000); }
+
+function setupGaps(){
+  const s = db.student, gaps = [];
+  if (!s.name.trim())                       gaps.push("your name, so exports and reports are attributable");
+  if (!(+s.hours > 0))                      gaps.push("your appointment hours a week");
+  if (!courses().length)                    gaps.push("at least one course you are assisting");
+  else if (!courses().some(c=>+c.hours>0))  gaps.push("the hours allocated to your course");
+  return gaps;
+}
+
+function statusHTML(){
+  const gaps = setupGaps();
+  if (gaps.length){
+    return '<div class="callout stop"><strong>Finish the setup before you start logging.</strong>'
+      + '<p style="margin:.4rem 0 0">An entry with no name, no hours and no course attached is data '
+      + 'nobody can use later, including you. This takes a minute and you only do it once.</p>'
+      + '<ul class="todo">' + gaps.map(g=>'<li>'+esc(g)+'</li>').join('') + '</ul>'
+      + '<p style="margin:.6rem 0 0"><button class="act" id="go-setup">Go to setup</button></p></div>';
+  }
+
+  const today = todayISO(), s = db.student, items = [];
+  const dates = db.entries.map(e=>e.date).sort();
+  const last = dates[dates.length-1];
+  const thisWeek = sunday(today);
+  const loggedThisWeek = db.entries.some(e => sunday(e.date) === thisWeek);
+  const dow = new Date(today+"T12:00:00").getDay();       // 0 Sun .. 6 Sat
+  const weekRec = db.weeks.find(w => w.of === thisWeek);
+  const checksDone = CHECKS.filter(([id]) => (db.checks[id]||{}).done).length;
+  const before = s.start && today < s.start, after = s.end && today > s.end;
+
+  if (before) items.push(["wait","Your appointment has not started yet ("+s.start+"). Nothing to log.",1]);
+  else if (after) items.push(["done","Your appointment ended "+s.end+". This is now a record rather than a live journal.",1]);
+
+  if (!before && !after){
+    if (!dates.length) items.push(["do","Nothing logged yet. Add your first entry below, even if it is fifteen minutes.",0]);
+    else if (daysBetween(last, today) >= 5)
+      items.push(["do","Nothing logged for "+daysBetween(last,today)+" days. Catch up now while you still remember.",0]);
+    else if (!loggedThisWeek)
+      items.push(["do","Nothing logged this week yet.",0]);
+    else items.push(["done","Logged something this week.",1]);
+
+    if (dow >= 4){        // Thursday onward
+      if (weekRec && weekRec.fit) items.push(["done","This week's two questions answered.",1]);
+      else items.push(["do","Answer this week's two questions on the <b>This week</b> tab: did it fit, and is anything worth flagging.",0]);
+    }
+    if (s.ctx === "879" && dow >= 4)
+      items.push(["do879","Export the Markdown and JSON and upload both to this week's TA Journal assignment in Canvas.",0]);
+  }
+
+  if (checksDone < CHECKS.length)
+    items.push(["do","<b>What I know</b> is "+checksDone+" of "+CHECKS.length+" filled in. Worth finishing in the first fortnight.",0]);
+  else items.push(["done","What I know is complete.",1]);
+
+  if (!fsHandle)
+    items.push(["do","Your journal is only in this browser. Link a file, or download the JSON, from <b>Export and setup</b>.",0]);
+  else items.push(["done","Saving to "+esc(fsHandle.name)+" as well as this browser.",1]);
+
+  const alloc = allocated(), avail = available();
+  if (avail && alloc && Math.abs(alloc-avail) > 0.01)
+    items.push(["do","Your courses add up to "+alloc+" hours but "+avail+" are available. Check the allocation.",0]);
+  if (!s.start || !s.end)
+    items.push(["do","Add your appointment start and end dates so the calendar spans the right period.",0]);
+
+  const todo = items.filter(i=>!i[2]);
+  const cls = todo.length ? "warn" : "ok";
+  const head = todo.length
+    ? (todo.length===1 ? "One thing to do" : todo.length+" things to do")
+    : "You are up to date";
+  return '<div class="callout '+cls+'"><strong>'+head+'</strong>'
+    + '<ul class="todo">'
+    + items.map(i=>'<li class="'+(i[2]?"done":"")+'">'
+        + (i[0]==="do879" ? '<span class="tag879">879</span> ' : '') + i[1] + '</li>').join('')
+    + '</ul></div>';
+}
+
 /* ---------- render --------------------------------------------------------*/
 function render(){
   // log list
@@ -611,6 +704,12 @@ function render(){
     + '<div><b>'+db.entries.length+'</b><span>entries</span></div>'
     + '<div><b>'+wk.length+'</b><span>weeks recorded</span></div>'
     + '<div><b>'+hrs(avg)+'</b><span>hours per week</span></div>';
+  const blocked = setupGaps().length > 0;
+  $("status").innerHTML = statusHTML();
+  $("e-form").disabled = blocked;
+  const goto = $("go-setup");
+  if (goto) goto.onclick = () => document.querySelector('nav button[data-tab=data]').click();
+
   $("cal-wrap").innerHTML = calendarHTML();
   $("chart-cat").innerHTML = barChart(byCat, total);
   const perCourse = courses().map((c,i)=>({k:c.code,
@@ -759,6 +858,7 @@ CATS.forEach(c=>{
   $("f-cat").insertAdjacentHTML("beforeend",'<option>'+esc(c)+'</option>');
 });
 $("e-add").onclick = async () => {
+  if (setupGaps().length){ flash($("e-msg"),"Finish the setup first."); return; }
   const date=$("e-date").value, mins=parseInt($("e-mins").value,10), what=$("e-what").value.trim();
   if(!date||!(mins>0)||!what){ flash($("e-msg"),"Date, minutes and what you did are all needed."); return; }
   const cl = courses();
@@ -837,9 +937,10 @@ $("fs-link").onclick = async () => {
       types:[{description:"JSON", accept:{"application/json":[".json"]}}]});
     await save();
     fsState("Linked to "+fsHandle.name+". Every change is written there as well as to this browser.");
+    render();
   }catch(e){ /* cancelled */ }
 };
-$("fs-unlink").onclick = ()=>{ fsHandle=null; initFs(); };
+$("fs-unlink").onclick = ()=>{ fsHandle=null; initFs(); render(); };
 $("wipe").onclick = async () => {
   if(!confirm("Delete every entry in this browser? Export first if you want to keep it.")) return;
   db = blank(); try{ localStorage.removeItem(KEY); }catch(e){}
