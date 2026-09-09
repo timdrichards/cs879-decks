@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TA Journal</title>
+<title>Staff Journal</title>
 <style>
 :root{
   /* --brand is the deep maroon that always carries white text: the header and the
@@ -122,7 +122,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 <body>
 <header>
   <div>
-    <h1>TA Journal</h1>
+    <h1>Staff Journal</h1>
     <p id="hdr-sub">Everything stays on this computer unless you export it</p>
   </div>
   <button id="theme" title="Light, dark, or follow your system"
@@ -290,12 +290,23 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   one knows whose it is.</p>
   <div class="row c2">
     <div><label for="s-name">Your name</label><input id="s-name" placeholder="For the exported files"></div>
+    <div><label for="s-role">Your role</label>
+      <select id="s-role">
+        <option value="TA">Teaching Assistant (TA)</option>
+        <option value="UCA">Undergraduate Course Assistant (UCA)</option>
+        <option value="Grader">Graduate grader</option>
+        <option value="TO">Teaching Occupation (TO)</option>
+      </select></div>
+  </div>
+  <div class="row c2">
     <div><label for="s-hours">Appointment, hours a week</label>
-      <input type="number" id="s-hours" min="1" max="40" step="1" placeholder="10"></div>
+      <input type="number" id="s-hours" min="1" max="40" step="0.5" placeholder="10"></div>
+    <div></div>
   </div>
   <p class="hint">The appointment hours are the contract total, before anything is taken off. It is
   what the dashboard measures your weeks against, so a wrong number here makes every later
-  comparison wrong.</p>
+  comparison wrong. UCA appointments are often 5 or 10 hours; graduate assistantships are usually
+  10 or 20.</p>
 
   <h3>Reserved hours and context</h3>
   <p class="hint">Reserved hours come off the appointment before regular duties, so they are not
@@ -326,7 +337,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   </div>
 
   <h3>Courses you are assisting</h3>
-  <p class="hint">Most TAs have one. If your appointment is split across two, add both and give each
+  <p class="hint">Most people have one. If your appointment is split across two, add both and give each
   the hours allocated to it. Every entry is then tagged with its course, the dashboard breaks the
   totals down, and you can produce a report for one instructor covering only their course.</p>
   <div id="courses"></div>
@@ -370,7 +381,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <h3>The short version</h3>
   <div class="callout">
     Log what you do as you do it. Once a week, look at the dashboard and write two lines about how
-    the week went. At the end of the term you will have something almost no TA has: a record of what
+    the week went. At the end of the term you will have something almost nobody on a course staff has: a record of what
     the job actually was, in your own words, with numbers attached.
   </div>
 
@@ -387,7 +398,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   something down while it was still fresh, looked at it later, and changed one thing.</p>
 
   <h3>Why it is worth it for you</h3>
-  <p><strong>You will know whether the job is what you were told it was.</strong> Most TAs have no
+  <p><strong>You will know whether the job is what you were told it was.</strong> Most people have no
   real idea whether they are working six hours or sixteen until something goes wrong late in the
   term, and by then the conversation is a complaint rather than a question. A weekly number turns
   &ldquo;this feels like a lot&rdquo; into &ldquo;this is the fourth week over my hours, here is
@@ -405,7 +416,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 
   <h3 class="only879"><span class="tag879">879</span> Why the course asks for it</h3>
   <div class="only879">
-    <p>Nobody currently knows how TA time is actually spent across the college, only how it is
+    <p>Nobody currently knows how staff time is actually spent across the college, only how it is
     estimated. This is the first cohort to measure it, and what you record will shape how
     appointments are set in future years.</p>
     <p>You upload the exported files to Canvas each Friday. There is no right number and nobody is
@@ -427,7 +438,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <p><strong>Once a week, look at the dashboard.</strong> It shows where your hours went and flags
   in red any week that ran past the hours available for regular duties. Then the This week tab: did
   it fit, and is anything worth flagging. Two lines.</p>
-  <p><strong>Fill in What I know early.</strong> Ten things every TA should be able to answer about
+  <p><strong>Fill in What I know early.</strong> Ten things everyone on a course staff should be able to answer about
   their own course, each asking you to write the policy in your own words. If you cannot put it in
   your own words, you have not read it yet, and week two is a much better time to discover that than
   week ten.</p>
@@ -503,7 +514,7 @@ const CHECKS = [
 
 const blank = () => ({
   version: 3,
-  student: {name:"", hours:10, reserved:0, ctx:"general", start:"", end:"",
+  student: {name:"", role:"TA", hours:10, reserved:0, ctx:"general", start:"", end:"",
             courses:[{code:"", instructor:"", hours:0}]},
   entries: [], checks: {}, weeks: [],
   updated: null
@@ -525,6 +536,7 @@ function migrate(d){
     d.version = 3;
   }
   if (d.student.start === undefined){ d.student.start = ""; d.student.end = ""; }
+  if (d.student.role === undefined) d.student.role = "TA";
   return d;
 }
 const courses = () => (db.student.courses||[]).filter(c=>c.code.trim());
@@ -844,7 +856,7 @@ function maybeNotify(){
   const todo = m.blocked ? m.gaps : m.items.filter(i=>!i[2]).map(i=>i[1]);
   if (!todo.length) return;
   const plain = t => String(t).replace(/<[^>]+>/g,"");
-  const n = new Notification("TA Journal", {
+  const n = new Notification("Staff Journal", {
     body: (m.blocked ? "Finish the setup before you start logging: " : "")
           + plain(todo[0]) + (todo.length>1 ? "\n+"+(todo.length-1)+" more" : ""),
     tag: "cs879-journal-daily"
@@ -902,7 +914,7 @@ function render(){
   $("budget-note").innerHTML = !wk.length
     ? 'Log a few entries and this will tell you whether your weeks fit inside your paid hours.'
     : (budget > 0
-        ? 'Your appointment leaves <strong>'+budget+' hours a week</strong> for regular TA duties'
+        ? 'Your appointment leaves <strong>'+budget+' hours a week</strong> for regular duties'
           + (res ? ', after the '+res+' reserved' + (db.student.ctx==="879" ? ' for 879' : '') : '')
           + '. Your average is <strong>'+hrs(avg)+'</strong>. '
           + (avg/60 > budget
@@ -981,9 +993,10 @@ function render(){
 function toMarkdown(){
   const s = db.student, total = db.entries.reduce((a,e)=>a+e.mins,0);
   const weeks = {}; db.entries.forEach(e=>{const w=sunday(e.date);(weeks[w]=weeks[w]||[]).push(e);});
-  let m = "# TA Journal — "+(s.name||"unnamed")+"\n\n";
+  let m = "# Staff Journal — "+(s.name||"unnamed")+"\n\n";
   m += "- **Course assisted:** "+(s.course||"—")+"\n";
   m += "- **Supervising instructor:** "+(s.professor||"—")+"\n";
+  m += "- **Role:** "+(s.role||"TA")+"\n";
   m += "- **Appointment:** "+s.hours+" hours a week"
      + (s.reserved ? " ("+available()+" for regular duties, "+s.reserved+" reserved"
                      + (s.ctx==="879" ? " for COMPSCI 879" : "")+")" : "")+"\n";
@@ -1090,6 +1103,7 @@ $("s-ctx").onchange = () => {
 $("s-save").onclick = async () => {
   db.student = Object.assign({}, db.student, {
     name:$("s-name").value.trim(),
+    role:$("s-role").value,
     hours:parseFloat($("s-hours").value)||0,
     reserved:parseFloat($("s-reserved").value)||0,
     ctx:$("s-ctx").value,
@@ -1154,7 +1168,7 @@ function reportHTML(from, to, course){
   };
 
   return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
-  + '<title>TA hours report'+(s.name?" — "+esc(s.name):"")+'</title><style>'
+  + '<title>Hours report'+(s.name?" — "+esc(s.name):"")+'</title><style>'
   + '@page{margin:16mm}'
   + 'body{font-family:Lato,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:#24292f;'
   + 'line-height:1.5;max-width:52rem;margin:0 auto;padding:1.5rem;font-size:15px}'
@@ -1179,16 +1193,16 @@ function reportHTML(from, to, course){
   + 'footer{margin-top:2.5rem;padding-top:.8rem;border-top:1px solid #d8d8d8;color:#57606a;font-size:.82rem}'
   + '@media print{body{padding:0;max-width:none}.noprint{display:none}h2{page-break-after:avoid}}'
   + '</style></head><body>'
-  + '<h1>TA hours report</h1>'
+  + '<h1>Hours report</h1>'
   + '<p class="meta">'
   +   (s.name ? '<b>'+esc(s.name)+'</b><br>' : '')
   +   (one
-        ? 'Assisting <b>'+esc(one.code)+'</b>'
+        ? esc(s.role||'TA')+' for <b>'+esc(one.code)+'</b>'
           + (one.instructor ? ' · supervising instructor <b>'+esc(one.instructor)+'</b>' : '')
           + '<br>Hours allocated to this course: <b>'+(one.hours||0)+' a week</b>'
           + (cl.length>1 ? ' (of a '+(s.hours||0)+'-hour appointment across '+cl.length+' courses)' : '')
         : (cl.length
-            ? 'Assisting <b>'+cl.map(c=>esc(c.code)).join('</b> and <b>')+'</b><br>'
+            ? esc(s.role||'TA')+' for <b>'+cl.map(c=>esc(c.code)).join('</b> and <b>')+'</b><br>'
               + 'Appointment <b>'+(s.hours||0)+' hours a week</b>'
               + (s.reserved ? ', of which <b>'+s.reserved+'</b> reserved'
                   + (s.ctx==="879" ? ' for COMPSCI 879' : '')
@@ -1258,7 +1272,7 @@ function initFs(){
 }
 function fill(){
   $("s-name").value=db.student.name;
-  $("s-hours").value=db.student.hours;
+  $("s-hours").value=db.student.hours; $("s-role").value=db.student.role||"TA";
   $("s-reserved").value=db.student.reserved; $("s-ctx").value=db.student.ctx;
   $("s-start").value=db.student.start||""; $("s-end").value=db.student.end||"";
 
