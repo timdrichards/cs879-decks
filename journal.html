@@ -22,6 +22,9 @@ nav button{flex:0 0 auto;padding:.75rem 1.15rem;border:0;background:none;font:in
 nav button[aria-selected=true]{color:var(--maroon);border-bottom-color:var(--maroon);background:#fff}
 main{max-width:60rem;margin:0 auto;padding:1.4rem}
 section[hidden]{display:none}
+/* .row sets display:grid, which is a class selector and so beats the user-agent
+   [hidden]{display:none}. Without this the course picker shows even when hidden. */
+[hidden]{display:none !important}
 h2{color:var(--maroon);font-size:1.15rem;margin:0 0 .3rem;font-weight:800}
 h2+.sub{color:var(--muted);margin:0 0 1.2rem;font-size:.94rem}
 h3{font-size:1rem;margin:1.6rem 0 .5rem}
