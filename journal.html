@@ -488,7 +488,7 @@ function render(){
     + '<th>Time</th><th>What you did</th><th></th></tr></thead><tbody>'
     + es.map(e=>'<tr><td>'+fmtDate(e.date)+'</td>'
         + (showCourse?'<td><span class="pill">'+esc(e.course||"—")+'</span></td>':'')
-        + '<td><span class="pill">'+esc(e.cat)+'</span></td>''
+        + '<td><span class="pill">'+esc(e.cat)+'</span></td>'
         + '<td>'+hrs(e.mins)+' h</td>'
         + '<td>'+esc(e.what)+(e.note?'<div style="color:var(--muted);font-size:.87rem;margin-top:.2rem">'+esc(e.note)+'</div>':'')+'</td>'
         + '<td><button class="tiny" data-del="'+e.id+'">delete</button></td></tr>').join('')
