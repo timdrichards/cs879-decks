@@ -158,10 +158,19 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 <!-- ============================ THIS WEEK ========================== -->
 <section id="week" hidden>
   <h2>This week</h2>
-  <p class="sub">Two questions at the end of each week. This is what you bring to Studio on Friday.</p>
-  <div class="row c2">
-    <div><label for="w-of">Week beginning (Sunday)</label><input type="date" id="w-of"></div>
-    <div><label for="w-fit">Did it fit inside your paid hours?</label>
+  <p class="sub">Two questions at the end of each week: <strong>did it fit</strong>, and
+  <strong>is anything worth flagging</strong>. A minute, once a week, and it is the part that turns
+  a pile of entries into something you can act on.</p>
+  <p class="only879" style="font-size:.92rem;color:var(--muted);margin:-.6rem 0 1.2rem">
+    <span class="tag879">879</span> Answer them before Friday. They are what the five minutes at the
+    start of Studio is for.</p>
+  <div class="row"><div style="max-width:22rem">
+    <label for="w-of">Which week</label><input type="date" id="w-of">
+    <p style="font-size:.85rem;color:var(--muted);margin:.25rem 0 0">Any day in the week will do; it
+    snaps to that week's Sunday.</p>
+  </div></div>
+  <div class="row"><div style="max-width:22rem">
+    <label for="w-fit">1. Did the week fit inside your paid hours?</label>
       <select id="w-fit">
         <option value="">&mdash;</option>
         <option>Comfortably under</option>
@@ -171,7 +180,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
       </select></div>
   </div>
   <div class="row"><div>
-    <label for="w-flag">Anything worth flagging?</label>
+    <label for="w-flag">2. Anything worth flagging?</label>
     <textarea id="w-flag" placeholder="Something that took far longer than expected, something you were asked to do that you were not sure was yours, or something you want to raise with your instructor and have not yet."></textarea>
   </div></div>
   <div class="bar"><button class="act" id="w-save">Save week</button><span class="saved" id="w-msg"></span></div>
@@ -182,7 +191,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 <!-- ========================= EXPORT & SETUP ======================== -->
 <section id="data" hidden>
   <h2>Export and setup</h2>
-  <p class="sub">Download the two files and submit them to Canvas each Friday.</p>
+  <p class="sub">Your journal as files you can keep, hand on, or load back in.</p>
 
   <div class="bar">
     <button class="act" id="dl-md">Download Markdown</button>
@@ -354,8 +363,8 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 </section>
 
 <footer>
-  Your data never leaves this computer on its own. Exporting and submitting to Canvas is the only
-  time it moves, and you do that deliberately.
+  Your data never leaves this computer on its own. It moves only when you export it, print it, or
+  hand it to someone, and you do each of those deliberately.
 </footer>
 </main>
 
