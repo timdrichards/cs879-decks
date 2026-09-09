@@ -114,6 +114,14 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .reveal .slide-number{ background:transparent; color:var(--slate); font-size:15px;
   right:auto; left:14px; bottom:10px; }
 .reveal .controls{ right:auto; left:8px; bottom:34px; color:var(--maroon); }
+
+/* Submission slides carry a full student answer, a rubric strip and a timer at once,
+   which does not fit at the deck's default rhythm. Tighten just these. */
+.sub h2{ margin-top:14px; margin-bottom:14px; }
+.sub .tiny{ margin:10px 0; line-height:1.34; }
+.sub .rubric{ border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+  padding:7px 0; margin:12px 0; color:var(--slate); }
+.sub .timer{ margin-top:12px; }
 </style>
 </head>
 <body>
@@ -213,53 +221,48 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 
 </section>
 
-<section data-obj="2">
+<section data-obj="2" class="go">
+<span class="tag">YOUR TURN · 2 MIN EACH</span>
 <h3>How you will mark it</h3>
 <h2>The rubric</h2>
-<p>Ten points, four criteria. Use it on all four submissions.</p>
+<p>Ten points, four criteria, two minutes each. Follow along on the <a href="https://timdrichards.github.io/cs879-decks/unit01-grade-these-four.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">handout</a>.</p>
 <p class="fragment tiny"><strong>Scope, 3.</strong> <code>var</code> is function-scoped, <code>let</code> and <code>const</code> are block-scoped.</p>
 <p class="fragment tiny"><strong>const, 2.</strong> Prevents reassignment of the binding, not mutation of the value.</p>
 <p class="fragment tiny"><strong>The bug, 4.</strong> A concrete bug caused by the wrong choice, correctly explained.</p>
 <p class="fragment tiny"><strong>Clarity, 1.</strong> Readable, and within the word count.</p>
-<div class="fragment callout">Apply it honestly. Do not adjust it as you go.</div>
+<div class="fragment callout">Apply it honestly, and do not adjust it as you go. No conferring.</div>
 
 </section>
 
-<section data-obj="2" class="go">
-<span class="tag">YOUR TURN · 8 MIN</span>
-<h3>The part worth staying for</h3>
-<h2>Grade these four</h2>
-<p><a href="https://timdrichards.github.io/cs879-decks/unit01-grade-these-four.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Four submissions</a> to the same short-answer question. Give each a grade out of 10 and say what you would do next.</p>
-<p class="lede">Write it down before we talk. No conferring.</p>
-<div class="timer compact" data-phases="Grade:480"></div>
-
-</section>
-
-<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="2">
-<h3>Submission</h3>
-<h2>1</h2>
+<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="2" class="go sub">
+<h2>Submission 1</h2>
 <p class="tiny"><code>var</code> is function scoped and the other two are block scoped. So if you use <code>var</code> inside a for loop the variable leaks out of the loop, but <code>let</code> stays inside the braces. <code>const</code> means you cant reassign it, though you can still change whats inside an object which confused me at first.<br><br>A bug from using the wrong one. I had a loop where I made buttons and added a click handler that logged the counter <code>i</code>. With <code>var</code> every button logged the same number, the last one, because they all shared the one <code>i</code>. Switching it to <code>let</code> fixed it because each iteration got its own <code>i</code>. I still don't totally get why the closure captures it differently but it worked.</p>
+<p class="tiny rubric"><strong>Rubric</strong> &nbsp; Scope <strong>3</strong> &nbsp;·&nbsp; <code>const</code> <strong>2</strong> &nbsp;·&nbsp; The bug <strong>4</strong> &nbsp;·&nbsp; Clarity <strong>1</strong></p>
+<div class="timer compact" data-phases="Grade:120"></div>
 
 </section>
 
-<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="2">
-<h3>Submission</h3>
-<h2>2</h2>
+<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="2" class="go sub">
+<h2>Submission 2</h2>
 <p class="tiny">JavaScript provides three variable declaration keywords, each with distinct scoping and mutability characteristics.<br><br><code>var</code> declarations are function-scoped and are hoisted to the top of their enclosing function, initialized as <code>undefined</code>. <code>let</code> and <code>const</code> are block-scoped and are subject to the temporal dead zone. <code>const</code> additionally prevents reassignment of the binding, though it does not render the referenced value immutable.<br><br>A common bug arises when <code>var</code> is used within a loop that creates closures. Because <code>var</code> is function-scoped, all closures share a single variable binding, causing each to observe the final value after the loop completes. Using <code>let</code> creates a new binding per iteration.<br><br>Selecting the appropriate declaration keyword is therefore essential for predictable behavior.</p>
+<p class="tiny rubric"><strong>Rubric</strong> &nbsp; Scope <strong>3</strong> &nbsp;·&nbsp; <code>const</code> <strong>2</strong> &nbsp;·&nbsp; The bug <strong>4</strong> &nbsp;·&nbsp; Clarity <strong>1</strong></p>
+<div class="timer compact" data-phases="Grade:120"></div>
 
 </section>
 
-<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="2">
-<h3>Submission</h3>
-<h2>3</h2>
+<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="2" class="go sub">
+<h2>Submission 3</h2>
 <p class="tiny">The three differ along two axes: scope and reassignability.<br><br>Scope. <code>var</code> is function-scoped, so it escapes blocks. <code>let</code> and <code>const</code> are block-scoped. Reassignability. <code>var</code> and <code>let</code> can be reassigned, <code>const</code> cannot, though <code>const</code> only freezes the binding, not the object. <code>const arr = []</code> still permits <code>arr.push(1)</code>.<br><br>The bug I actually hit was on the assignment where we had to make the image grid clickable. I built the click handlers in a <code>for (var i...)</code> loop and every single thumbnail opened the last picture. Took me an hour. All six handlers were closing over the same <code>i</code>, which by then was 6.<br><br>Since then I default to <code>const</code>, switch to <code>let</code> only when I know I am reassigning, and never reach for <code>var</code>.</p>
+<p class="tiny rubric"><strong>Rubric</strong> &nbsp; Scope <strong>3</strong> &nbsp;·&nbsp; <code>const</code> <strong>2</strong> &nbsp;·&nbsp; The bug <strong>4</strong> &nbsp;·&nbsp; Clarity <strong>1</strong></p>
+<div class="timer compact" data-phases="Grade:120"></div>
 
 </section>
 
-<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="2">
-<h3>Submission</h3>
-<h2>4</h2>
+<section data-auto-animate data-auto-animate-easing="ease-in-out" data-obj="2" class="go sub">
+<h2>Submission 4</h2>
 <p class="tiny">Scope is the main difference. <code>var</code> is scoped to the enclosing function; <code>let</code> and <code>const</code> are scoped to the enclosing block. <code>const</code> also prevents reassignment of the binding itself, though the value it points at can still be mutated.<br><br>The classic bug is the loop-closure problem. If you register callbacks inside a <code>for (var i = 0; ...)</code> loop, all of them share one <code>i</code> and see its final value. With <code>let</code>, each iteration binds a fresh <code>i</code>.<br><br>There is a related trap that got me on the one where we pulled data from the API. I had <code>const</code> on a variable I was reassigning inside a <code>.then()</code>, and the TypeError it threw looked to me like the request had failed, because it surfaced inside the promise chain instead of at the declaration.</p>
+<p class="tiny rubric"><strong>Rubric</strong> &nbsp; Scope <strong>3</strong> &nbsp;·&nbsp; <code>const</code> <strong>2</strong> &nbsp;·&nbsp; The bug <strong>4</strong> &nbsp;·&nbsp; Clarity <strong>1</strong></p>
+<div class="timer compact" data-phases="Grade:120"></div>
 
 </section>
 
