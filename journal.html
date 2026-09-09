@@ -484,6 +484,9 @@ const CATS = ["Office hours and help sessions","Section, lab or recitation","Gra
 // dark background, and the dark one washes out on white.
 const COLORS_LIGHT = ["#7B1416","#A63A3C","#1F7A4D","#2F6F9F","#9A6700","#5B4B8A","#3E7C7B","#6B6B6B"];
 const COLORS_DARK  = ["#F0908F","#D3706F","#5CC08E","#6FA8D8","#D9A441","#A furthest","#6FBDBB","#A3ADB8"];
+const OK_DARK="#5CC08E", OK_LIGHT="#1F7A4D", BAD_DARK="#EE8087", BAD_LIGHT="#A4262C";
+const okC = () => isDark() ? OK_DARK : OK_LIGHT;
+const badC = () => isDark() ? BAD_DARK : BAD_LIGHT;
 const isDark = () => document.documentElement.dataset.theme === "dark"
   || (!document.documentElement.dataset.theme
       && matchMedia("(prefers-color-scheme: dark)").matches);
@@ -909,7 +912,7 @@ function render(){
   $("chart-course").innerHTML = perCourse.length>1 ? barChart(perCourse, total) : "";
   $("course-head").hidden = perCourse.length<2;
   $("chart-week").innerHTML = barChart(wk.map(w=>({k:"Week of "+fmtDate(w), v:weeks[w],
-      c: weeks[w]/60 > budget ? "#A4262C" : "#1F7A4D"})), total);
+      c: weeks[w]/60 > budget ? badC() : okC()})), total);
   const res = +db.student.reserved || 0;
   $("budget-note").innerHTML = !wk.length
     ? 'Log a few entries and this will tell you whether your weeks fit inside your paid hours.'
