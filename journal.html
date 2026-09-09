@@ -6,20 +6,42 @@
 <title>TA Journal</title>
 <style>
 :root{
+  /* --brand is the deep maroon that always carries white text: the header and the
+     solid buttons. --maroon is the accent used *on* the page background, so it has
+     to lighten in dark mode or headings disappear against it. Keeping the two
+     separate is what lets one stylesheet serve both themes. */
+  --brand:#7B1416; --brand-hi:#8f1a1c;
   --maroon:#7B1416; --ink:#24292f; --muted:#57606a; --rule:#d8d8d8;
-  --wash:#f6f6f5; --go:#1F7A4D; --amber:#9A6700; --red:#A4262C;
+  --bg:#ffffff; --panel:#ffffff; --wash:#f6f6f5;
+  --go:#1F7A4D; --amber:#9A6700; --red:#A4262C;
+  --warn-bg:#FFF8E5; --stop-bg:#FDF3F3; --ok-bg:#F3FAF6;
   --font:Lato,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
 }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --maroon:#F0908F; --ink:#e7e9ec; --muted:#9aa3ad; --rule:#333a44;
+    --bg:#14161a; --panel:#1b1e24; --wash:#22262e;
+    --go:#5CC08E; --amber:#D9A441; --red:#EE8087;
+    --warn-bg:#2C2617; --stop-bg:#2E1B1D; --ok-bg:#17281F;
+  }
+}
+:root[data-theme="dark"]{
+  --maroon:#F0908F; --ink:#e7e9ec; --muted:#9aa3ad; --rule:#333a44;
+  --bg:#14161a; --panel:#1b1e24; --wash:#22262e;
+  --go:#5CC08E; --amber:#D9A441; --red:#EE8087;
+  --warn-bg:#2C2617; --stop-bg:#2E1B1D; --ok-bg:#17281F;
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:var(--font);color:var(--ink);background:#fff;line-height:1.55;font-size:16px}
-header{background:var(--maroon);color:#fff;padding:1.1rem 1.4rem}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55;font-size:16px}
+header{background:var(--brand);color:#fff;padding:1.1rem 1.4rem;display:flex;
+  justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
 header h1{margin:0;font-size:1.25rem;font-weight:800;letter-spacing:.01em}
 header p{margin:.25rem 0 0;opacity:.85;font-size:.9rem}
 nav{display:flex;gap:0;border-bottom:2px solid var(--rule);background:var(--wash);
   position:sticky;top:0;z-index:5;overflow-x:auto}
 nav button{flex:0 0 auto;padding:.75rem 1.15rem;border:0;background:none;font:inherit;
   font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent}
-nav button[aria-selected=true]{color:var(--maroon);border-bottom-color:var(--maroon);background:#fff}
+nav button[aria-selected=true]{color:var(--maroon);border-bottom-color:var(--maroon);background:var(--bg)}
 main{max-width:60rem;margin:0 auto;padding:1.4rem}
 section[hidden]{display:none}
 /* .row sets display:grid, which is a class selector and so beats the user-agent
@@ -30,7 +52,8 @@ h2+.sub{color:var(--muted);margin:0 0 1.2rem;font-size:.94rem}
 h3{font-size:1rem;margin:1.6rem 0 .5rem}
 label{display:block;font-weight:700;font-size:.86rem;margin:0 0 .25rem;color:var(--muted)}
 input,select,textarea{width:100%;padding:.5rem .6rem;border:1px solid var(--rule);border-radius:4px;
-  font:inherit;background:#fff;color:var(--ink)}
+  font:inherit;background:var(--panel);color:var(--ink)}
+input[type=date]{color-scheme:light dark}
 textarea{min-height:4.5rem;resize:vertical}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--maroon);outline-offset:1px;border-color:var(--maroon)}
 .row{display:grid;gap:.8rem;margin-bottom:.8rem}
@@ -38,20 +61,20 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--maroon);outline-
 .row.c3{grid-template-columns:1fr 1fr 1fr}
 .row.c4{grid-template-columns:repeat(4,1fr)}
 @media(max-width:640px){.row.c2,.row.c3,.row.c4{grid-template-columns:1fr}}
-button.act{background:var(--maroon);color:#fff;border:0;border-radius:4px;padding:.55rem 1.1rem;
+button.act{background:var(--brand);color:#fff;border:0;border-radius:4px;padding:.55rem 1.1rem;
   font:inherit;font-weight:700;cursor:pointer}
-button.act:hover{background:#8f1a1c}
-button.ghost{background:#fff;color:var(--maroon);border:2px solid var(--maroon)}
+button.act:hover{background:var(--brand-hi)}
+button.ghost{background:var(--panel);color:var(--maroon);border:2px solid var(--maroon)}
 button.ghost:hover{background:var(--wash)}
 button.tiny{padding:.2rem .5rem;font-size:.8rem;font-weight:700;border:1px solid var(--rule);
-  background:#fff;border-radius:3px;cursor:pointer;color:var(--muted)}
+  background:var(--panel);border-radius:3px;cursor:pointer;color:var(--muted)}
 button.tiny:hover{border-color:var(--maroon);color:var(--maroon)}
 .bar{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin:1rem 0}
 .callout{background:var(--wash);border-left:4px solid var(--maroon);padding:.85rem 1.1rem;
   border-radius:0 3px 3px 0;margin:0 0 1.2rem;font-size:.95rem}
-.warn{border-left-color:var(--amber);background:#FFF8E5}
-.stop{border-left-color:var(--red);background:#FDF3F3}
-.ok{border-left-color:var(--go);background:#F3FAF6}
+.warn{border-left-color:var(--amber);background:var(--warn-bg)}
+.stop{border-left-color:var(--red);background:var(--stop-bg)}
+.ok{border-left-color:var(--go);background:var(--ok-bg)}
 #e-form[disabled]{opacity:.45;pointer-events:none}
 .todo{margin:.5rem 0 0;padding-left:1.15rem}
 .todo li{margin:0 0 .3rem}
@@ -65,7 +88,7 @@ th{background:var(--wash);font-size:.82rem;text-transform:uppercase;letter-spaci
 .stat b{display:block;font-size:1.7rem;line-height:1.1;color:var(--maroon)}
 .stat span{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .chk{border:1px solid var(--rule);border-radius:5px;padding:.8rem 1rem;margin:0 0 .7rem}
-.chk.done{border-color:var(--go);background:#F3FAF6}
+.chk.done{border-color:var(--go);background:var(--ok-bg)}
 .chk .top{display:flex;gap:.6rem;align-items:flex-start}
 .chk input[type=checkbox]{width:1.15rem;height:1.15rem;margin-top:.15rem;flex:0 0 auto;accent-color:var(--go)}
 .chk strong{font-size:.98rem}
@@ -75,7 +98,8 @@ th{background:var(--wash);font-size:.82rem;text-transform:uppercase;letter-spaci
   background:var(--wash);border:1px solid var(--rule);color:var(--muted);white-space:nowrap}
 .saved{font-size:.85rem;color:var(--muted)}
 .saved b{color:var(--go)}
-.tag879{display:inline-block;background:var(--maroon);color:#fff;font-size:.7rem;font-weight:800;
+.hint{font-size:.9rem;color:var(--muted);margin:-.1rem 0 .8rem;max-width:44rem}
+.tag879{display:inline-block;background:var(--brand);color:#fff;font-size:.7rem;font-weight:800;
   letter-spacing:.05em;padding:.05rem .4rem;border-radius:3px;vertical-align:.08em}
 .only879{display:none}
 body.is879 .only879{display:block}
@@ -86,7 +110,7 @@ svg text{font-family:var(--font)}
   padding-top:1.15rem;line-height:15px}
 .calgrid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,15px);gap:3px}
 .calmonths{display:grid;grid-auto-flow:column;gap:3px;font-size:.72rem;color:var(--muted);height:1.15rem}
-.calcell{width:15px;height:15px;border-radius:2px;background:#efedeb;cursor:default}
+.calcell{width:15px;height:15px;border-radius:2px;background:var(--wash);cursor:default}
 .calcell[data-n]{cursor:pointer}
 .calcell.out{background:transparent}
 .calcell:hover{outline:2px solid var(--maroon);outline-offset:1px}
@@ -97,8 +121,14 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 </head>
 <body>
 <header>
-  <h1>TA Journal</h1>
-  <p id="hdr-sub">Everything stays on this computer unless you export it</p>
+  <div>
+    <h1>TA Journal</h1>
+    <p id="hdr-sub">Everything stays on this computer unless you export it</p>
+  </div>
+  <button id="theme" title="Light, dark, or follow your system"
+    style="background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4);
+           border-radius:4px;padding:.4rem .85rem;font:inherit;font-size:.85rem;font-weight:700;
+           cursor:pointer;white-space:nowrap"></button>
 </header>
 
 <nav role="tablist">
@@ -106,7 +136,8 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <button role="tab" data-tab="dash" aria-selected="false">Dashboard</button>
   <button role="tab" data-tab="know" aria-selected="false">What I know</button>
   <button role="tab" data-tab="week" aria-selected="false">This week</button>
-  <button role="tab" data-tab="data" aria-selected="false">Export &amp; setup</button>
+  <button role="tab" data-tab="data" aria-selected="false">Export</button>
+  <button role="tab" data-tab="setup" aria-selected="false">Setup</button>
   <button role="tab" data-tab="help" aria-selected="false">How this works</button>
 </nav>
 
@@ -217,56 +248,62 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 
 <!-- ========================= EXPORT & SETUP ======================== -->
 <section id="data" hidden>
-  <h2>Export and setup</h2>
-  <p class="sub">Your journal as files you can keep, hand on, or load back in.</p>
+  <h2>Export</h2>
+  <p class="sub">Getting your journal out: as files to keep, or as a report to hand to someone.</p>
 
+  <h3>The two files</h3>
+  <p class="hint">The <strong>Markdown</strong> is your journal, readable by anyone, week by week
+  with the policies you wrote in your own words. The <strong>JSON</strong> is the same data in the
+  form this tool reads back, so it is the one to keep if you ever need to restore.</p>
   <div class="bar">
     <button class="act" id="dl-md">Download Markdown</button>
     <button class="act" id="dl-json">Download JSON</button>
     <button class="ghost" id="imp">Import a JSON backup</button>
     <input type="file" id="imp-file" accept="application/json,.json" hidden>
   </div>
-  <p class="only879" style="font-size:.9rem;color:var(--muted);margin-top:-.4rem">
-    <span class="tag879">879</span> Upload both files to that week's TA Journal assignment in Canvas
-    each Friday.</p>
+  <p class="hint">Importing replaces everything currently in this browser, so export first if you
+  are not sure.</p>
+  <p class="only879 hint"><span class="tag879">879</span> Upload both files to that week's TA
+  Journal assignment in Canvas each Friday.</p>
 
   <h3>Report for your instructor</h3>
-  <p style="font-size:.94rem">A printable summary of your hours and what you spent them on. Opens in
-  a new tab; use your browser's Print command and choose Save as PDF. Send it when an instructor asks
-  where your time is going, or when you want evidence for a conversation about workload.</p>
+  <p class="hint">A printable summary of your hours and what you spent them on. Opens in a new tab;
+  use your browser's Print command and choose Save as PDF. Send it when an instructor asks where
+  your time is going, or when you want evidence behind a conversation about workload. Limit it to a
+  date range, or to one course if only one instructor is asking.</p>
   <div class="row c3">
     <div><label for="r-from">From</label><input type="date" id="r-from"></div>
     <div><label for="r-to">To</label><input type="date" id="r-to"></div>
     <div><label for="r-course">Course</label><select id="r-course"></select></div>
   </div>
-  <div class="bar" style="margin-top:-.3rem">
-    <button class="act" id="mk-report">Open printable report</button>
-  </div>
-  <p style="font-size:.87rem;color:var(--muted);margin-top:-.3rem">Leave the dates empty for
-  everything you have logged.</p>
+  <p class="hint">Leave the dates empty for everything you have logged.</p>
+  <div class="bar"><button class="act" id="mk-report">Open printable report</button></div>
+</section>
 
-  <h3>Keeping your journal safe</h3>
-  <div class="callout" id="fs-state"></div>
-  <div class="bar">
-    <button class="ghost" id="fs-link">Link a file on this computer</button>
-    <button class="tiny" id="fs-unlink">Unlink</button>
-  </div>
-  <p style="font-size:.9rem;color:var(--muted)">
-    Your journal is saved in this browser automatically. Browser storage can be cleared without
-    warning, so link a file as well: the journal is then written to a real file on your disk every
-    time it changes, and you can keep that file in Dropbox, iCloud, OneDrive or a git repository and
-    have it follow you between machines. If your browser does not support linking, download the JSON
-    each week instead and import it if you ever lose the browser copy.
-  </p>
+<section id="setup" hidden>
+  <h2>Setup</h2>
+  <p class="sub">Done once, at the start. Everything here shapes what the dashboard, the exports and
+  the report can tell you, which is why you cannot log anything until the essentials are in.</p>
 
   <h3>About you</h3>
+  <p class="hint">Your name goes at the top of the exported files and the report, so whoever reads
+  one knows whose it is.</p>
   <div class="row c2">
     <div><label for="s-name">Your name</label><input id="s-name" placeholder="For the exported files"></div>
     <div><label for="s-hours">Appointment, hours a week</label>
       <input type="number" id="s-hours" min="1" max="40" step="1" placeholder="10"></div>
   </div>
+  <p class="hint">The appointment hours are the contract total, before anything is taken off. It is
+  what the dashboard measures your weeks against, so a wrong number here makes every later
+  comparison wrong.</p>
+
+  <h3>Reserved hours and context</h3>
+  <p class="hint">Reserved hours come off the appointment before regular duties, so they are not
+  counted as time available for the course you assist. If nothing is reserved, leave it at 0.
+  <span class="tag879">879</span> In COMPSCI 879 three hours a week are encumbered for the course
+  itself, so a 10-hour TA has 7 for regular duties and a 20-hour TA has 17.</p>
   <div class="row c2">
-    <div><label for="s-reserved">Hours a week reserved for training or other duties</label>
+    <div><label for="s-reserved">Hours a week reserved</label>
       <input type="number" id="s-reserved" min="0" max="20" step="0.5" placeholder="0"></div>
     <div><label for="s-ctx">This journal is for</label>
       <select id="s-ctx">
@@ -274,24 +311,24 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
         <option value="879">COMPSCI 879, the TA training practicum</option>
       </select></div>
   </div>
-  <p style="font-size:.9rem;color:var(--muted);margin-top:-.3rem">
-    <strong>Reserved hours</strong> come off your appointment before regular duties. If nothing is
-    reserved, leave it at 0. <span class="tag879">879</span> In COMPSCI 879 three hours a week are
-    encumbered for the course, so a 10-hour TA has 7 for regular duties and a 20-hour TA has 17.
-  </p>
+  <p class="hint">Choosing COMPSCI 879 fills in the three reserved hours and the Fall 2026
+  appointment dates, and turns on the reminders about weekly uploads to Canvas. Leave it on the
+  general setting for any other appointment and nothing about 879 appears anywhere.</p>
+
+  <h3>Appointment dates</h3>
+  <p class="hint">These set the span of the calendar on the dashboard and head the report, so a
+  reader can see the period your hours sit inside. Days outside them are left blank on the calendar.
+  <span class="tag879">879</span> Fall 2026 runs Sunday 6 September 2026 to Saturday 16 January
+  2027.</p>
   <div class="row c2">
     <div><label for="s-start">Appointment starts</label><input type="date" id="s-start"></div>
     <div><label for="s-end">Appointment ends</label><input type="date" id="s-end"></div>
   </div>
-  <p style="font-size:.9rem;color:var(--muted);margin-top:-.3rem">
-    Used to set the span of the calendar and to head the report. <span class="tag879">879</span>
-    For Fall 2026 the appointment runs Sunday 6 September 2026 to Saturday 16 January 2027;
-    choosing COMPSCI 879 above fills those in.</p>
 
   <h3>Courses you are assisting</h3>
-  <p style="font-size:.9rem;color:var(--muted);margin-top:-.2rem">Most TAs have one. If your
-  appointment is split across two, add both and give each the hours allocated to it, so you can see
-  and report them separately.</p>
+  <p class="hint">Most TAs have one. If your appointment is split across two, add both and give each
+  the hours allocated to it. Every entry is then tagged with its course, the dashboard breaks the
+  totals down, and you can produce a report for one instructor covering only their course.</p>
   <div id="courses"></div>
   <div class="bar" style="margin-top:.4rem">
     <button class="tiny" id="c-add">Add another course</button>
@@ -300,7 +337,20 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 
   <div class="bar"><button class="act" id="s-save">Save</button><span class="saved" id="s-msg"></span></div>
 
+  <h3>Keeping your journal safe</h3>
+  <p class="hint">Your journal is saved in this browser automatically. Browser storage can be
+  cleared without warning, and a term-long journal is worth more than that. Linking a file writes it
+  to a real file on your disk every time it changes; keep that file somewhere that syncs and it
+  follows you between machines. Chrome and Edge support this; on other browsers download the JSON
+  regularly instead.</p>
+  <div class="callout" id="fs-state"></div>
+  <div class="bar">
+    <button class="ghost" id="fs-link">Link a file on this computer</button>
+    <button class="tiny" id="fs-unlink">Unlink</button>
+  </div>
+
   <h3>Start over</h3>
+  <p class="hint">Wipes everything in this browser. Export first if you want to keep any of it.</p>
   <div class="bar"><button class="tiny" id="wipe">Delete everything in this browser</button></div>
 </section>
 
@@ -357,7 +407,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   </div>
 
   <h3>Using it</h3>
-  <p><strong>Set yourself up first.</strong> On the Export and setup tab, put in your appointment
+  <p><strong>Set yourself up first.</strong> On the Setup tab, put in your appointment
   hours, anything reserved off the top, and the course or courses you are assisting. If your
   appointment is split across two courses, add both with the hours allocated to each; every entry
   then gets tagged and you can report on them separately.</p>
@@ -385,7 +435,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <h3>Where your data lives</h3>
   <p>In this browser, on this computer. It is not sent anywhere and there is no account. That also
   means nobody can recover it for you, so do one of these:</p>
-  <p><strong>Link a file</strong> from the Export tab if you are on Chrome or Edge. The journal is
+  <p><strong>Link a file</strong> from the Setup tab if you are on Chrome or Edge. The journal is
   then written to a real file on your disk every time it changes. Put that file somewhere that syncs
   and it follows you between machines and survives a cleared browser.</p>
   <p><strong>Or download the JSON regularly</strong> and keep it safe. If you ever lose the browser
@@ -410,7 +460,15 @@ const KEY = "cs879-ta-journal-v1";
 const CATS = ["Office hours and help sessions","Section, lab or recitation","Grading",
   "Questions online and by email","Preparing materials","Staff meetings",
   "Proctoring and exam logistics","Other"];
-const COLORS = ["#7B1416","#A63A3C","#1F7A4D","#2F6F9F","#9A6700","#5B4B8A","#3E7C7B","#6B6B6B"];
+// Chart bars and calendar squares are painted from JS, so they cannot inherit a CSS
+// variable. Two palettes, picked at draw time: the light one is too dark to read on a
+// dark background, and the dark one washes out on white.
+const COLORS_LIGHT = ["#7B1416","#A63A3C","#1F7A4D","#2F6F9F","#9A6700","#5B4B8A","#3E7C7B","#6B6B6B"];
+const COLORS_DARK  = ["#F0908F","#D3706F","#5CC08E","#6FA8D8","#D9A441","#A furthest","#6FBDBB","#A3ADB8"];
+const isDark = () => document.documentElement.dataset.theme === "dark"
+  || (!document.documentElement.dataset.theme
+      && matchMedia("(prefers-color-scheme: dark)").matches);
+Object.defineProperty(window, "COLORS", { get: () => isDark() ? COLORS_DARK : COLORS_LIGHT });
 
 const CHECKS = [
   ["syllabus","I have read the syllabus of the course I am assisting",
@@ -528,7 +586,9 @@ function barChart(rows, total){
    journal actually raises: not "how many hours" but "am I still doing this".
    Hovering a square fills the panel underneath rather than relying on a tooltip,
    because several entries on one day do not fit in a title attribute. --------*/
-const CALSHADE = ["#efedeb","#E8CFCF","#D09A9B","#A9484A","#7B1416"];
+const CALSHADE_LIGHT = ["#efedeb","#E8CFCF","#D09A9B","#A9484A","#7B1416"];
+const CALSHADE = () => isDark() ? CALSHADE_DARK : CALSHADE_LIGHT;
+const CALSHADE_DARK  = ["#22262e","#4A2A2E","#7A3B40","#B05B5E","#F0908F"];
 function addDays(iso, n){ const d=new Date(iso+"T12:00:00"); d.setDate(d.getDate()+n);
   return d.toISOString().slice(0,10); }
 function calendarHTML(){
@@ -561,7 +621,7 @@ function calendarHTML(){
       const lvl = !m ? 0 : Math.min(4, 1+Math.floor((m/peak)*3.999));
       cells.push('<div class="calcell'+(out?' out':'')+'" data-d="'+d+'"'
         + (n?' data-n="'+n+'"':'')
-        + ' style="background:'+(out?'transparent':CALSHADE[lvl])+'"'
+        + ' style="background:'+(out?'transparent':CALSHADE()[lvl])+'"'
         + ' title="'+d+(n?': '+hrs(m)+' h, '+n+' entr'+(n>1?'ies':'y'):': nothing logged')+'"></div>');
     }
   }
@@ -573,7 +633,7 @@ function calendarHTML(){
     + '<div><div class="calmonths" style="grid-template-columns:repeat('+weeks+',15px)">'+months.join("")+'</div>'
     + '<div class="calgrid">'+ordered.join("")+'</div></div></div>'
     + '<div class="callegend">Less'
-    + CALSHADE.map(c=>'<i style="background:'+c+'"></i>').join("")
+    + CALSHADE().map(c=>'<i style="background:'+c+'"></i>').join("")
     + 'More · squares outside your appointment are left blank</div>';
 }
 function calDetail(d){
@@ -589,6 +649,34 @@ function calDetail(d){
         + '<span class="pill">'+esc(e.cat)+'</span> '+hrs(e.mins)+' h — '+esc(e.what)
         + (e.note?'<div style="color:var(--muted);font-size:.88rem">'+esc(e.note)+'</div>':'')
         + '</li>').join('') + '</ul>';
+}
+
+/* ---------- theme ----------------------------------------------------------
+   Three states rather than two. "auto" is the default and follows the system, so
+   someone who never touches the button still gets dark at night. The choice is
+   kept out of the journal data: it belongs to this browser, not to the record. */
+const THEMES = ["auto","light","dark"];
+const THEME_KEY = KEY + "-theme";
+function applyTheme(t){
+  if (t === "auto") delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = t;
+  const b = $("theme");
+  if (b) b.textContent = t === "auto" ? "Theme: auto" : (t === "dark" ? "Theme: dark" : "Theme: light");
+  try{ localStorage.setItem(THEME_KEY, t); }catch(e){}
+  if (typeof db !== "undefined") render();
+}
+function initTheme(){
+  let t = "auto";
+  try{ t = localStorage.getItem(THEME_KEY) || "auto"; }catch(e){}
+  applyTheme(THEMES.includes(t) ? t : "auto");
+  $("theme").onclick = () => {
+    let cur = "auto";
+    try{ cur = localStorage.getItem(THEME_KEY) || "auto"; }catch(e){}
+    applyTheme(THEMES[(THEMES.indexOf(cur)+1) % THEMES.length]);
+  };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (!document.documentElement.dataset.theme) render();
+  });
 }
 
 /* ---------- status panel ---------------------------------------------------
@@ -653,7 +741,7 @@ function statusHTML(){
   else items.push(["done","What I know is complete.",1]);
 
   if (!fsHandle)
-    items.push(["do","Your journal is only in this browser. Link a file, or download the JSON, from <b>Export and setup</b>.",0]);
+    items.push(["do","Your journal is only in this browser. Link a file on the <b>Setup</b> tab, or download the JSON from <b>Export</b>.",0]);
   else items.push(["done","Saving to "+esc(fsHandle.name)+" as well as this browser.",1]);
 
   const alloc = allocated(), avail = available();
@@ -711,7 +799,7 @@ function render(){
   $("status").innerHTML = statusHTML();
   $("e-form").disabled = blocked;
   const goto = $("go-setup");
-  if (goto) goto.onclick = () => document.querySelector('nav button[data-tab=data]').click();
+  if (goto) goto.onclick = () => document.querySelector('nav button[data-tab=setup]').click();
 
   $("cal-wrap").innerHTML = calendarHTML();
   $("chart-cat").innerHTML = barChart(byCat, total);
@@ -732,7 +820,7 @@ function render(){
           + (avg/60 > budget
               ? 'That is over. Bars in red are weeks that went past it. This is worth raising with your instructor, and your entries are the evidence.'
               : 'Weeks that go past it show in red. One busy week is normal; a run of them is worth a conversation.')
-        : 'Set your appointment hours on the Export and setup tab and this will tell you whether '
+        : 'Set your appointment hours on the Setup tab and this will tell you whether '
           + 'your weeks fit inside them. Your average so far is <strong>'+hrs(avg)+'</strong> a week.');
 
   // both of these follow edits without a reload, so they belong here rather than in fill()
@@ -854,7 +942,7 @@ function stamp(){
 /* ---------- wiring --------------------------------------------------------*/
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected", x===b));
-  ["log","dash","know","week","data","help"].forEach(id=>$(id).hidden = (id!==b.dataset.tab));
+  ["log","dash","know","week","data","setup","help"].forEach(id=>$(id).hidden = (id!==b.dataset.tab));
 });
 CATS.forEach(c=>{
   $("e-cat").insertAdjacentHTML("beforeend",'<option>'+esc(c)+'</option>');
@@ -966,7 +1054,7 @@ function reportHTML(from, to, course){
   const wk = Object.keys(weeks).sort();
   const budget = one ? (+one.hours||0) : available();
   const avg = wk.length ? total/60/wk.length : 0;
-  const cats = CATS.map((c,i)=>({k:c, v:es.filter(e=>e.cat===c).reduce((a,e)=>a+e.mins,0), c:COLORS[i]}))
+  const cats = CATS.map((c,i)=>({k:c, v:es.filter(e=>e.cat===c).reduce((a,e)=>a+e.mins,0), c:COLORS_LIGHT[i]}))
                    .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
   const span = es.length ? (es[0].date + " to " + es[es.length-1].date) : "no entries in range";
   const bars = (rows, denom) => {
@@ -1033,7 +1121,7 @@ function reportHTML(from, to, course){
   + (!one && cl.length>1 ? '<h2>By course</h2><table><thead><tr><th>Course</th><th></th>'
       + '<th class="num">Hours</th><th class="num">Share</th></tr></thead><tbody>'
       + bars(cl.map((c,i)=>({k:c.code||"(unnamed)",
-          v:es.filter(e=>e.course===c.code).reduce((a,e)=>a+e.mins,0), c:COLORS[i]}))
+          v:es.filter(e=>e.course===c.code).reduce((a,e)=>a+e.mins,0), c:COLORS_LIGHT[i]}))
           .filter(r=>r.v>0), total)
       + '</tbody></table>' : '')
   + '<h2>Where the time went</h2>'
@@ -1089,7 +1177,7 @@ function fill(){
   $("e-date").value=new Date().toISOString().slice(0,10);
   $("w-of").value=sunday(new Date().toISOString().slice(0,10));
 }
-load(); fill(); initFs(); render();
+initTheme(); load(); fill(); initFs(); render();
 </script>
 </body>
 </html>
