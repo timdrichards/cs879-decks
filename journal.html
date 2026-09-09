@@ -86,6 +86,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <button role="tab" data-tab="know" aria-selected="false">What I know</button>
   <button role="tab" data-tab="week" aria-selected="false">This week</button>
   <button role="tab" data-tab="data" aria-selected="false">Export &amp; setup</button>
+  <button role="tab" data-tab="help" aria-selected="false">How this works</button>
 </nav>
 
 <main>
@@ -107,6 +108,9 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
     <div><label for="e-mins">Minutes</label><input type="number" id="e-mins" min="0" step="5" placeholder="45"></div>
     <div style="grid-column:span 2"><label for="e-cat">Category</label><select id="e-cat"></select></div>
   </div>
+  <div class="row" id="e-course-row" hidden><div>
+    <label for="e-course">Which course</label><select id="e-course"></select>
+  </div></div>
   <div class="row"><div>
     <label for="e-what">What you did</label>
     <input id="e-what" placeholder="Ran the Thursday help session, six students, mostly on pointers">
@@ -123,6 +127,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <h3>Entries</h3>
   <div class="bar" style="margin-top:0">
     <select id="f-cat" style="width:auto"><option value="">All categories</option></select>
+    <span hidden><select id="f-course" style="width:auto"></select></span>
     <button class="tiny" id="f-clear">Clear filter</button>
   </div>
   <div id="log-list"></div>
@@ -133,6 +138,8 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <h2>Where your time goes</h2>
   <p class="sub">Built from your own entries. Nothing here is sent anywhere.</p>
   <div class="stat" id="stats"></div>
+  <h3 id="course-head" hidden>By course</h3>
+  <div id="chart-course"></div>
   <h3>By category</h3>
   <div id="chart-cat"></div>
   <h3>By week</h3>
@@ -194,8 +201,10 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <div class="row c3">
     <div><label for="r-from">From</label><input type="date" id="r-from"></div>
     <div><label for="r-to">To</label><input type="date" id="r-to"></div>
-    <div style="display:flex;align-items:flex-end"><button class="act" id="mk-report"
-      style="width:100%">Open printable report</button></div>
+    <div><label for="r-course">Course</label><select id="r-course"></select></div>
+  </div>
+  <div class="bar" style="margin-top:-.3rem">
+    <button class="act" id="mk-report">Open printable report</button>
   </div>
   <p style="font-size:.87rem;color:var(--muted);margin-top:-.3rem">Leave the dates empty for
   everything you have logged.</p>
@@ -217,10 +226,6 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <h3>About you</h3>
   <div class="row c2">
     <div><label for="s-name">Your name</label><input id="s-name" placeholder="For the exported files"></div>
-    <div><label for="s-course">Course you are TAing</label><input id="s-course" placeholder="COMPSCI 187"></div>
-  </div>
-  <div class="row c2">
-    <div><label for="s-prof">Supervising instructor</label><input id="s-prof"></div>
     <div><label for="s-hours">Appointment, hours a week</label>
       <input type="number" id="s-hours" min="1" max="40" step="1" placeholder="10"></div>
   </div>
@@ -238,10 +243,114 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
     reserved, leave it at 0. <span class="tag879">879</span> In COMPSCI 879 three hours a week are
     encumbered for the course, so a 10-hour TA has 7 for regular duties and a 20-hour TA has 17.
   </p>
+  <h3>Courses you are assisting</h3>
+  <p style="font-size:.9rem;color:var(--muted);margin-top:-.2rem">Most TAs have one. If your
+  appointment is split across two, add both and give each the hours allocated to it, so you can see
+  and report them separately.</p>
+  <div id="courses"></div>
+  <div class="bar" style="margin-top:.4rem">
+    <button class="tiny" id="c-add">Add another course</button>
+    <span class="saved" id="c-msg"></span>
+  </div>
+
   <div class="bar"><button class="act" id="s-save">Save</button><span class="saved" id="s-msg"></span></div>
 
   <h3>Start over</h3>
   <div class="bar"><button class="tiny" id="wipe">Delete everything in this browser</button></div>
+</section>
+
+<!-- ============================== HELP ============================= -->
+<section id="help" hidden>
+  <h2>How this works, and why bother</h2>
+  <p class="sub">Five minutes of reading. Worth it once, at the start.</p>
+
+  <h3>The short version</h3>
+  <div class="callout">
+    Log what you do as you do it. Once a week, look at the dashboard and write two lines about how
+    the week went. At the end of the term you will have something almost no TA has: a record of what
+    the job actually was, in your own words, with numbers attached.
+  </div>
+
+  <h3>Why a journal rather than a timesheet</h3>
+  <p>A timesheet answers one question, badly: how many hours. This asks two more that turn out to
+  matter far more. <strong>What did you actually do</strong>, and <strong>what did you notice while
+  doing it</strong>.</p>
+  <p>That second field is the whole point. &ldquo;Ran help session, 90 minutes&rdquo; is a number.
+  &ldquo;Ran help session, 90 minutes, three students had the same misconception about
+  pass-by-reference&rdquo; is the start of a change to how the next one runs. One of those compounds
+  over a semester and the other does not.</p>
+  <p>This is the difference between teaching for five years and teaching the same year five times.
+  The people who get better at this are not the ones who work hardest. They are the ones who wrote
+  something down while it was still fresh, looked at it later, and changed one thing.</p>
+
+  <h3>Why it is worth it for you</h3>
+  <p><strong>You will know whether the job is what you were told it was.</strong> Most TAs have no
+  real idea whether they are working six hours or sixteen until something goes wrong late in the
+  term, and by then the conversation is a complaint rather than a question. A weekly number turns
+  &ldquo;this feels like a lot&rdquo; into &ldquo;this is the fourth week over my hours, here is
+  where the time went.&rdquo; That is a conversation an instructor can act on.</p>
+  <p><strong>It is evidence when you need it.</strong> If anyone ever asks what you have been doing,
+  or you need to make a case about workload, the report gives you a page of specifics rather than an
+  impression.</p>
+  <p><strong>It is the raw material for everything that comes later.</strong> Teaching statements,
+  job applications, and interviews all ask for a concrete example of something you tried and what
+  happened. Almost nobody can produce one, because almost nobody wrote anything down at the time.
+  Your journal is forty of them.</p>
+  <p><strong>It makes you better at the job while you are still doing it.</strong> Noticing is a
+  skill, and it is trainable. Writing one line about what you observed, twice a week, changes what
+  you see in the room within a month.</p>
+
+  <h3 class="only879"><span class="tag879">879</span> Why the course asks for it</h3>
+  <div class="only879">
+    <p>Nobody currently knows how TA time is actually spent across the college, only how it is
+    estimated. This is the first cohort to measure it, and what you record will shape how
+    appointments are set in future years.</p>
+    <p>You upload the exported files to Canvas each Friday. There is no right number and nobody is
+    judged on theirs. A week at three hours and a week at fifteen are both findings about how a
+    course is run, not verdicts on you. Marks are for having done it.</p>
+    <p>Anything that leaves the course leaves as aggregate totals with names removed.</p>
+  </div>
+
+  <h3>Using it</h3>
+  <p><strong>Set yourself up first.</strong> On the Export and setup tab, put in your appointment
+  hours, anything reserved off the top, and the course or courses you are assisting. If your
+  appointment is split across two courses, add both with the hours allocated to each; every entry
+  then gets tagged and you can report on them separately.</p>
+  <p><strong>Log as you go.</strong> The Log tab. Date, minutes, category, one line on what you did.
+  Estimates are fine and a round number is fine. Do it right after a shift if you can; two minutes
+  then beats an hour of reconstruction in December. A blank week is worse than a rough one.</p>
+  <p><strong>Fill in what you noticed when there is something to say.</strong> Not every entry needs
+  it. The ones that do are the ones you will reread.</p>
+  <p><strong>Once a week, look at the dashboard.</strong> It shows where your hours went and flags
+  in red any week that ran past the hours available for regular duties. Then the This week tab: did
+  it fit, and is anything worth flagging. Two lines.</p>
+  <p><strong>Fill in What I know early.</strong> Ten things every TA should be able to answer about
+  their own course, each asking you to write the policy in your own words. If you cannot put it in
+  your own words, you have not read it yet, and week two is a much better time to discover that than
+  week ten.</p>
+
+  <h3>Getting it out</h3>
+  <p><strong>Markdown and JSON</strong> from the Export tab. The Markdown is readable and is your
+  journal; the JSON is the backup that can be loaded straight back in.</p>
+  <p><strong>The printable report</strong> opens in a new tab, formatted for printing. Use your
+  browser's Print command and choose Save as PDF. You can limit it to a date range, or to one course
+  if an instructor only wants their own. Send it when someone asks where your time is going, or when
+  you want a page of evidence behind a conversation about workload.</p>
+
+  <h3>Where your data lives</h3>
+  <p>In this browser, on this computer. It is not sent anywhere and there is no account. That also
+  means nobody can recover it for you, so do one of these:</p>
+  <p><strong>Link a file</strong> from the Export tab if you are on Chrome or Edge. The journal is
+  then written to a real file on your disk every time it changes. Put that file somewhere that syncs
+  and it follows you between machines and survives a cleared browser.</p>
+  <p><strong>Or download the JSON regularly</strong> and keep it safe. If you ever lose the browser
+  copy, Import it and carry on.</p>
+  <div class="callout warn">
+    <strong>Do not name students anywhere in this journal.</strong> &ldquo;A student in my
+    section&rdquo; carries everything you need. A journal that names students becomes an education
+    record, with rules about where it can be stored and who can read it, and you do not want that on
+    your laptop or in a report you hand to someone.
+  </div>
 </section>
 
 <footer>
@@ -282,20 +391,33 @@ const CHECKS = [
 ];
 
 const blank = () => ({
-  version: 2,
-  student: {name:"",course:"",professor:"",hours:10,reserved:0,ctx:"general"},
+  version: 3,
+  student: {name:"", hours:10, reserved:0, ctx:"general",
+            courses:[{code:"", instructor:"", hours:0}]},
   entries: [], checks: {}, weeks: [],
   updated: null
 });
 // v1 stored hours as 10 or 20 and assumed the 879 encumbrance. Anything written by
 // that version belongs to an 879 TA, so carry the 3 hours across explicitly.
 function migrate(d){
+  // v1 assumed the 879 encumbrance and stored hours as 10 or 20
   if (d.version === 1 || d.student.reserved === undefined){
     d.student.reserved = 3; d.student.ctx = "879"; d.version = 2;
   }
+  // v2 held one course. An appointment can be split across two, so it becomes a list
+  // and every entry gains the course it belongs to.
+  if (d.version === 2 || !Array.isArray(d.student.courses)){
+    d.student.courses = [{code:d.student.course||"", instructor:d.student.professor||"",
+                          hours:Math.max(0,(+d.student.hours||0)-(+d.student.reserved||0))}];
+    delete d.student.course; delete d.student.professor;
+    d.entries.forEach(e => { if (e.course === undefined) e.course = d.student.courses[0].code; });
+    d.version = 3;
+  }
   return d;
 }
+const courses = () => (db.student.courses||[]).filter(c=>c.code.trim());
 const available = () => Math.max(0, (+db.student.hours||0) - (+db.student.reserved||0));
+const allocated = () => courses().reduce((a,c)=>a+(+c.hours||0), 0);
 
 let db = blank();
 let fsHandle = null;
@@ -357,12 +479,16 @@ function barChart(rows, total){
 /* ---------- render --------------------------------------------------------*/
 function render(){
   // log list
-  const filt = $("f-cat").value;
-  const es = db.entries.filter(e=>!filt||e.cat===filt)
+  const filt = $("f-cat").value, fcv = $("f-course") ? $("f-course").value : "";
+  const es = db.entries.filter(e=>(!filt||e.cat===filt) && (!fcv||e.course===fcv))
                        .sort((a,b)=> b.date.localeCompare(a.date) || b.id-a.id);
-  $("log-list").innerHTML = es.length ? '<table><thead><tr><th>Date</th><th>Category</th>'
+  const showCourse = courses().length > 1;
+  $("log-list").innerHTML = es.length ? '<table><thead><tr><th>Date</th>'
+    + (showCourse?'<th>Course</th>':'') + '<th>Category</th>'
     + '<th>Time</th><th>What you did</th><th></th></tr></thead><tbody>'
-    + es.map(e=>'<tr><td>'+fmtDate(e.date)+'</td><td><span class="pill">'+esc(e.cat)+'</span></td>'
+    + es.map(e=>'<tr><td>'+fmtDate(e.date)+'</td>'
+        + (showCourse?'<td><span class="pill">'+esc(e.course||"—")+'</span></td>':'')
+        + '<td><span class="pill">'+esc(e.cat)+'</span></td>''
         + '<td>'+hrs(e.mins)+' h</td>'
         + '<td>'+esc(e.what)+(e.note?'<div style="color:var(--muted);font-size:.87rem;margin-top:.2rem">'+esc(e.note)+'</div>':'')+'</td>'
         + '<td><button class="tiny" data-del="'+e.id+'">delete</button></td></tr>').join('')
@@ -384,6 +510,11 @@ function render(){
     + '<div><b>'+wk.length+'</b><span>weeks recorded</span></div>'
     + '<div><b>'+hrs(avg)+'</b><span>hours per week</span></div>';
   $("chart-cat").innerHTML = barChart(byCat, total);
+  const perCourse = courses().map((c,i)=>({k:c.code,
+      v:db.entries.filter(e=>e.course===c.code).reduce((s,e)=>s+e.mins,0), c:COLORS[i]}))
+    .filter(r=>r.v>0);
+  $("chart-course").innerHTML = perCourse.length>1 ? barChart(perCourse, total) : "";
+  $("course-head").hidden = perCourse.length<2;
   $("chart-week").innerHTML = barChart(wk.map(w=>({k:"Week of "+fmtDate(w), v:weeks[w],
       c: weeks[w]/60 > budget ? "#A4262C" : "#1F7A4D"})), total);
   const res = +db.student.reserved || 0;
@@ -398,6 +529,46 @@ function render(){
               : 'Weeks that go past it show in red. One busy week is normal; a run of them is worth a conversation.')
         : 'Set your appointment hours on the Export and setup tab and this will tell you whether '
           + 'your weeks fit inside them. Your average so far is <strong>'+hrs(avg)+'</strong> a week.');
+
+  // courses editor
+  const cs = db.student.courses||[];
+  $("courses").innerHTML = cs.map((c,i)=>
+     '<div class="row c3" style="margin-bottom:.5rem">'
+   + '<div><label>Course</label><input data-c="code" data-i="'+i+'" value="'+esc(c.code)+'" placeholder="COMPSCI 187"></div>'
+   + '<div><label>Supervising instructor</label><input data-c="instructor" data-i="'+i+'" value="'+esc(c.instructor)+'"></div>'
+   + '<div style="display:flex;gap:.4rem;align-items:flex-end">'
+   +   '<div style="flex:1"><label>Hours a week</label><input type="number" min="0" step="0.5" data-c="hours" data-i="'+i+'" value="'+(c.hours||0)+'"></div>'
+   +   (cs.length>1 ? '<button class="tiny" data-crm="'+i+'" style="margin-bottom:.35rem">remove</button>' : '')
+   + '</div></div>').join("");
+  const alloc = allocated(), avail = available();
+  $("c-msg").innerHTML = (!avail || !alloc) ? ""
+    : (Math.abs(alloc-avail) < 0.01
+        ? '<b>'+alloc+' of '+avail+' hours allocated.</b>'
+        : '<span style="color:var(--red)">'+alloc+' hours allocated but '+avail+' available. Not fatal, but check it.</span>');
+
+  // the entry form only asks which course when there is more than one
+  const many = courses().length > 1;
+  $("e-course-row").hidden = !many;
+  if (many){
+    const keep = $("e-course").value;
+    $("e-course").innerHTML = courses().map(c=>'<option>'+esc(c.code)+'</option>').join("");
+    if (keep) $("e-course").value = keep;
+  }
+  const rc = $("r-course");
+  if (rc){
+    const keep = rc.value;
+    rc.innerHTML = '<option value="">All courses together</option>'
+      + courses().map(c=>'<option>'+esc(c.code)+'</option>').join("");
+    rc.value = keep;
+  }
+  const fc = $("f-course");
+  if (fc){
+    fc.parentElement.hidden = !many;
+    const keep = fc.value;
+    fc.innerHTML = '<option value="">All courses</option>'
+      + courses().map(c=>'<option>'+esc(c.code)+'</option>').join("");
+    fc.value = keep;
+  }
 
   // checklist
   $("checklist").innerHTML = CHECKS.map(([id,label,prompt])=>{
@@ -471,7 +642,7 @@ function stamp(){
 /* ---------- wiring --------------------------------------------------------*/
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected", x===b));
-  ["log","dash","know","week","data"].forEach(id=>$(id).hidden = (id!==b.dataset.tab));
+  ["log","dash","know","week","data","help"].forEach(id=>$(id).hidden = (id!==b.dataset.tab));
 });
 CATS.forEach(c=>{
   $("e-cat").insertAdjacentHTML("beforeend",'<option>'+esc(c)+'</option>');
@@ -480,7 +651,9 @@ CATS.forEach(c=>{
 $("e-add").onclick = async () => {
   const date=$("e-date").value, mins=parseInt($("e-mins").value,10), what=$("e-what").value.trim();
   if(!date||!(mins>0)||!what){ flash($("e-msg"),"Date, minutes and what you did are all needed."); return; }
-  db.entries.push({id:Date.now(),date,mins,cat:$("e-cat").value,what,note:$("e-note").value.trim()});
+  const cl = courses();
+  const course = cl.length>1 ? $("e-course").value : (cl[0] ? cl[0].code : "");
+  db.entries.push({id:Date.now(),date,mins,cat:$("e-cat").value,course,what,note:$("e-note").value.trim()});
   $("e-mins").value=""; $("e-what").value=""; $("e-note").value="";
   await save(); flash($("e-msg"),"Added.");
 };
@@ -489,7 +662,20 @@ $("log-list").onclick = async ev => {
   db.entries = db.entries.filter(e=>String(e.id)!==id); await save();
 };
 $("f-cat").onchange = render;
-$("f-clear").onclick = ()=>{ $("f-cat").value=""; render(); };
+$("f-course").onchange = render;
+$("f-clear").onclick = ()=>{ $("f-cat").value=""; $("f-course").value=""; render(); };
+$("courses").oninput = ev => {
+  const t=ev.target, i=+t.dataset.i, k=t.dataset.c; if(k===undefined) return;
+  db.student.courses[i][k] = (k==="hours") ? (parseFloat(t.value)||0) : t.value;
+};
+$("courses").onchange = async ev => { if(ev.target.dataset.c) await save(); };
+$("courses").onclick = async ev => {
+  const i = ev.target.dataset.crm; if(i===undefined) return;
+  db.student.courses.splice(+i,1); await save();
+};
+$("c-add").onclick = async () => {
+  db.student.courses.push({code:"",instructor:"",hours:0}); await save();
+};
 $("checklist").onchange = async ev => {
   const t=ev.target;
   if(t.dataset.chk){ (db.checks[t.dataset.chk] = db.checks[t.dataset.chk]||{note:""}).done = t.checked; await save(); }
@@ -507,11 +693,11 @@ $("s-ctx").onchange = () => {
   if ($("s-ctx").value === "general" && parseFloat($("s-reserved").value) === 3) $("s-reserved").value = 0;
 };
 $("s-save").onclick = async () => {
-  db.student = {name:$("s-name").value.trim(), course:$("s-course").value.trim(),
-                professor:$("s-prof").value.trim(),
-                hours:parseFloat($("s-hours").value)||0,
-                reserved:parseFloat($("s-reserved").value)||0,
-                ctx:$("s-ctx").value};
+  db.student = Object.assign({}, db.student, {
+    name:$("s-name").value.trim(),
+    hours:parseFloat($("s-hours").value)||0,
+    reserved:parseFloat($("s-reserved").value)||0,
+    ctx:$("s-ctx").value});
   await save(); flash($("s-msg"),"Saved.");
 };
 $("dl-md").onclick = ()=>download(stamp()+".md", toMarkdown(), "text/markdown");
@@ -547,14 +733,18 @@ $("wipe").onclick = async () => {
    PDF and hand it to an instructor. Everything is inline: that tab is a document
    in its own right and has to survive being saved, mailed on, or printed from a
    machine that has never seen this tool. -----------------------------------*/
-function reportHTML(from, to){
+function reportHTML(from, to, course){
   const s = db.student;
-  const inRange = e => (!from || e.date >= from) && (!to || e.date <= to);
+  const inRange = e => (!from || e.date >= from) && (!to || e.date <= to)
+                     && (!course || e.course === course);
+  const cl = courses();
+  const one = course ? cl.find(c=>c.code===course) : null;
   const es = db.entries.filter(inRange).sort((a,b)=>a.date.localeCompare(b.date));
   const total = es.reduce((a,e)=>a+e.mins,0);
   const weeks = {}; es.forEach(e=>{ const w=sunday(e.date); (weeks[w]=weeks[w]||[]).push(e); });
   const wk = Object.keys(weeks).sort();
-  const budget = available(), avg = wk.length ? total/60/wk.length : 0;
+  const budget = one ? (+one.hours||0) : available();
+  const avg = wk.length ? total/60/wk.length : 0;
   const cats = CATS.map((c,i)=>({k:c, v:es.filter(e=>e.cat===c).reduce((a,e)=>a+e.mins,0), c:COLORS[i]}))
                    .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
   const span = es.length ? (es[0].date + " to " + es[es.length-1].date) : "no entries in range";
@@ -595,11 +785,18 @@ function reportHTML(from, to){
   + '<h1>TA hours report</h1>'
   + '<p class="meta">'
   +   (s.name ? '<b>'+esc(s.name)+'</b><br>' : '')
-  +   (s.course ? 'Assisting <b>'+esc(s.course)+'</b>' : 'Course not set')
-  +   (s.professor ? ' · supervising instructor <b>'+esc(s.professor)+'</b>' : '') + '<br>'
-  +   'Appointment <b>'+(s.hours||0)+' hours a week</b>'
-  +   (s.reserved ? ', of which <b>'+s.reserved+'</b> reserved'
-        + (s.ctx==="879" ? ' for COMPSCI 879' : '') + ', leaving <b>'+budget+'</b> for regular duties' : '')
+  +   (one
+        ? 'Assisting <b>'+esc(one.code)+'</b>'
+          + (one.instructor ? ' · supervising instructor <b>'+esc(one.instructor)+'</b>' : '')
+          + '<br>Hours allocated to this course: <b>'+(one.hours||0)+' a week</b>'
+          + (cl.length>1 ? ' (of a '+(s.hours||0)+'-hour appointment across '+cl.length+' courses)' : '')
+        : (cl.length
+            ? 'Assisting <b>'+cl.map(c=>esc(c.code)).join('</b> and <b>')+'</b><br>'
+              + 'Appointment <b>'+(s.hours||0)+' hours a week</b>'
+              + (s.reserved ? ', of which <b>'+s.reserved+'</b> reserved'
+                  + (s.ctx==="879" ? ' for COMPSCI 879' : '')
+                  + ', leaving <b>'+budget+'</b> for regular duties' : '')
+            : 'Course not set'))
   +   '<br>Period covered: <b>'+esc(span)+'</b> · generated '+new Date().toLocaleDateString()
   + '</p>'
   + '<div class="stat">'
@@ -611,6 +808,12 @@ function reportHTML(from, to){
   + (budget ? '<p class="note">'+(avg>budget
       ? 'The weekly average is above the '+budget+' hours available for regular duties.'
       : 'The weekly average is within the '+budget+' hours available for regular duties.')+'</p>' : '')
+  + (!one && cl.length>1 ? '<h2>By course</h2><table><thead><tr><th>Course</th><th></th>'
+      + '<th class="num">Hours</th><th class="num">Share</th></tr></thead><tbody>'
+      + bars(cl.map((c,i)=>({k:c.code||"(unnamed)",
+          v:es.filter(e=>e.course===c.code).reduce((a,e)=>a+e.mins,0), c:COLORS[i]}))
+          .filter(r=>r.v>0), total)
+      + '</tbody></table>' : '')
   + '<h2>Where the time went</h2>'
   + (cats.length ? '<table><thead><tr><th>Category</th><th></th><th class="num">Hours</th>'
       + '<th class="num">Share</th></tr></thead><tbody>'+bars(cats, total)+'</tbody></table>'
@@ -630,7 +833,9 @@ function reportHTML(from, to){
         + (rec && (rec.fit||rec.flag) ? '<p class="note">'
             + (rec.fit ? '<b>Fit:</b> '+esc(rec.fit) : '')
             + (rec.flag ? (rec.fit?' · ':'')+'<b>Flagged:</b> '+esc(rec.flag) : '')+'</p>' : '')
-        + '<ul>' + weeks[w].map(e=>'<li><b>'+e.date+'</b> · '+esc(e.cat)+' · '+hrs(e.mins)
+        + '<ul>' + weeks[w].map(e=>'<li><b>'+e.date+'</b> · '
+            + (!one && cl.length>1 && e.course ? esc(e.course)+' · ' : '')
+            + esc(e.cat)+' · '+hrs(e.mins)
             + ' h — ' + esc(e.what)
             + (e.note ? '<br><span class="note">Noticed: '+esc(e.note)+'</span>' : '') + '</li>').join('')
         + '</ul></div>';
@@ -644,7 +849,7 @@ function reportHTML(from, to){
 $("mk-report").onclick = () => {
   const w = window.open("", "_blank");
   if (!w){ alert("Your browser blocked the new tab. Allow pop-ups for this page and try again."); return; }
-  w.document.write(reportHTML($("r-from").value, $("r-to").value));
+  w.document.write(reportHTML($("r-from").value, $("r-to").value, $("r-course").value));
   w.document.close();
 };
 function initFs(){
@@ -655,10 +860,11 @@ function initFs(){
 }
 function fill(){
   $("s-name").value=db.student.name; $("s-course").value=db.student.course;
-  $("s-prof").value=db.student.professor; $("s-hours").value=db.student.hours;
+  $("s-hours").value=db.student.hours;
   $("s-reserved").value=db.student.reserved; $("s-ctx").value=db.student.ctx;
   document.body.classList.toggle("is879", db.student.ctx==="879");
-  $("hdr-sub").textContent = (db.student.course ? db.student.course+" · " : "")
+  const cl = courses().map(c=>c.code).join(" and ");
+  $("hdr-sub").textContent = (cl ? cl+" · " : "")
     + "everything stays on this computer unless you export it";
   $("e-date").value=new Date().toISOString().slice(0,10);
   $("w-of").value=sunday(new Date().toISOString().slice(0,10));
