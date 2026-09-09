@@ -356,9 +356,14 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   to a real file on your disk every time it changes; keep that file somewhere that syncs and it
   follows you between machines. Chrome and Edge support this; on other browsers download the JSON
   regularly instead.</p>
+  <p class="hint">The link survives closing the browser. Some browsers ask for permission again
+  after a reload, in which case a <strong>Reconnect</strong> button appears here and nothing is
+  lost. Only the file name is shown rather than the full path, because browsers deliberately do not
+  tell a web page where a file sits on your disk.</p>
   <div class="callout" id="fs-state"></div>
   <div class="bar">
     <button class="ghost" id="fs-link">Link a file on this computer</button>
+    <button class="act" id="fs-reconnect" hidden>Reconnect</button>
     <button class="tiny" id="fs-unlink">Unlink</button>
   </div>
 
@@ -549,7 +554,44 @@ const available = () => Math.max(0, (+db.student.hours||0) - (+db.student.reserv
 const allocated = () => courses().reduce((a,c)=>a+(+c.hours||0), 0);
 
 let db = blank();
-let fsHandle = null;
+let fsHandle = null, fsPending = null;
+
+/* A FileSystemFileHandle cannot go in localStorage: it is not JSON. It is
+   structured-cloneable though, so IndexedDB holds it across reloads. Without this
+   the link silently evaporated every time the page was refreshed. */
+const FSDB = KEY + "-fs";
+function idbOpen(){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(FSDB, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("h");
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function idbPut(v){
+  const d = await idbOpen();
+  return new Promise((res, rej) => {
+    const t = d.transaction("h", "readwrite");
+    t.objectStore("h").put(v, "handle");
+    t.oncomplete = res; t.onerror = () => rej(t.error);
+  });
+}
+async function idbGet(){
+  const d = await idbOpen();
+  return new Promise((res, rej) => {
+    const t = d.transaction("h", "readonly");
+    const q = t.objectStore("h").get("handle");
+    q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+  });
+}
+async function idbClear(){
+  const d = await idbOpen();
+  return new Promise((res, rej) => {
+    const t = d.transaction("h", "readwrite");
+    t.objectStore("h").delete("handle");
+    t.oncomplete = res; t.onerror = () => rej(t.error);
+  });
+}
 
 /* ---------- storage -------------------------------------------------------
    Two layers on purpose. localStorage is automatic but a browser can clear it
@@ -1149,15 +1191,30 @@ $("fs-link").onclick = async () => {
     fsHandle = await window.showSaveFilePicker({suggestedName: stamp()+".json",
       types:[{description:"JSON", accept:{"application/json":[".json"]}}]});
     await save();
-    fsState("Linked to "+fsHandle.name+". Every change is written there as well as to this browser.");
-    render();
+    fsPending = null;
+    try{ await idbPut(fsHandle); }catch(e){}
+    initFs(); render();
   }catch(e){ /* cancelled */ }
 };
-$("fs-unlink").onclick = ()=>{ fsHandle=null; initFs(); render(); };
+$("fs-unlink").onclick = async () => {
+  fsHandle = null; fsPending = null;
+  try{ await idbClear(); }catch(e){}
+  initFs(); render();
+};
+$("fs-reconnect").onclick = async () => {
+  if (!fsPending) return;
+  let perm = "denied";
+  try{ perm = await fsPending.requestPermission({mode:"readwrite"}); }catch(e){}
+  if (perm === "granted"){ fsHandle = fsPending; fsPending = null; await save(); }
+  initFs(); render();
+};
 $("wipe").onclick = async () => {
   if(!confirm("Delete every entry in this browser? Export first if you want to keep it.")) return;
-  db = blank(); try{ localStorage.removeItem(KEY); }catch(e){}
-  fill(); render();
+  db = blank();
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  fsHandle = null; fsPending = null;
+  try{ await idbClear(); }catch(e){}
+  fill(); initFs(); render();
 };
 /* ---------- printable report ----------------------------------------------
    Opens in a new tab with its own print stylesheet so the student can Save as
@@ -1285,10 +1342,42 @@ $("mk-report").onclick = () => {
   w.document.close();
 };
 function initFs(){
-  fsState(fsSupported()
-    ? "Not linked. Your journal is only in this browser, which can be cleared without warning."
-    : "This browser cannot link a file. Download the JSON each week and keep it somewhere safe.",
-    true);
+  const rc = $("fs-reconnect");
+  if (!fsSupported()){
+    if (rc) rc.hidden = true;
+    fsState("This browser cannot link a file. Download the JSON each week and keep it somewhere safe.", true);
+    return;
+  }
+  if (fsHandle){
+    if (rc) rc.hidden = true;
+    fsState("Linked to " + fsHandle.name + ". Every change is written there as well as to this "
+          + "browser. (Browsers do not reveal the full path to a page, so only the file name is "
+          + "shown; it is wherever you saved it.)");
+    return;
+  }
+  if (fsPending){
+    if (rc) rc.hidden = false;
+    fsState("Linked to " + fsPending.name + ", but this browser needs your permission again after "
+          + "a reload. Press Reconnect and nothing is lost.", true);
+    return;
+  }
+  if (rc) rc.hidden = true;
+  fsState("Not linked. Your journal is only in this browser, which can be cleared without warning.", true);
+}
+
+/* On load the handle comes back from IndexedDB, but the permission may not: some
+   browsers keep it, others drop to "prompt" and require a click. Handle both. */
+async function restoreFs(){
+  if (!fsSupported()) return;
+  let h = null;
+  try{ h = await idbGet(); }catch(e){ return; }
+  if (!h) return;
+  let perm = "prompt";
+  try{ perm = await h.queryPermission({mode:"readwrite"}); }catch(e){}
+  if (perm === "granted"){ fsHandle = h; fsPending = null; }
+  else if (perm === "prompt"){ fsPending = h; }
+  else { try{ await idbClear(); }catch(e){} }
+  initFs(); render();
 }
 function fill(){
   $("s-name").value=db.student.name;
@@ -1299,7 +1388,7 @@ function fill(){
   $("e-date").value=new Date().toISOString().slice(0,10);
   $("w-of").value=sunday(new Date().toISOString().slice(0,10));
 }
-initTheme(); load(); fill(); initFs(); render();
+initTheme(); load(); fill(); initFs(); render(); restoreFs();
 $("nf-toggle").onclick = toggleNotify;
 notifyState();
 startStatusTicker();
