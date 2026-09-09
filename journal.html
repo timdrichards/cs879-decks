@@ -530,6 +530,11 @@ function render(){
         : 'Set your appointment hours on the Export and setup tab and this will tell you whether '
           + 'your weeks fit inside them. Your average so far is <strong>'+hrs(avg)+'</strong> a week.');
 
+  // the header names whatever courses are set, so it follows edits without a reload
+  const codes = courses().map(c=>c.code).join(" and ");
+  $("hdr-sub").textContent = (codes ? codes+" · " : "")
+    + "everything stays on this computer unless you export it";
+
   // courses editor
   const cs = db.student.courses||[];
   $("courses").innerHTML = cs.map((c,i)=>
@@ -863,9 +868,7 @@ function fill(){
   $("s-hours").value=db.student.hours;
   $("s-reserved").value=db.student.reserved; $("s-ctx").value=db.student.ctx;
   document.body.classList.toggle("is879", db.student.ctx==="879");
-  const cl = courses().map(c=>c.code).join(" and ");
-  $("hdr-sub").textContent = (cl ? cl+" · " : "")
-    + "everything stays on this computer unless you export it";
+
   $("e-date").value=new Date().toISOString().slice(0,10);
   $("w-of").value=sunday(new Date().toISOString().slice(0,10));
 }
