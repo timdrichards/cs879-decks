@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TA Journal · COMPSCI 879</title>
+<style>
+:root{
+  --maroon:#7B1416; --ink:#24292f; --muted:#57606a; --rule:#d8d8d8;
+  --wash:#f6f6f5; --go:#1F7A4D; --amber:#9A6700; --red:#A4262C;
+  --font:Lato,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:#fff;line-height:1.55;font-size:16px}
+header{background:var(--maroon);color:#fff;padding:1.1rem 1.4rem}
+header h1{margin:0;font-size:1.25rem;font-weight:800;letter-spacing:.01em}
+header p{margin:.25rem 0 0;opacity:.85;font-size:.9rem}
+nav{display:flex;gap:0;border-bottom:2px solid var(--rule);background:var(--wash);
+  position:sticky;top:0;z-index:5;overflow-x:auto}
+nav button{flex:0 0 auto;padding:.75rem 1.15rem;border:0;background:none;font:inherit;
+  font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent}
+nav button[aria-selected=true]{color:var(--maroon);border-bottom-color:var(--maroon);background:#fff}
+main{max-width:60rem;margin:0 auto;padding:1.4rem}
+section[hidden]{display:none}
+h2{color:var(--maroon);font-size:1.15rem;margin:0 0 .3rem;font-weight:800}
+h2+.sub{color:var(--muted);margin:0 0 1.2rem;font-size:.94rem}
+h3{font-size:1rem;margin:1.6rem 0 .5rem}
+label{display:block;font-weight:700;font-size:.86rem;margin:0 0 .25rem;color:var(--muted)}
+input,select,textarea{width:100%;padding:.5rem .6rem;border:1px solid var(--rule);border-radius:4px;
+  font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:4.5rem;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--maroon);outline-offset:1px;border-color:var(--maroon)}
+.row{display:grid;gap:.8rem;margin-bottom:.8rem}
+.row.c2{grid-template-columns:1fr 1fr}
+.row.c3{grid-template-columns:1fr 1fr 1fr}
+.row.c4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:640px){.row.c2,.row.c3,.row.c4{grid-template-columns:1fr}}
+button.act{background:var(--maroon);color:#fff;border:0;border-radius:4px;padding:.55rem 1.1rem;
+  font:inherit;font-weight:700;cursor:pointer}
+button.act:hover{background:#8f1a1c}
+button.ghost{background:#fff;color:var(--maroon);border:2px solid var(--maroon)}
+button.ghost:hover{background:var(--wash)}
+button.tiny{padding:.2rem .5rem;font-size:.8rem;font-weight:700;border:1px solid var(--rule);
+  background:#fff;border-radius:3px;cursor:pointer;color:var(--muted)}
+button.tiny:hover{border-color:var(--maroon);color:var(--maroon)}
+.bar{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin:1rem 0}
+.callout{background:var(--wash);border-left:4px solid var(--maroon);padding:.85rem 1.1rem;
+  border-radius:0 3px 3px 0;margin:0 0 1.2rem;font-size:.95rem}
+.warn{border-left-color:var(--amber);background:#FFF8E5}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--rule);vertical-align:top}
+th{background:var(--wash);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.8rem;margin:0 0 1.4rem}
+.stat div{background:var(--wash);border:1px solid var(--rule);border-radius:5px;padding:.8rem}
+.stat b{display:block;font-size:1.7rem;line-height:1.1;color:var(--maroon)}
+.stat span{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.chk{border:1px solid var(--rule);border-radius:5px;padding:.8rem 1rem;margin:0 0 .7rem}
+.chk.done{border-color:var(--go);background:#F3FAF6}
+.chk .top{display:flex;gap:.6rem;align-items:flex-start}
+.chk input[type=checkbox]{width:1.15rem;height:1.15rem;margin-top:.15rem;flex:0 0 auto;accent-color:var(--go)}
+.chk strong{font-size:.98rem}
+.chk .q{color:var(--muted);font-size:.87rem;margin:.15rem 0 .5rem}
+.empty{color:var(--muted);font-style:italic;padding:1.5rem 0}
+.pill{display:inline-block;padding:.1rem .5rem;border-radius:99px;font-size:.76rem;font-weight:700;
+  background:var(--wash);border:1px solid var(--rule);color:var(--muted);white-space:nowrap}
+.saved{font-size:.85rem;color:var(--muted)}
+.saved b{color:var(--go)}
+svg text{font-family:var(--font)}
+footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>TA Journal</h1>
+  <p>COMPSCI 879 · everything stays on this computer unless you export it</p>
+</header>
+
+<nav role="tablist">
+  <button role="tab" data-tab="log" aria-selected="true">Log</button>
+  <button role="tab" data-tab="dash" aria-selected="false">Dashboard</button>
+  <button role="tab" data-tab="know" aria-selected="false">What I know</button>
+  <button role="tab" data-tab="week" aria-selected="false">This week</button>
+  <button role="tab" data-tab="data" aria-selected="false">Export &amp; setup</button>
+</nav>
+
+<main>
+
+<!-- ============================== LOG ============================== -->
+<section id="log">
+  <h2>Log what you did</h2>
+  <p class="sub">A line at a time, while it is fresh. Two minutes after a shift beats an hour of
+  reconstruction in December.</p>
+
+  <div class="callout warn">
+    <strong>Do not name students.</strong> Write &ldquo;a student in my section&rdquo; rather than a
+    name. What you write here is about your own practice, and a journal that names students becomes
+    an education record with rules attached.
+  </div>
+
+  <div class="row c4">
+    <div><label for="e-date">Date</label><input type="date" id="e-date"></div>
+    <div><label for="e-mins">Minutes</label><input type="number" id="e-mins" min="0" step="5" placeholder="45"></div>
+    <div style="grid-column:span 2"><label for="e-cat">Category</label><select id="e-cat"></select></div>
+  </div>
+  <div class="row"><div>
+    <label for="e-what">What you did</label>
+    <input id="e-what" placeholder="Ran the Thursday help session, six students, mostly on pointers">
+  </div></div>
+  <div class="row"><div>
+    <label for="e-note">What you noticed <span style="font-weight:400;text-transform:none">&mdash; optional, and the part that pays off later</span></label>
+    <textarea id="e-note" placeholder="Three of them had the same misconception about pass-by-reference. Worth flagging to the instructor before the next homework goes out."></textarea>
+  </div></div>
+  <div class="bar">
+    <button class="act" id="e-add">Add entry</button>
+    <span class="saved" id="e-msg"></span>
+  </div>
+
+  <h3>Entries</h3>
+  <div class="bar" style="margin-top:0">
+    <select id="f-cat" style="width:auto"><option value="">All categories</option></select>
+    <button class="tiny" id="f-clear">Clear filter</button>
+  </div>
+  <div id="log-list"></div>
+</section>
+
+<!-- ============================ DASHBOARD ========================== -->
+<section id="dash" hidden>
+  <h2>Where your time goes</h2>
+  <p class="sub">Built from your own entries. Nothing here is sent anywhere.</p>
+  <div class="stat" id="stats"></div>
+  <h3>By category</h3>
+  <div id="chart-cat"></div>
+  <h3>By week</h3>
+  <div id="chart-week"></div>
+  <div class="callout" id="budget-note"></div>
+</section>
+
+<!-- =========================== WHAT I KNOW ========================= -->
+<section id="know" hidden>
+  <h2>What I know about my course</h2>
+  <p class="sub">Tick it when you have actually read it, and write the policy in your own words.
+  If you cannot put it in your own words, you have not read it yet.</p>
+  <div id="checklist"></div>
+</section>
+
+<!-- ============================ THIS WEEK ========================== -->
+<section id="week" hidden>
+  <h2>This week</h2>
+  <p class="sub">Two questions at the end of each week. This is what you bring to Studio on Friday.</p>
+  <div class="row c2">
+    <div><label for="w-of">Week beginning (Sunday)</label><input type="date" id="w-of"></div>
+    <div><label for="w-fit">Did it fit inside your paid hours?</label>
+      <select id="w-fit">
+        <option value="">&mdash;</option>
+        <option>Comfortably under</option>
+        <option>About right</option>
+        <option>Went over</option>
+        <option>Went well over</option>
+      </select></div>
+  </div>
+  <div class="row"><div>
+    <label for="w-flag">Anything worth flagging?</label>
+    <textarea id="w-flag" placeholder="Something that took far longer than expected, something you were asked to do that you were not sure was yours, or something you want to raise with your instructor and have not yet."></textarea>
+  </div></div>
+  <div class="bar"><button class="act" id="w-save">Save week</button><span class="saved" id="w-msg"></span></div>
+  <h3>Weeks recorded</h3>
+  <div id="week-list"></div>
+</section>
+
+<!-- ========================= EXPORT & SETUP ======================== -->
+<section id="data" hidden>
+  <h2>Export and setup</h2>
+  <p class="sub">Download the two files and submit them to Canvas each Friday.</p>
+
+  <div class="bar">
+    <button class="act" id="dl-md">Download Markdown</button>
+    <button class="act" id="dl-json">Download JSON</button>
+    <button class="ghost" id="imp">Import a JSON backup</button>
+    <input type="file" id="imp-file" accept="application/json,.json" hidden>
+  </div>
+
+  <h3>Keeping your journal safe</h3>
+  <div class="callout" id="fs-state"></div>
+  <div class="bar">
+    <button class="ghost" id="fs-link">Link a file on this computer</button>
+    <button class="tiny" id="fs-unlink">Unlink</button>
+  </div>
+  <p style="font-size:.9rem;color:var(--muted)">
+    Your journal is saved in this browser automatically. Browser storage can be cleared without
+    warning, so link a file as well: the journal is then written to a real file on your disk every
+    time it changes, and you can keep that file in Dropbox, iCloud, OneDrive or a git repository and
+    have it follow you between machines. If your browser does not support linking, download the JSON
+    each week instead and import it if you ever lose the browser copy.
+  </p>
+
+  <h3>About you</h3>
+  <div class="row c2">
+    <div><label for="s-name">Your name</label><input id="s-name" placeholder="For the exported files"></div>
+    <div><label for="s-course">Course you are TAing</label><input id="s-course" placeholder="COMPSCI 187"></div>
+  </div>
+  <div class="row c2">
+    <div><label for="s-prof">Supervising instructor</label><input id="s-prof"></div>
+    <div><label for="s-hours">Appointment</label>
+      <select id="s-hours">
+        <option value="10">10 hours a week (7 for TA duties, 3 encumbered for 879)</option>
+        <option value="20">20 hours a week (17 for TA duties, 3 encumbered for 879)</option>
+      </select></div>
+  </div>
+  <div class="bar"><button class="act" id="s-save">Save</button><span class="saved" id="s-msg"></span></div>
+
+  <h3>Start over</h3>
+  <div class="bar"><button class="tiny" id="wipe">Delete everything in this browser</button></div>
+</section>
+
+<footer>
+  Your data never leaves this computer on its own. Exporting and submitting to Canvas is the only
+  time it moves, and you do that deliberately.
+</footer>
+</main>
+
+<script>
+"use strict";
+const KEY = "cs879-ta-journal-v1";
+const CATS = ["Office hours and help sessions","Section, lab or recitation","Grading",
+  "Questions online and by email","Preparing materials","Staff meetings",
+  "Proctoring and exam logistics","Other"];
+const COLORS = ["#7B1416","#A63A3C","#1F7A4D","#2F6F9F","#9A6700","#5B4B8A","#3E7C7B","#6B6B6B"];
+
+const CHECKS = [
+  ["syllabus","I have read the syllabus of the course I am assisting",
+   "What does it say that would surprise a student?"],
+  ["ai","I have found and read the AI policy",
+   "In your own words: what may a student use, and what happens if they go past it?"],
+  ["late","I know the late work and extension policy",
+   "What do you say to a student who asks for two more days?"],
+  ["regrade","I know how regrade requests are handled",
+   "Who decides, on what basis, and by when?"],
+  ["honesty","I know what to do if I suspect academic dishonesty",
+   "What is your first step, and who do you tell? Not what you would like it to be, what it is."],
+  ["accom","I know how accommodations reach me and what they oblige",
+   "What do you do when a letter arrives, and what must you not ask?"],
+  ["report","I know what I am obliged to report as a responsible employee",
+   "A student starts telling you something in confidence. What do you say?"],
+  ["duties","I have agreed my duties with my instructor in writing",
+   "List them, with the hours or turnaround time attached to each."],
+  ["space","I know where I am holding office hours and have booked it",
+   "Where, when, and how does a student get in?"],
+  ["staff","I know who else is on the course staff and how we communicate",
+   "Names, roles, and which channel is used for what."]
+];
+
+const blank = () => ({
+  version: 1,
+  student: {name:"",course:"",professor:"",hours:10},
+  entries: [], checks: {}, weeks: [],
+  updated: null
+});
+
+let db = blank();
+let fsHandle = null;
+
+/* ---------- storage -------------------------------------------------------
+   Two layers on purpose. localStorage is automatic but a browser can clear it
+   without warning, which over a fifteen week term is a real risk. The File
+   System Access API writes to a real file the student picks once, so the journal
+   survives a cleared cache and can live in a synced folder. Chromium only, so
+   everything degrades to localStorage plus manual export. -------------------*/
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if (raw) db = Object.assign(blank(), JSON.parse(raw));
+  }catch(e){ /* private window, blocked storage: run in memory */ }
+}
+async function save(){
+  db.updated = new Date().toISOString();
+  try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){}
+  if (fsHandle){
+    try{
+      const w = await fsHandle.createWritable();
+      await w.write(JSON.stringify(db, null, 2));
+      await w.close();
+    }catch(e){ fsState("Could not write to the linked file. Re-link it.", true); }
+  }
+  render();
+}
+function fsSupported(){ return "showSaveFilePicker" in window; }
+function fsState(msg, bad){
+  const el = document.getElementById("fs-state");
+  el.textContent = msg;
+  el.className = "callout" + (bad ? " warn" : "");
+}
+
+/* ---------- helpers -------------------------------------------------------*/
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hrs = m => (m/60).toFixed(1);
+function sunday(d){ const x = new Date(d+"T12:00:00"); x.setDate(x.getDate()-x.getDay()); return x.toISOString().slice(0,10); }
+function fmtDate(d){ return new Date(d+"T12:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric"}); }
+function flash(el, msg){ el.innerHTML = "<b>"+esc(msg)+"</b>"; setTimeout(()=>{el.textContent="";}, 2500); }
+
+/* ---------- charts, drawn as SVG so there is nothing to load --------------*/
+function barChart(rows, total){
+  if (!rows.length) return '<p class="empty">Nothing logged yet.</p>';
+  const max = Math.max(...rows.map(r=>r.v)) || 1;
+  return '<div>' + rows.map((r,i)=>{
+    const pct = Math.round(r.v/max*100), share = total? Math.round(r.v/total*100):0;
+    return '<div style="display:grid;grid-template-columns:13rem 1fr 4.5rem;gap:.6rem;align-items:center;margin:0 0 .35rem">'
+      + '<div style="font-size:.87rem">'+esc(r.k)+'</div>'
+      + '<div style="background:var(--wash);border-radius:3px;height:1.35rem;overflow:hidden">'
+      +   '<div style="width:'+pct+'%;height:100%;background:'+(r.c||COLORS[i%COLORS.length])+'"></div></div>'
+      + '<div style="font-size:.85rem;color:var(--muted)"><b style="color:var(--ink)">'+hrs(r.v)+'</b> h · '+share+'%</div>'
+      + '</div>';
+  }).join('') + '</div>';
+}
+
+/* ---------- render --------------------------------------------------------*/
+function render(){
+  // log list
+  const filt = $("f-cat").value;
+  const es = db.entries.filter(e=>!filt||e.cat===filt)
+                       .sort((a,b)=> b.date.localeCompare(a.date) || b.id-a.id);
+  $("log-list").innerHTML = es.length ? '<table><thead><tr><th>Date</th><th>Category</th>'
+    + '<th>Time</th><th>What you did</th><th></th></tr></thead><tbody>'
+    + es.map(e=>'<tr><td>'+fmtDate(e.date)+'</td><td><span class="pill">'+esc(e.cat)+'</span></td>'
+        + '<td>'+hrs(e.mins)+' h</td>'
+        + '<td>'+esc(e.what)+(e.note?'<div style="color:var(--muted);font-size:.87rem;margin-top:.2rem">'+esc(e.note)+'</div>':'')+'</td>'
+        + '<td><button class="tiny" data-del="'+e.id+'">delete</button></td></tr>').join('')
+    + '</tbody></table>'
+    : '<p class="empty">No entries yet. Add the first one above.</p>';
+
+  // dashboard
+  const total = db.entries.reduce((s,e)=>s+e.mins,0);
+  const byCat = CATS.map((c,i)=>({k:c, v:db.entries.filter(e=>e.cat===c).reduce((s,e)=>s+e.mins,0), c:COLORS[i]}))
+                    .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+  const weeks = {};
+  db.entries.forEach(e=>{ const w=sunday(e.date); weeks[w]=(weeks[w]||0)+e.mins; });
+  const wk = Object.keys(weeks).sort();
+  const budget = (db.student.hours==20?17:7);
+  const avg = wk.length ? total/wk.length : 0;
+  $("stats").innerHTML =
+      '<div><b>'+hrs(total)+'</b><span>hours logged</span></div>'
+    + '<div><b>'+db.entries.length+'</b><span>entries</span></div>'
+    + '<div><b>'+wk.length+'</b><span>weeks recorded</span></div>'
+    + '<div><b>'+hrs(avg)+'</b><span>hours per week</span></div>';
+  $("chart-cat").innerHTML = barChart(byCat, total);
+  $("chart-week").innerHTML = barChart(wk.map(w=>({k:"Week of "+fmtDate(w), v:weeks[w],
+      c: weeks[w]/60 > budget ? "#A4262C" : "#1F7A4D"})), total);
+  $("budget-note").innerHTML = wk.length
+    ? 'Your appointment leaves <strong>'+budget+' hours a week</strong> for regular TA duties, '
+      + 'after the 3 hours encumbered for 879. Your average is <strong>'+hrs(avg)+'</strong>. '
+      + (avg/60 > budget
+          ? 'That is over. Bars in red are weeks that went past it. This is worth raising with your instructor, and the entries are your evidence.'
+          : 'Weeks that go past it show in red. One busy week is normal; a run of them is worth a conversation.')
+    : 'Log a few entries and this will tell you whether your weeks fit inside your paid hours.';
+
+  // checklist
+  $("checklist").innerHTML = CHECKS.map(([id,label,prompt])=>{
+    const c = db.checks[id] || {done:false,note:""};
+    return '<div class="chk'+(c.done?' done':'')+'">'
+      + '<div class="top"><input type="checkbox" id="c-'+id+'" data-chk="'+id+'"'+(c.done?' checked':'')+'>'
+      + '<div style="flex:1"><strong>'+esc(label)+'</strong>'
+      + '<div class="q">'+esc(prompt)+'</div>'
+      + '<textarea data-note="'+id+'" placeholder="In your own words">'+esc(c.note)+'</textarea>'
+      + '</div></div></div>';
+  }).join('');
+
+  // weeks
+  const ws = db.weeks.slice().sort((a,b)=>b.of.localeCompare(a.of));
+  $("week-list").innerHTML = ws.length
+    ? '<table><thead><tr><th>Week of</th><th>Fit</th><th>Flagged</th></tr></thead><tbody>'
+      + ws.map(w=>'<tr><td>'+fmtDate(w.of)+'</td><td>'+esc(w.fit||"—")+'</td><td>'+esc(w.flag||"—")+'</td></tr>').join('')
+      + '</tbody></table>'
+    : '<p class="empty">Nothing recorded yet.</p>';
+}
+
+/* ---------- export --------------------------------------------------------*/
+function toMarkdown(){
+  const s = db.student, total = db.entries.reduce((a,e)=>a+e.mins,0);
+  const weeks = {}; db.entries.forEach(e=>{const w=sunday(e.date);(weeks[w]=weeks[w]||[]).push(e);});
+  let m = "# TA Journal — "+(s.name||"unnamed")+"\n\n";
+  m += "- **Course assisted:** "+(s.course||"—")+"\n";
+  m += "- **Supervising instructor:** "+(s.professor||"—")+"\n";
+  m += "- **Appointment:** "+s.hours+" hours a week ("+(s.hours==20?17:7)+" for TA duties, 3 encumbered for 879)\n";
+  m += "- **Exported:** "+new Date().toISOString().slice(0,10)+"\n";
+  m += "- **Total logged:** "+hrs(total)+" hours across "+db.entries.length+" entries\n\n";
+
+  m += "## Time by category\n\n| Category | Hours | Share |\n|---|---:|---:|\n";
+  CATS.forEach(c=>{ const v=db.entries.filter(e=>e.cat===c).reduce((a,e)=>a+e.mins,0);
+    if(v) m += "| "+c+" | "+hrs(v)+" | "+Math.round(v/total*100)+"% |\n"; });
+
+  m += "\n## Week by week\n";
+  Object.keys(weeks).sort().forEach(w=>{
+    const mins = weeks[w].reduce((a,e)=>a+e.mins,0);
+    const rec = db.weeks.find(x=>x.of===w);
+    m += "\n### Week of "+w+" — "+hrs(mins)+" hours\n\n";
+    if (rec){ m += "- **Fit inside paid hours:** "+(rec.fit||"—")+"\n";
+              if (rec.flag) m += "- **Flagged:** "+rec.flag+"\n"; m += "\n"; }
+    weeks[w].sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>{
+      m += "- **"+e.date+"** · "+e.cat+" · "+hrs(e.mins)+" h — "+e.what+"\n";
+      if (e.note) m += "  - *Noticed:* "+e.note+"\n";
+    });
+  });
+
+  m += "\n## What I know about my course\n\n";
+  CHECKS.forEach(([id,label,prompt])=>{
+    const c = db.checks[id]||{done:false,note:""};
+    m += "### "+(c.done?"[x]":"[ ]")+" "+label+"\n\n";
+    m += "*"+prompt+"*\n\n"+(c.note ? c.note : "_not yet written_")+"\n\n";
+  });
+  return m;
+}
+function download(name, text, type){
+  const b = new Blob([text], {type});
+  const u = URL.createObjectURL(b), a = document.createElement("a");
+  a.href = u; a.download = name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(u), 1000);
+}
+function stamp(){
+  const n = (db.student.name||"journal").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  return n+"-ta-journal-"+new Date().toISOString().slice(0,10);
+}
+
+/* ---------- wiring --------------------------------------------------------*/
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected", x===b));
+  ["log","dash","know","week","data"].forEach(id=>$(id).hidden = (id!==b.dataset.tab));
+});
+CATS.forEach(c=>{
+  $("e-cat").insertAdjacentHTML("beforeend",'<option>'+esc(c)+'</option>');
+  $("f-cat").insertAdjacentHTML("beforeend",'<option>'+esc(c)+'</option>');
+});
+$("e-add").onclick = async () => {
+  const date=$("e-date").value, mins=parseInt($("e-mins").value,10), what=$("e-what").value.trim();
+  if(!date||!(mins>0)||!what){ flash($("e-msg"),"Date, minutes and what you did are all needed."); return; }
+  db.entries.push({id:Date.now(),date,mins,cat:$("e-cat").value,what,note:$("e-note").value.trim()});
+  $("e-mins").value=""; $("e-what").value=""; $("e-note").value="";
+  await save(); flash($("e-msg"),"Added.");
+};
+$("log-list").onclick = async ev => {
+  const id = ev.target.dataset.del; if(!id) return;
+  db.entries = db.entries.filter(e=>String(e.id)!==id); await save();
+};
+$("f-cat").onchange = render;
+$("f-clear").onclick = ()=>{ $("f-cat").value=""; render(); };
+$("checklist").onchange = async ev => {
+  const t=ev.target;
+  if(t.dataset.chk){ (db.checks[t.dataset.chk] = db.checks[t.dataset.chk]||{note:""}).done = t.checked; await save(); }
+  if(t.dataset.note){ (db.checks[t.dataset.note] = db.checks[t.dataset.note]||{done:false}).note = t.value; await save(); }
+};
+$("w-save").onclick = async () => {
+  const of=$("w-of").value; if(!of){ flash($("w-msg"),"Pick the week."); return; }
+  const w = sunday(of), i = db.weeks.findIndex(x=>x.of===w);
+  const rec = {of:w, fit:$("w-fit").value, flag:$("w-flag").value.trim()};
+  if(i>=0) db.weeks[i]=rec; else db.weeks.push(rec);
+  await save(); flash($("w-msg"),"Saved.");
+};
+$("s-save").onclick = async () => {
+  db.student = {name:$("s-name").value.trim(), course:$("s-course").value.trim(),
+                professor:$("s-prof").value.trim(), hours:parseInt($("s-hours").value,10)};
+  await save(); flash($("s-msg"),"Saved.");
+};
+$("dl-md").onclick = ()=>download(stamp()+".md", toMarkdown(), "text/markdown");
+$("dl-json").onclick = ()=>download(stamp()+".json", JSON.stringify(db,null,2), "application/json");
+$("imp").onclick = ()=>$("imp-file").click();
+$("imp-file").onchange = async ev => {
+  const f = ev.target.files[0]; if(!f) return;
+  try{
+    const d = JSON.parse(await f.text());
+    if(!Array.isArray(d.entries)) throw new Error("not a journal file");
+    if(!confirm("Replace what is in this browser with the file? Export first if you are unsure."))return;
+    db = Object.assign(blank(), d); await save(); fill();
+    alert("Imported "+db.entries.length+" entries.");
+  }catch(e){ alert("That file could not be read as a journal: "+e.message); }
+};
+$("fs-link").onclick = async () => {
+  if(!fsSupported()){ alert("This browser cannot link a file. Use Chrome or Edge, or download the JSON each week."); return; }
+  try{
+    fsHandle = await window.showSaveFilePicker({suggestedName: stamp()+".json",
+      types:[{description:"JSON", accept:{"application/json":[".json"]}}]});
+    await save();
+    fsState("Linked to "+fsHandle.name+". Every change is written there as well as to this browser.");
+  }catch(e){ /* cancelled */ }
+};
+$("fs-unlink").onclick = ()=>{ fsHandle=null; initFs(); };
+$("wipe").onclick = async () => {
+  if(!confirm("Delete every entry in this browser? Export first if you want to keep it.")) return;
+  db = blank(); try{ localStorage.removeItem(KEY); }catch(e){}
+  fill(); render();
+};
+function initFs(){
+  fsState(fsSupported()
+    ? "Not linked. Your journal is only in this browser, which can be cleared without warning."
+    : "This browser cannot link a file. Download the JSON each week and keep it somewhere safe.",
+    true);
+}
+function fill(){
+  $("s-name").value=db.student.name; $("s-course").value=db.student.course;
+  $("s-prof").value=db.student.professor; $("s-hours").value=db.student.hours;
+  $("e-date").value=new Date().toISOString().slice(0,10);
+  $("w-of").value=sunday(new Date().toISOString().slice(0,10));
+}
+load(); fill(); initFs(); render();
+</script>
+</body>
+</html>
