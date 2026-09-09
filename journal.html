@@ -71,6 +71,17 @@ th{background:var(--wash);font-size:.82rem;text-transform:uppercase;letter-spaci
 body.is879 .only879{display:block}
 body.is879 span.only879{display:inline}
 svg text{font-family:var(--font)}
+.calbox{display:flex;gap:.4rem;align-items:flex-start;overflow-x:auto;padding-bottom:.4rem}
+.caldow{display:grid;grid-template-rows:repeat(7,15px);gap:3px;font-size:9px;color:var(--muted);
+  padding-top:1.15rem;line-height:15px}
+.calgrid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,15px);gap:3px}
+.calmonths{display:grid;grid-auto-flow:column;gap:3px;font-size:.72rem;color:var(--muted);height:1.15rem}
+.calcell{width:15px;height:15px;border-radius:2px;background:#efedeb;cursor:default}
+.calcell[data-n]{cursor:pointer}
+.calcell.out{background:transparent}
+.calcell:hover{outline:2px solid var(--maroon);outline-offset:1px}
+.callegend{display:flex;gap:.35rem;align-items:center;font-size:.78rem;color:var(--muted);margin:.5rem 0 0}
+.callegend i{width:15px;height:15px;border-radius:2px;display:inline-block}
 footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color:var(--muted);font-size:.85rem}
 </style>
 </head>
@@ -138,6 +149,9 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <h2>Where your time goes</h2>
   <p class="sub">Built from your own entries. Nothing here is sent anywhere.</p>
   <div class="stat" id="stats"></div>
+  <h3>Days you logged something</h3>
+  <div id="cal-wrap"></div>
+  <div id="cal-detail" class="callout" style="min-height:3.2rem">Hover a day to see what you logged.</div>
   <h3 id="course-head" hidden>By course</h3>
   <div id="chart-course"></div>
   <h3>By category</h3>
@@ -252,6 +266,15 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
     reserved, leave it at 0. <span class="tag879">879</span> In COMPSCI 879 three hours a week are
     encumbered for the course, so a 10-hour TA has 7 for regular duties and a 20-hour TA has 17.
   </p>
+  <div class="row c2">
+    <div><label for="s-start">Appointment starts</label><input type="date" id="s-start"></div>
+    <div><label for="s-end">Appointment ends</label><input type="date" id="s-end"></div>
+  </div>
+  <p style="font-size:.9rem;color:var(--muted);margin-top:-.3rem">
+    Used to set the span of the calendar and to head the report. <span class="tag879">879</span>
+    For Fall 2026 the appointment runs Sunday 6 September 2026 to Saturday 16 January 2027;
+    choosing COMPSCI 879 above fills those in.</p>
+
   <h3>Courses you are assisting</h3>
   <p style="font-size:.9rem;color:var(--muted);margin-top:-.2rem">Most TAs have one. If your
   appointment is split across two, add both and give each the hours allocated to it, so you can see
@@ -401,7 +424,7 @@ const CHECKS = [
 
 const blank = () => ({
   version: 3,
-  student: {name:"", hours:10, reserved:0, ctx:"general",
+  student: {name:"", hours:10, reserved:0, ctx:"general", start:"", end:"",
             courses:[{code:"", instructor:"", hours:0}]},
   entries: [], checks: {}, weeks: [],
   updated: null
@@ -422,6 +445,7 @@ function migrate(d){
     d.entries.forEach(e => { if (e.course === undefined) e.course = d.student.courses[0].code; });
     d.version = 3;
   }
+  if (d.student.start === undefined){ d.student.start = ""; d.student.end = ""; }
   return d;
 }
 const courses = () => (db.student.courses||[]).filter(c=>c.code.trim());
@@ -485,6 +509,75 @@ function barChart(rows, total){
   }).join('') + '</div>';
 }
 
+/* ---------- calendar -------------------------------------------------------
+   One square per day across the whole appointment, weeks as columns. Shows at a
+   glance which days have anything on them, which is the question a term-long
+   journal actually raises: not "how many hours" but "am I still doing this".
+   Hovering a square fills the panel underneath rather than relying on a tooltip,
+   because several entries on one day do not fit in a title attribute. --------*/
+const CALSHADE = ["#efedeb","#E8CFCF","#D09A9B","#A9484A","#7B1416"];
+function addDays(iso, n){ const d=new Date(iso+"T12:00:00"); d.setDate(d.getDate()+n);
+  return d.toISOString().slice(0,10); }
+function calendarHTML(){
+  const byDay = {};
+  db.entries.forEach(e => (byDay[e.date] = byDay[e.date] || []).push(e));
+  const seen = Object.keys(byDay).sort();
+  const s = db.student;
+  let from = s.start || seen[0], to = s.end || seen[seen.length-1];
+  if (!from) return '<p class="empty">Set your appointment dates, or log an entry, and the calendar appears here.</p>';
+  if (!to || to < from) to = from;
+  from = sunday(from);
+  while (new Date(to+"T12:00:00").getDay() !== 6) to = addDays(to, 1);
+  const days = Math.round((new Date(to+"T12:00:00") - new Date(from+"T12:00:00"))/86400000) + 1;
+  if (days > 500) return '<p class="empty">That date range is too wide to draw. Check your appointment dates.</p>';
+
+  const mins = d => (byDay[d]||[]).reduce((a,e)=>a+e.mins,0);
+  const peak = Math.max(1, ...Object.keys(byDay).map(mins));
+  const weeks = Math.ceil(days/7);
+  const cells = [], months = [];
+  for (let w = 0; w < weeks; w++){
+    const first = addDays(from, w*7);
+    const mo = new Date(first+"T12:00:00").getMonth();
+    const prev = w ? new Date(addDays(from,(w-1)*7)+"T12:00:00").getMonth() : -1;
+    months.push('<span>'+(mo!==prev
+      ? new Date(first+"T12:00:00").toLocaleDateString(undefined,{month:"short"}) : "")+'</span>');
+    for (let dow = 0; dow < 7; dow++){
+      const d = addDays(from, w*7+dow);
+      const out = (s.start && d < s.start) || (s.end && d > s.end);
+      const m = mins(d), n = (byDay[d]||[]).length;
+      const lvl = !m ? 0 : Math.min(4, 1+Math.floor((m/peak)*3.999));
+      cells.push('<div class="calcell'+(out?' out':'')+'" data-d="'+d+'"'
+        + (n?' data-n="'+n+'"':'')
+        + ' style="background:'+(out?'transparent':CALSHADE[lvl])+'"'
+        + ' title="'+d+(n?': '+hrs(m)+' h, '+n+' entr'+(n>1?'ies':'y'):': nothing logged')+'"></div>');
+    }
+  }
+  // column-major fill means the grid must be ordered week by week
+  const ordered = [];
+  for (let w = 0; w < weeks; w++) for (let dow = 0; dow < 7; dow++) ordered.push(cells[w*7+dow]);
+  return '<div class="calbox">'
+    + '<div class="caldow"><span></span><span>M</span><span></span><span>W</span><span></span><span>F</span><span></span></div>'
+    + '<div><div class="calmonths" style="grid-template-columns:repeat('+weeks+',15px)">'+months.join("")+'</div>'
+    + '<div class="calgrid">'+ordered.join("")+'</div></div></div>'
+    + '<div class="callegend">Less'
+    + CALSHADE.map(c=>'<i style="background:'+c+'"></i>').join("")
+    + 'More · squares outside your appointment are left blank</div>';
+}
+function calDetail(d){
+  const es = db.entries.filter(e=>e.date===d).sort((a,b)=>a.id-b.id);
+  const el = $("cal-detail");
+  if (!es.length){ el.innerHTML = '<strong>'+d+'</strong> — nothing logged.'; return; }
+  const tot = es.reduce((a,e)=>a+e.mins,0);
+  el.innerHTML = '<strong>'+d+'</strong> — '+hrs(tot)+' hours across '+es.length+' entr'
+    + (es.length>1?'ies':'y')
+    + '<ul style="margin:.4rem 0 0;padding-left:1.1rem">'
+    + es.map(e=>'<li style="margin:0 0 .25rem">'
+        + (courses().length>1 && e.course ? '<span class="pill">'+esc(e.course)+'</span> ' : '')
+        + '<span class="pill">'+esc(e.cat)+'</span> '+hrs(e.mins)+' h — '+esc(e.what)
+        + (e.note?'<div style="color:var(--muted);font-size:.88rem">'+esc(e.note)+'</div>':'')
+        + '</li>').join('') + '</ul>';
+}
+
 /* ---------- render --------------------------------------------------------*/
 function render(){
   // log list
@@ -518,6 +611,7 @@ function render(){
     + '<div><b>'+db.entries.length+'</b><span>entries</span></div>'
     + '<div><b>'+wk.length+'</b><span>weeks recorded</span></div>'
     + '<div><b>'+hrs(avg)+'</b><span>hours per week</span></div>';
+  $("cal-wrap").innerHTML = calendarHTML();
   $("chart-cat").innerHTML = barChart(byCat, total);
   const perCourse = courses().map((c,i)=>({k:c.code,
       v:db.entries.filter(e=>e.course===c.code).reduce((s,e)=>s+e.mins,0), c:COLORS[i]}))
@@ -615,6 +709,7 @@ function toMarkdown(){
   m += "- **Appointment:** "+s.hours+" hours a week"
      + (s.reserved ? " ("+available()+" for regular duties, "+s.reserved+" reserved"
                      + (s.ctx==="879" ? " for COMPSCI 879" : "")+")" : "")+"\n";
+  if (s.start || s.end) m += "- **Appointment:** "+(s.start||"?")+" to "+(s.end||"?")+"\n";
   m += "- **Exported:** "+new Date().toISOString().slice(0,10)+"\n";
   m += "- **Total logged:** "+hrs(total)+" hours across "+db.entries.length+" entries\n\n";
 
@@ -676,6 +771,8 @@ $("log-list").onclick = async ev => {
   const id = ev.target.dataset.del; if(!id) return;
   db.entries = db.entries.filter(e=>String(e.id)!==id); await save();
 };
+$("cal-wrap").onmouseover = ev => { const d = ev.target.dataset.d; if (d) calDetail(d); };
+$("cal-wrap").onclick     = ev => { const d = ev.target.dataset.d; if (d) calDetail(d); };
 $("f-cat").onchange = render;
 $("f-course").onchange = render;
 $("f-clear").onclick = ()=>{ $("f-cat").value=""; $("f-course").value=""; render(); };
@@ -706,13 +803,18 @@ $("w-save").onclick = async () => {
 $("s-ctx").onchange = () => {
   if ($("s-ctx").value === "879" && !parseFloat($("s-reserved").value)) $("s-reserved").value = 3;
   if ($("s-ctx").value === "general" && parseFloat($("s-reserved").value) === 3) $("s-reserved").value = 0;
+  if ($("s-ctx").value === "879"){
+    if (!$("s-start").value) $("s-start").value = "2026-09-06";
+    if (!$("s-end").value)   $("s-end").value   = "2027-01-16";
+  }
 };
 $("s-save").onclick = async () => {
   db.student = Object.assign({}, db.student, {
     name:$("s-name").value.trim(),
     hours:parseFloat($("s-hours").value)||0,
     reserved:parseFloat($("s-reserved").value)||0,
-    ctx:$("s-ctx").value});
+    ctx:$("s-ctx").value,
+    start:$("s-start").value, end:$("s-end").value});
   await save(); flash($("s-msg"),"Saved.");
 };
 $("dl-md").onclick = ()=>download(stamp()+".md", toMarkdown(), "text/markdown");
@@ -812,6 +914,7 @@ function reportHTML(from, to, course){
                   + (s.ctx==="879" ? ' for COMPSCI 879' : '')
                   + ', leaving <b>'+budget+'</b> for regular duties' : '')
             : 'Course not set'))
+  +   (s.start||s.end ? '<br>Appointment: <b>'+esc(s.start||"?")+'</b> to <b>'+esc(s.end||"?")+'</b>' : '')
   +   '<br>Period covered: <b>'+esc(span)+'</b> · generated '+new Date().toLocaleDateString()
   + '</p>'
   + '<div class="stat">'
@@ -877,6 +980,7 @@ function fill(){
   $("s-name").value=db.student.name;
   $("s-hours").value=db.student.hours;
   $("s-reserved").value=db.student.reserved; $("s-ctx").value=db.student.ctx;
+  $("s-start").value=db.student.start||""; $("s-end").value=db.student.end||"";
 
   $("e-date").value=new Date().toISOString().slice(0,10);
   $("w-of").value=sunday(new Date().toISOString().slice(0,10));
