@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TA Journal · COMPSCI 879</title>
+<title>TA Journal</title>
 <style>
 :root{
   --maroon:#7B1416; --ink:#24292f; --muted:#57606a; --rule:#d8d8d8;
@@ -65,6 +65,11 @@ th{background:var(--wash);font-size:.82rem;text-transform:uppercase;letter-spaci
   background:var(--wash);border:1px solid var(--rule);color:var(--muted);white-space:nowrap}
 .saved{font-size:.85rem;color:var(--muted)}
 .saved b{color:var(--go)}
+.tag879{display:inline-block;background:var(--maroon);color:#fff;font-size:.7rem;font-weight:800;
+  letter-spacing:.05em;padding:.05rem .4rem;border-radius:3px;vertical-align:.08em}
+.only879{display:none}
+body.is879 .only879{display:block}
+body.is879 span.only879{display:inline}
 svg text{font-family:var(--font)}
 footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color:var(--muted);font-size:.85rem}
 </style>
@@ -72,7 +77,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
 <body>
 <header>
   <h1>TA Journal</h1>
-  <p>COMPSCI 879 · everything stays on this computer unless you export it</p>
+  <p id="hdr-sub">Everything stays on this computer unless you export it</p>
 </header>
 
 <nav role="tablist">
@@ -178,6 +183,22 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
     <button class="ghost" id="imp">Import a JSON backup</button>
     <input type="file" id="imp-file" accept="application/json,.json" hidden>
   </div>
+  <p class="only879" style="font-size:.9rem;color:var(--muted);margin-top:-.4rem">
+    <span class="tag879">879</span> Upload both files to that week's TA Journal assignment in Canvas
+    each Friday.</p>
+
+  <h3>Report for your instructor</h3>
+  <p style="font-size:.94rem">A printable summary of your hours and what you spent them on. Opens in
+  a new tab; use your browser's Print command and choose Save as PDF. Send it when an instructor asks
+  where your time is going, or when you want evidence for a conversation about workload.</p>
+  <div class="row c3">
+    <div><label for="r-from">From</label><input type="date" id="r-from"></div>
+    <div><label for="r-to">To</label><input type="date" id="r-to"></div>
+    <div style="display:flex;align-items:flex-end"><button class="act" id="mk-report"
+      style="width:100%">Open printable report</button></div>
+  </div>
+  <p style="font-size:.87rem;color:var(--muted);margin-top:-.3rem">Leave the dates empty for
+  everything you have logged.</p>
 
   <h3>Keeping your journal safe</h3>
   <div class="callout" id="fs-state"></div>
@@ -200,12 +221,23 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   </div>
   <div class="row c2">
     <div><label for="s-prof">Supervising instructor</label><input id="s-prof"></div>
-    <div><label for="s-hours">Appointment</label>
-      <select id="s-hours">
-        <option value="10">10 hours a week (7 for TA duties, 3 encumbered for 879)</option>
-        <option value="20">20 hours a week (17 for TA duties, 3 encumbered for 879)</option>
+    <div><label for="s-hours">Appointment, hours a week</label>
+      <input type="number" id="s-hours" min="1" max="40" step="1" placeholder="10"></div>
+  </div>
+  <div class="row c2">
+    <div><label for="s-reserved">Hours a week reserved for training or other duties</label>
+      <input type="number" id="s-reserved" min="0" max="20" step="0.5" placeholder="0"></div>
+    <div><label for="s-ctx">This journal is for</label>
+      <select id="s-ctx">
+        <option value="general">A TA appointment (general)</option>
+        <option value="879">COMPSCI 879, the TA training practicum</option>
       </select></div>
   </div>
+  <p style="font-size:.9rem;color:var(--muted);margin-top:-.3rem">
+    <strong>Reserved hours</strong> come off your appointment before regular duties. If nothing is
+    reserved, leave it at 0. <span class="tag879">879</span> In COMPSCI 879 three hours a week are
+    encumbered for the course, so a 10-hour TA has 7 for regular duties and a 20-hour TA has 17.
+  </p>
   <div class="bar"><button class="act" id="s-save">Save</button><span class="saved" id="s-msg"></span></div>
 
   <h3>Start over</h3>
@@ -250,11 +282,20 @@ const CHECKS = [
 ];
 
 const blank = () => ({
-  version: 1,
-  student: {name:"",course:"",professor:"",hours:10},
+  version: 2,
+  student: {name:"",course:"",professor:"",hours:10,reserved:0,ctx:"general"},
   entries: [], checks: {}, weeks: [],
   updated: null
 });
+// v1 stored hours as 10 or 20 and assumed the 879 encumbrance. Anything written by
+// that version belongs to an 879 TA, so carry the 3 hours across explicitly.
+function migrate(d){
+  if (d.version === 1 || d.student.reserved === undefined){
+    d.student.reserved = 3; d.student.ctx = "879"; d.version = 2;
+  }
+  return d;
+}
+const available = () => Math.max(0, (+db.student.hours||0) - (+db.student.reserved||0));
 
 let db = blank();
 let fsHandle = null;
@@ -268,7 +309,7 @@ let fsHandle = null;
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
-    if (raw) db = Object.assign(blank(), JSON.parse(raw));
+    if (raw) db = migrate(Object.assign(blank(), JSON.parse(raw)));
   }catch(e){ /* private window, blocked storage: run in memory */ }
 }
 async function save(){
@@ -335,7 +376,7 @@ function render(){
   const weeks = {};
   db.entries.forEach(e=>{ const w=sunday(e.date); weeks[w]=(weeks[w]||0)+e.mins; });
   const wk = Object.keys(weeks).sort();
-  const budget = (db.student.hours==20?17:7);
+  const budget = available();
   const avg = wk.length ? total/wk.length : 0;
   $("stats").innerHTML =
       '<div><b>'+hrs(total)+'</b><span>hours logged</span></div>'
@@ -345,13 +386,18 @@ function render(){
   $("chart-cat").innerHTML = barChart(byCat, total);
   $("chart-week").innerHTML = barChart(wk.map(w=>({k:"Week of "+fmtDate(w), v:weeks[w],
       c: weeks[w]/60 > budget ? "#A4262C" : "#1F7A4D"})), total);
-  $("budget-note").innerHTML = wk.length
-    ? 'Your appointment leaves <strong>'+budget+' hours a week</strong> for regular TA duties, '
-      + 'after the 3 hours encumbered for 879. Your average is <strong>'+hrs(avg)+'</strong>. '
-      + (avg/60 > budget
-          ? 'That is over. Bars in red are weeks that went past it. This is worth raising with your instructor, and the entries are your evidence.'
-          : 'Weeks that go past it show in red. One busy week is normal; a run of them is worth a conversation.')
-    : 'Log a few entries and this will tell you whether your weeks fit inside your paid hours.';
+  const res = +db.student.reserved || 0;
+  $("budget-note").innerHTML = !wk.length
+    ? 'Log a few entries and this will tell you whether your weeks fit inside your paid hours.'
+    : (budget > 0
+        ? 'Your appointment leaves <strong>'+budget+' hours a week</strong> for regular TA duties'
+          + (res ? ', after the '+res+' reserved' + (db.student.ctx==="879" ? ' for 879' : '') : '')
+          + '. Your average is <strong>'+hrs(avg)+'</strong>. '
+          + (avg/60 > budget
+              ? 'That is over. Bars in red are weeks that went past it. This is worth raising with your instructor, and your entries are the evidence.'
+              : 'Weeks that go past it show in red. One busy week is normal; a run of them is worth a conversation.')
+        : 'Set your appointment hours on the Export and setup tab and this will tell you whether '
+          + 'your weeks fit inside them. Your average so far is <strong>'+hrs(avg)+'</strong> a week.');
 
   // checklist
   $("checklist").innerHTML = CHECKS.map(([id,label,prompt])=>{
@@ -380,7 +426,9 @@ function toMarkdown(){
   let m = "# TA Journal — "+(s.name||"unnamed")+"\n\n";
   m += "- **Course assisted:** "+(s.course||"—")+"\n";
   m += "- **Supervising instructor:** "+(s.professor||"—")+"\n";
-  m += "- **Appointment:** "+s.hours+" hours a week ("+(s.hours==20?17:7)+" for TA duties, 3 encumbered for 879)\n";
+  m += "- **Appointment:** "+s.hours+" hours a week"
+     + (s.reserved ? " ("+available()+" for regular duties, "+s.reserved+" reserved"
+                     + (s.ctx==="879" ? " for COMPSCI 879" : "")+")" : "")+"\n";
   m += "- **Exported:** "+new Date().toISOString().slice(0,10)+"\n";
   m += "- **Total logged:** "+hrs(total)+" hours across "+db.entries.length+" entries\n\n";
 
@@ -454,9 +502,16 @@ $("w-save").onclick = async () => {
   if(i>=0) db.weeks[i]=rec; else db.weeks.push(rec);
   await save(); flash($("w-msg"),"Saved.");
 };
+$("s-ctx").onchange = () => {
+  if ($("s-ctx").value === "879" && !parseFloat($("s-reserved").value)) $("s-reserved").value = 3;
+  if ($("s-ctx").value === "general" && parseFloat($("s-reserved").value) === 3) $("s-reserved").value = 0;
+};
 $("s-save").onclick = async () => {
   db.student = {name:$("s-name").value.trim(), course:$("s-course").value.trim(),
-                professor:$("s-prof").value.trim(), hours:parseInt($("s-hours").value,10)};
+                professor:$("s-prof").value.trim(),
+                hours:parseFloat($("s-hours").value)||0,
+                reserved:parseFloat($("s-reserved").value)||0,
+                ctx:$("s-ctx").value};
   await save(); flash($("s-msg"),"Saved.");
 };
 $("dl-md").onclick = ()=>download(stamp()+".md", toMarkdown(), "text/markdown");
@@ -487,6 +542,111 @@ $("wipe").onclick = async () => {
   db = blank(); try{ localStorage.removeItem(KEY); }catch(e){}
   fill(); render();
 };
+/* ---------- printable report ----------------------------------------------
+   Opens in a new tab with its own print stylesheet so the student can Save as
+   PDF and hand it to an instructor. Everything is inline: that tab is a document
+   in its own right and has to survive being saved, mailed on, or printed from a
+   machine that has never seen this tool. -----------------------------------*/
+function reportHTML(from, to){
+  const s = db.student;
+  const inRange = e => (!from || e.date >= from) && (!to || e.date <= to);
+  const es = db.entries.filter(inRange).sort((a,b)=>a.date.localeCompare(b.date));
+  const total = es.reduce((a,e)=>a+e.mins,0);
+  const weeks = {}; es.forEach(e=>{ const w=sunday(e.date); (weeks[w]=weeks[w]||[]).push(e); });
+  const wk = Object.keys(weeks).sort();
+  const budget = available(), avg = wk.length ? total/60/wk.length : 0;
+  const cats = CATS.map((c,i)=>({k:c, v:es.filter(e=>e.cat===c).reduce((a,e)=>a+e.mins,0), c:COLORS[i]}))
+                   .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+  const span = es.length ? (es[0].date + " to " + es[es.length-1].date) : "no entries in range";
+  const bars = (rows, denom) => {
+    const max = Math.max(...rows.map(x=>x.v)) || 1;
+    return rows.map(r=>'<tr><th scope="row">'+esc(r.k)+'</th>'
+      + '<td class="barcell"><span class="bar" style="width:'+Math.round(r.v/max*100)+'%;background:'+r.c+'"></span></td>'
+      + '<td class="num">'+hrs(r.v)+'</td>'
+      + '<td class="num">'+(denom ? Math.round(r.v/denom*100)+'%' : '')+'</td></tr>').join("");
+  };
+
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
+  + '<title>TA hours report'+(s.name?" — "+esc(s.name):"")+'</title><style>'
+  + '@page{margin:16mm}'
+  + 'body{font-family:Lato,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:#24292f;'
+  + 'line-height:1.5;max-width:52rem;margin:0 auto;padding:1.5rem;font-size:15px}'
+  + 'h1{color:#7B1416;font-size:1.5rem;margin:0 0 .2rem}'
+  + 'h2{color:#7B1416;font-size:1.05rem;margin:2rem 0 .6rem;border-bottom:2px solid #d8d8d8;padding-bottom:.25rem}'
+  + '.meta{color:#57606a;font-size:.92rem;margin:0 0 1.4rem}.meta b{color:#24292f}'
+  + 'table{width:100%;border-collapse:collapse;font-size:.92rem;margin:0 0 1rem}'
+  + 'th,td{text-align:left;padding:.4rem .55rem;border-bottom:1px solid #e6e6e6;vertical-align:top}'
+  + 'thead th{background:#f6f6f5;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:#57606a}'
+  + 'th[scope=row]{font-weight:400;width:14rem}'
+  + '.num{text-align:right;white-space:nowrap;width:4.5rem}'
+  + '.bar{display:block;height:.85rem;border-radius:2px;min-width:2px}'
+  + '.stat{display:flex;gap:1.6rem;flex-wrap:wrap;margin:0 0 1.2rem;padding:.9rem 1.1rem;'
+  + 'background:#f6f6f5;border-left:4px solid #7B1416}'
+  + '.stat div b{display:block;font-size:1.5rem;color:#7B1416;line-height:1.1}'
+  + '.stat div span{font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:#57606a}'
+  + '.over{color:#A4262C;font-weight:700}'
+  + '.note{color:#57606a;font-size:.88rem;margin:.15rem 0 0}'
+  + '.wk{margin:0 0 1.1rem;page-break-inside:avoid}'
+  + '.wk h3{font-size:.98rem;margin:0 0 .3rem}'
+  + '.wk ul{margin:.2rem 0 0;padding-left:1.1rem}.wk li{margin:0 0 .3rem}'
+  + 'footer{margin-top:2.5rem;padding-top:.8rem;border-top:1px solid #d8d8d8;color:#57606a;font-size:.82rem}'
+  + '@media print{body{padding:0;max-width:none}.noprint{display:none}h2{page-break-after:avoid}}'
+  + '</style></head><body>'
+  + '<h1>TA hours report</h1>'
+  + '<p class="meta">'
+  +   (s.name ? '<b>'+esc(s.name)+'</b><br>' : '')
+  +   (s.course ? 'Assisting <b>'+esc(s.course)+'</b>' : 'Course not set')
+  +   (s.professor ? ' · supervising instructor <b>'+esc(s.professor)+'</b>' : '') + '<br>'
+  +   'Appointment <b>'+(s.hours||0)+' hours a week</b>'
+  +   (s.reserved ? ', of which <b>'+s.reserved+'</b> reserved'
+        + (s.ctx==="879" ? ' for COMPSCI 879' : '') + ', leaving <b>'+budget+'</b> for regular duties' : '')
+  +   '<br>Period covered: <b>'+esc(span)+'</b> · generated '+new Date().toLocaleDateString()
+  + '</p>'
+  + '<div class="stat">'
+  +   '<div><b>'+hrs(total)+'</b><span>hours</span></div>'
+  +   '<div><b>'+es.length+'</b><span>entries</span></div>'
+  +   '<div><b>'+wk.length+'</b><span>weeks</span></div>'
+  +   '<div><b'+(budget && avg>budget ? ' class="over"' : '')+'>'+avg.toFixed(1)+'</b><span>hours per week</span></div>'
+  + '</div>'
+  + (budget ? '<p class="note">'+(avg>budget
+      ? 'The weekly average is above the '+budget+' hours available for regular duties.'
+      : 'The weekly average is within the '+budget+' hours available for regular duties.')+'</p>' : '')
+  + '<h2>Where the time went</h2>'
+  + (cats.length ? '<table><thead><tr><th>Category</th><th></th><th class="num">Hours</th>'
+      + '<th class="num">Share</th></tr></thead><tbody>'+bars(cats, total)+'</tbody></table>'
+      : '<p>No entries in this period.</p>')
+  + (wk.length ? '<h2>Week by week</h2>'
+      + '<table><thead><tr><th>Week beginning</th><th></th><th class="num">Hours</th>'
+      + '<th class="num"></th></tr></thead><tbody>'
+      + bars(wk.map(w=>{ const v = weeks[w].reduce((a,e)=>a+e.mins,0);
+          return {k:"Week of "+w, v, c:(budget && v/60>budget) ? "#A4262C" : "#1F7A4D"}; }), 0)
+      + '</tbody></table>' : "")
+  + '<h2>What the time was spent on</h2>'
+  + (wk.length ? wk.map(w=>{
+      const rec = db.weeks.find(x=>x.of===w);
+      const v = weeks[w].reduce((a,e)=>a+e.mins,0);
+      return '<div class="wk"><h3>Week of '+w+' — '+hrs(v)+' hours'
+        + (budget && v/60>budget ? ' <span class="over">(over)</span>' : '')+'</h3>'
+        + (rec && (rec.fit||rec.flag) ? '<p class="note">'
+            + (rec.fit ? '<b>Fit:</b> '+esc(rec.fit) : '')
+            + (rec.flag ? (rec.fit?' · ':'')+'<b>Flagged:</b> '+esc(rec.flag) : '')+'</p>' : '')
+        + '<ul>' + weeks[w].map(e=>'<li><b>'+e.date+'</b> · '+esc(e.cat)+' · '+hrs(e.mins)
+            + ' h — ' + esc(e.what)
+            + (e.note ? '<br><span class="note">Noticed: '+esc(e.note)+'</span>' : '') + '</li>').join('')
+        + '</ul></div>';
+    }).join('') : '<p>No entries in this period.</p>')
+  + '<footer>Compiled by the author from a journal kept week by week. Hours are the author’s own '
+  + 'estimates recorded at the time, not a timesheet. No student is identified.</footer>'
+  + '<p class="noprint" style="margin-top:1.5rem;color:#57606a;font-size:.85rem">'
+  + 'Use your browser’s Print command and choose <b>Save as PDF</b>.</p>'
+  + '</body></html>';
+}
+$("mk-report").onclick = () => {
+  const w = window.open("", "_blank");
+  if (!w){ alert("Your browser blocked the new tab. Allow pop-ups for this page and try again."); return; }
+  w.document.write(reportHTML($("r-from").value, $("r-to").value));
+  w.document.close();
+};
 function initFs(){
   fsState(fsSupported()
     ? "Not linked. Your journal is only in this browser, which can be cleared without warning."
@@ -496,6 +656,10 @@ function initFs(){
 function fill(){
   $("s-name").value=db.student.name; $("s-course").value=db.student.course;
   $("s-prof").value=db.student.professor; $("s-hours").value=db.student.hours;
+  $("s-reserved").value=db.student.reserved; $("s-ctx").value=db.student.ctx;
+  document.body.classList.toggle("is879", db.student.ctx==="879");
+  $("hdr-sub").textContent = (db.student.course ? db.student.course+" · " : "")
+    + "everything stays on this computer unless you export it";
   $("e-date").value=new Date().toISOString().slice(0,10);
   $("w-of").value=sunday(new Date().toISOString().slice(0,10));
 }
