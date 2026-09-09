@@ -349,6 +349,14 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
     <button class="tiny" id="fs-unlink">Unlink</button>
   </div>
 
+  <h3>Reminders</h3>
+  <p class="hint">The panel at the top of the Log tab always shows what is outstanding, and it
+  refreshes itself as the day moves on. Browser notifications are optional on top of that: at most
+  one a day, only while this tab is sitting in the background, and only when something is actually
+  due. They stop the moment you close the tab, so this is a nudge rather than a system.</p>
+  <div class="callout" id="nf-state"></div>
+  <div class="bar"><button class="ghost" id="nf-toggle">Turn reminders on</button></div>
+
   <h3>Start over</h3>
   <p class="hint">Wipes everything in this browser. Export first if you want to keep any of it.</p>
   <div class="bar"><button class="tiny" id="wipe">Delete everything in this browser</button></div>
@@ -697,14 +705,10 @@ function setupGaps(){
   return gaps;
 }
 
-function statusHTML(){
+function statusModel(){
   const gaps = setupGaps();
-  if (gaps.length){
-    return '<div class="callout stop"><strong>Finish the setup before you start logging.</strong>'
-      + '<p style="margin:.4rem 0 0">An entry with no name, no hours and no course attached is data '
-      + 'nobody can use later, including you. This takes a minute and you only do it once.</p>'
-      + '<ul class="todo">' + gaps.map(g=>'<li>'+esc(g)+'</li>').join('') + '</ul>'
-      + '<p style="margin:.6rem 0 0"><button class="act" id="go-setup">Go to setup</button></p></div>';
+  if (gaps.length) return {blocked:true, gaps, items:[]};
+  {
   }
 
   const today = todayISO(), s = db.student, items = [];
@@ -750,17 +754,105 @@ function statusHTML(){
   if (!s.start || !s.end)
     items.push(["do","Add your appointment start and end dates so the calendar spans the right period.",0]);
 
-  const todo = items.filter(i=>!i[2]);
+  return {blocked:false, gaps:[], items};
+}
+
+function statusHTML(){
+  const m = statusModel();
+  if (m.blocked){
+    return '<div class="callout stop"><strong>Finish the setup before you start logging.</strong>'
+      + '<p style="margin:.4rem 0 0">An entry with no name, no hours and no course attached is data '
+      + 'nobody can use later, including you. This takes a minute and you only do it once.</p>'
+      + '<ul class="todo">' + m.gaps.map(g=>'<li>'+esc(g)+'</li>').join('') + '</ul>'
+      + '<p style="margin:.6rem 0 0"><button class="act" id="go-setup">Go to setup</button></p></div>';
+  }
+  const todo = m.items.filter(i=>!i[2]);
   const cls = todo.length ? "warn" : "ok";
   const head = todo.length
     ? (todo.length===1 ? "One thing to do" : todo.length+" things to do")
     : "You are up to date";
   return '<div class="callout '+cls+'"><strong>'+head+'</strong>'
     + '<ul class="todo">'
-    + items.map(i=>'<li class="'+(i[2]?"done":"")+'">'
+    + m.items.map(i=>'<li class="'+(i[2]?"done":"")+'">'
         + (i[0]==="do879" ? '<span class="tag879">879</span> ' : '') + i[1] + '</li>').join('')
     + '</ul></div>';
 }
+
+/* ---------- keeping the panel honest ---------------------------------------
+   What is due changes with the clock, and this page can sit open for days. A full
+   render() would rebuild the course inputs and steal focus from anyone typing, so
+   the tick touches only the status panel and the form's disabled state. --------*/
+let lastStatusDay = null;
+function refreshStatus(){
+  $("status").innerHTML = statusHTML();
+  $("e-form").disabled = statusModel().blocked;
+  const g = $("go-setup");
+  if (g) g.onclick = () => document.querySelector('nav button[data-tab=setup]').click();
+  lastStatusDay = todayISO();
+}
+function startStatusTicker(){
+  setInterval(() => {
+    // a day rollover changes everything; otherwise this is a cheap no-op redraw
+    if (todayISO() !== lastStatusDay) refreshStatus();
+    else refreshStatus();
+    maybeNotify();
+  }, 60000);
+  // waking from sleep or coming back to the tab can skip the interval entirely
+  addEventListener("visibilitychange", () => { if (!document.hidden) refreshStatus(); });
+  addEventListener("focus", refreshStatus);
+}
+
+/* ---------- notifications ---------------------------------------------------
+   Once a day, only while the tab is in the background, only when something is
+   actually outstanding, and only after the student has asked for them. A reminder
+   that fires while you are looking at the reminder is just noise. --------------*/
+const NOTIFY_KEY = KEY + "-notify", NOTIFIED_KEY = KEY + "-notified";
+const notifyPref = () => { try{ return localStorage.getItem(NOTIFY_KEY) || "off"; }catch(e){ return "off"; } };
+function notifyState(){
+  const el = $("nf-state"); if (!el) return;
+  const supported = "Notification" in window;
+  const perm = supported ? Notification.permission : "unsupported";
+  let msg;
+  if (!supported) msg = "This browser cannot show notifications. The panel at the top of the Log tab is your reminder.";
+  else if (perm === "denied") msg = "Notifications are blocked for this site in your browser settings. Unblock them there if you want them back.";
+  else if (notifyPref() !== "on") msg = "Off. You will still see the reminders at the top of the Log tab.";
+  else if (perm !== "granted") msg = "Permission not granted yet. Press the button and allow it.";
+  else msg = "On. At most one a day, and only when this tab is in the background and something is outstanding.";
+  el.textContent = msg;
+  const b = $("nf-toggle");
+  if (b) b.textContent = notifyPref() === "on" ? "Turn reminders off" : "Turn reminders on";
+}
+async function toggleNotify(){
+  if (notifyPref() === "on"){
+    try{ localStorage.setItem(NOTIFY_KEY, "off"); }catch(e){}
+    notifyState(); return;
+  }
+  if (!("Notification" in window)){ notifyState(); return; }
+  let perm = Notification.permission;
+  if (perm === "default") perm = await Notification.requestPermission();
+  if (perm === "granted"){ try{ localStorage.setItem(NOTIFY_KEY, "on"); }catch(e){} }
+  notifyState();
+}
+function maybeNotify(){
+  if (notifyPref() !== "on") return;
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+  if (!document.hidden) return;                      // they are looking at the panel already
+  let last = ""; try{ last = localStorage.getItem(NOTIFIED_KEY) || ""; }catch(e){}
+  const today = todayISO();
+  if (last === today) return;
+  const m = statusModel();
+  const todo = m.blocked ? m.gaps : m.items.filter(i=>!i[2]).map(i=>i[1]);
+  if (!todo.length) return;
+  const plain = t => String(t).replace(/<[^>]+>/g,"");
+  const n = new Notification("TA Journal", {
+    body: (m.blocked ? "Finish the setup before you start logging: " : "")
+          + plain(todo[0]) + (todo.length>1 ? "\n+"+(todo.length-1)+" more" : ""),
+    tag: "cs879-journal-daily"
+  });
+  n.onclick = () => { window.focus(); n.close(); };
+  try{ localStorage.setItem(NOTIFIED_KEY, today); }catch(e){}
+}
+
 
 /* ---------- render --------------------------------------------------------*/
 function render(){
@@ -795,11 +887,7 @@ function render(){
     + '<div><b>'+db.entries.length+'</b><span>entries</span></div>'
     + '<div><b>'+wk.length+'</b><span>weeks recorded</span></div>'
     + '<div><b>'+hrs(avg)+'</b><span>hours per week</span></div>';
-  const blocked = setupGaps().length > 0;
-  $("status").innerHTML = statusHTML();
-  $("e-form").disabled = blocked;
-  const goto = $("go-setup");
-  if (goto) goto.onclick = () => document.querySelector('nav button[data-tab=setup]').click();
+  refreshStatus();
 
   $("cal-wrap").innerHTML = calendarHTML();
   $("chart-cat").innerHTML = barChart(byCat, total);
@@ -1178,6 +1266,9 @@ function fill(){
   $("w-of").value=sunday(new Date().toISOString().slice(0,10));
 }
 initTheme(); load(); fill(); initFs(); render();
+$("nf-toggle").onclick = toggleNotify;
+notifyState();
+startStatusTicker();
 </script>
 </body>
 </html>
