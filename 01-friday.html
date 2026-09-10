@@ -122,6 +122,14 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .sub .rubric{ border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
   padding:7px 0; margin:12px 0; color:var(--slate); }
 .sub .timer{ margin-top:12px; }
+
+/* For a slide that has to carry a callout, a list and a multi-phase timer at once. The
+   deck's default rhythm is built for three elements, not four; this tightens the gaps
+   without touching type size, so the slide still reads at the back of the room. */
+.tight h2{ margin-top:20px; margin-bottom:14px; }
+.tight .callout{ margin:10px 0; }
+.tight ul{ margin:14px 0; }
+.tight .timer{ margin-top:14px; }
 </style>
 </head>
 <body>
@@ -139,45 +147,49 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 </section>
 
 <section data-obj="0">
+<h3>Running Studio this term</h3>
+<h2>Boming Zhang</h2>
+<ul><li>TA for 879. Friday Studio is mine, Wednesdays are Tim's.</li><li>Canvas message me if you cannot make a Friday.</li><li>I am in the room the whole session. Interrupt me.</li></ul>
+<p class="lede">And you. Hands up for the course you are TAing.</p>
+<p class="tiny">100 level &nbsp;·&nbsp; 200 level &nbsp;·&nbsp; 300 or above &nbsp;·&nbsp; not assigned yet</p>
+<div class="timer compact" data-phases="Introductions:180"></div>
+</section>
+
+<section data-obj="0">
 <h2>Today</h2>
-<ul><li>Log your first week, 5 minutes</li><li>What does your course actually say, 3 minutes</li><li>Draft two emails, in threes, 22 minutes</li><li>Share back and send, 9 minutes</li><li>Exit ticket, last 10 minutes</li></ul>
+<ul><li>Introductions, 3 minutes</li><li>Log your first week, 5 minutes</li><li>What does your course actually say, 3 minutes</li><li>In threes: meet each other, then draft two emails, 21 minutes</li><li>Read one out and send it, 6 minutes</li><li>Exit ticket, last 10 minutes</li></ul>
 <p class="tiny">You read your course's AI policy before you came. Everything else happens here.</p>
 </section>
 
 <section data-obj="3">
-<h3>First five minutes</h3>
 <h2>Bring your journal up to date</h2>
 <p>Open the Staff Journal. Add anything from this week you have not logged yet.</p>
-<ul><li>Your appointment started Sunday September 6, so this is your first week</li><li>A guess at the minutes is fine. A blank is not.</li><li>Then Export and setup, download both files, and upload them to Canvas</li></ul>
+<ul><li>Your appointment started Sunday September 6. This is week one.</li><li>A guess at the minutes is fine. A blank is not.</li><li>Then Export: download both files and upload them to Canvas.</li></ul>
 <p class="tiny">https://timdrichards.github.io/cs879-decks/journal.html</p>
 <div class="timer compact" data-phases="Journal:300"></div>
 </section>
 
 <section data-obj="1">
-<h3>Three minutes</h3>
 <h2>What does your course actually say?</h2>
 <p>You were asked to find the AI policy for the course you are TAing. Round the room, one word each.</p>
-<ul><li>Permissive</li><li>Restrictive</li><li>Silent</li><li>Could not find it</li></ul>
+<p class="tiny">Permissive &nbsp;·&nbsp; Restrictive &nbsp;·&nbsp; Silent &nbsp;·&nbsp; could not find it</p>
 <p class="lede">If it says nothing, that is a finding, not a failure to find.</p>
 <div class="timer compact" data-phases="Round the room:180"></div>
 </section>
 
-<section data-obj="1" class="go">
-<h3>Twenty minutes, in threes</h3>
-<h2>Draft two emails</h2>
-<div class="callout">A student in your section emails: <em>"Hi, quick question, am I allowed to use ChatGPT for homework 3? I don't want to get in trouble."</em> You will answer within the hour.</div>
-<ul><li><strong>Email one.</strong> The reply you would actually send. Real wording, not a summary.</li><li><strong>Email two.</strong> To your supervising instructor, checking you got it right, and asking what they want you to say next time.</li></ul>
-<p class="tiny">Whatever the syllabus says, your reply becomes the policy that student experiences.</p>
-<div class="timer" data-phases="Draft one:660,Draft two:660"></div>
+<section data-obj="1" class="go tight">
+<h2>In threes: draft two emails</h2>
+<div class="callout">A student in your section emails: <em>"Am I allowed to use ChatGPT for homework 3? I don't want to get in trouble."</em> You answer within the hour.</div>
+<ul><li><strong>Two minutes.</strong> Names, your course, one surprise.</li><li><strong>Email one.</strong> The reply you would really send.</li><li><strong>Email two.</strong> Ask your instructor: did I get this right?</li></ul>
+<div class="timer" data-phases="Meet each other:120,Draft one:570,Draft two:570"></div>
 </section>
 
 <section data-obj="2">
-<h3>Eight minutes</h3>
 <h2>Read one out</h2>
 <p>Two or three groups read their second email aloud. Not the first one.</p>
 <p class="lede">Then send it. Before you leave this room.</p>
 <div class="callout">Most TAs never open this conversation with their instructor all semester. You will have done it in week one.</div>
-<div class="timer compact" data-phases="Share and send:540"></div>
+<div class="timer compact" data-phases="Share and send:360"></div>
 </section>
 
 <section data-obj="0">

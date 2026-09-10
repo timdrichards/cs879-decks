@@ -122,6 +122,14 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .sub .rubric{ border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
   padding:7px 0; margin:12px 0; color:var(--slate); }
 .sub .timer{ margin-top:12px; }
+
+/* For a slide that has to carry a callout, a list and a multi-phase timer at once. The
+   deck's default rhythm is built for three elements, not four; this tightens the gaps
+   without touching type size, so the slide still reads at the back of the room. */
+.tight h2{ margin-top:20px; margin-bottom:14px; }
+.tight .callout{ margin:10px 0; }
+.tight ul{ margin:14px 0; }
+.tight .timer{ margin-top:14px; }
 </style>
 </head>
 <body>
