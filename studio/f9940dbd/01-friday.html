@@ -131,6 +131,10 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .tight .callout{ margin:10px 0; }
 .tight ul{ margin:14px 0; }
 .tight .timer{ margin-top:14px; }
+/* A .tight slide is dense by definition, so the callout's own box and the gaps between
+   list items give up a few pixels too. Type size is untouched. */
+.tight .callout{ padding:12px 18px; }
+.tight li{ margin-bottom:6px; }
 </style>
 </head>
 <body>
@@ -209,10 +213,12 @@ If someone did not look, have them say so rather than guess, and give them ninet
 
 <section data-obj="1" class="go tight">
 <h2>In threes: draft the reply</h2>
-<div class="callout">A student in your section emails: <em>"Am I allowed to use ChatGPT for homework 3? I don't want to get in trouble."</em> You answer within the hour.</div>
-<ul><li><strong>Two minutes.</strong> Names, your course, one surprise.</li><li><strong>Pick one.</strong> Whose course policy are you answering under?</li><li><strong>Write one reply together.</strong> Real wording, not a summary.</li></ul>
+<div class="callout">A student emails: <em>"Am I allowed to use ChatGPT for homework 3? I don't want to get in trouble."</em></div>
+<ul><li><strong>Two minutes.</strong> Names, the course you TA, and one thing about the job so far that has surprised you.</li><li><strong>Pick one.</strong> Whose course policy are you answering under?</li><li><strong>Write one reply together.</strong> Real wording, not a summary.</li></ul>
 <div class="timer" data-phases="Meet each other:120,Pick a policy and draft:840"></div>
-<aside class="notes">Threes, not pairs. Three gives you someone who disagrees.
+<aside class="notes">Say the detail that is no longer on the slide: they answer within the hour. It is what stops them treating this as an essay.
+
+Threes, not pairs. Three gives you someone who disagrees.
 
 The first two minutes are the introductions proper: names, the course they TA, one thing that surprised them. Start the timer and let it run, or it becomes five minutes.
 
@@ -228,7 +234,7 @@ Circulate. Ask each group which course they picked and why.</aside>
 <section data-obj="2">
 <h2>Read it out, and say why</h2>
 <p>Three groups read their reply aloud. Then: whose course was it, what does that policy say, and why did you answer the way you did?</p>
-<div class="callout">Take the question you could not settle to your next staff meeting. If your course does not have one, ask your instructor however they have told you to reach them.</div>
+<div class="callout">Did the policy fail to answer something? Take that question to your next staff meeting, or to your instructor however they have asked you to reach them.</div>
 <div class="timer compact" data-phases="Read and explain:720"></div>
 <aside class="notes">This is the session now, not a wrap-up, so it has twelve minutes.
 
@@ -236,7 +242,7 @@ Three groups. For each one make them answer all three parts: whose course, what 
 
 Ask the room whether anyone would have answered differently under their own course's policy. That contrast is the most useful thing they will hear today, because it shows them that 'the right answer' is course-specific rather than universal.
 
-The callout replaces what used to be an email to their supervising instructor. We dropped that: it puts twenty eight emails into instructors' inboxes in week one and a staff meeting is the natural place for it. Say it explicitly, because it is a real instruction and not a suggestion to forget on the way out.
+The callout is aimed at the gap they will have just hit: almost every group runs into a case their chosen policy does not cover, and that is the question worth carrying to staff. It replaces what used to be an email to their supervising instructor. We dropped that: it puts twenty eight emails into instructors' inboxes in week one and a staff meeting is the natural place for it. Say it explicitly, because it is a real instruction and not a suggestion to forget on the way out.
 
 If you are behind, two groups instead of three.</aside>
 </section>
