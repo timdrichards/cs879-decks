@@ -1041,8 +1041,18 @@ function toMarkdown(){
   const s = db.student, total = db.entries.reduce((a,e)=>a+e.mins,0);
   const weeks = {}; db.entries.forEach(e=>{const w=sunday(e.date);(weeks[w]=weeks[w]||[]).push(e);});
   let m = "# Staff Journal — "+(s.name||"unnamed")+"\n\n";
-  m += "- **Course assisted:** "+(s.course||"—")+"\n";
-  m += "- **Supervising instructor:** "+(s.professor||"—")+"\n";
+  // s.course and s.professor are v2 fields that migrate() deletes, so these two lines
+  // rendered "—" for every v3 journal ever exported. Read the courses list instead.
+  const cs = courses();
+  if (cs.length === 1){
+    m += "- **Course assisted:** "+cs[0].code+"\n";
+    m += "- **Supervising instructor:** "+(cs[0].instructor||"—")+"\n";
+  } else if (cs.length > 1){
+    m += "- **Courses assisted:** "+cs.map(c=>c.code+(c.instructor?" ("+c.instructor+")":"")).join(", ")+"\n";
+  } else {
+    m += "- **Course assisted:** —\n";
+    m += "- **Supervising instructor:** —\n";
+  }
   m += "- **Role:** "+(s.role||"TA")+"\n";
   m += "- **Appointment:** "+s.hours+" hours a week"
      + (s.reserved ? " ("+available()+" for regular duties, "+s.reserved+" reserved"
