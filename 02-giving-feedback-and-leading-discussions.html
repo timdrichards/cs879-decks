@@ -201,7 +201,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 
 <section data-obj="0">
 <h2>Today</h2>
-<ul><li>Three replies to one stuck student. Score them, write yours. <strong>8 min</strong></li><li>Score the replies, then what separated them. <strong>6 min</strong></li><li>Why your section goes quiet.</li><li>Plan the first five minutes of your next section. <strong>6 min</strong></li><li>In threes: would that make <em>you</em> talk? <strong>6 min</strong></li><li>What your syllabus promises, and what you would change. <strong>5 min</strong></li><li>Reflection 1, written here. <strong>14 min</strong></li><li>Find your pod, and why it was done that way. <strong>5 min</strong></li></ul>
+<ul><li>Three replies to one stuck student. Score them, write yours. <strong>8 min</strong></li><li>Score them, then A, B and C one at a time. <strong>6 min</strong></li><li>Why your section goes quiet.</li><li>Plan the first five minutes of your next section. <strong>6 min</strong></li><li>In threes: would that make <em>you</em> talk? <strong>6 min</strong></li><li>What your syllabus promises, and what you would change. <strong>5 min</strong></li><li>Reflection 1, written here. <strong>14 min</strong></li><li>Find your pod, and why it was done that way. <strong>5 min</strong></li></ul>
 
 </section>
 
@@ -232,11 +232,30 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 </section>
 
 <section data-obj="1" class="tight">
-<h2>What separated them</h2>
-<p class="fragment tiny"><strong>A does the work.</strong> Correct, fast, and it teaches the student you will do it next time too.</p>
-<p class="fragment tiny"><strong>B costs nothing and gives nothing.</strong> "You have got this" is encouragement, not feedback. They are still stuck at 1am.</p>
-<p class="fragment tiny"><strong>C asks before telling</strong>, names one thing to try, and offers a way out that is not more typing.</p>
-<div class="fragment callout">A high standard, plus a signal you think they can meet it. Either one alone fails.</div>
+<h2>Reply A: it fixes the bug</h2>
+<p class="tiny"><strong>A.</strong> "Line 12 should be <code>i &lt; n-1</code>, not <code>i &lt;= n</code>. Your base case is also wrong, it needs to return 0 when the list is empty. Fix both and it should pass."</p>
+<ul><li><strong>It is not worthless.</strong> It is correct, it is fast, and the student is unblocked in one message.</li><li><strong>What it costs:</strong> they learn the quickest route to an answer is you. Next time they send the code sooner and try less.</li><li><strong>The tell:</strong> you wrote more of the solution than they did.</li><li><strong>When it is right:</strong> they have shown their work and are stuck on something they could not have known. A library quirk, an ambiguous spec, a typo they cannot see. Then just answer.</li></ul>
+
+</section>
+
+<section data-obj="1" class="tight">
+<h2>Reply B: it fixes nothing</h2>
+<p class="tiny"><strong>B.</strong> "Great effort, you are close! Take another look at your loop bounds and think about edge cases. You have got this."</p>
+<ul><li><strong>It is not worthless either.</strong> The tone is right, and a student who feels dismissed stops asking.</li><li><strong>What it costs:</strong> there is no information in it. They are still stuck, now at one in the morning, and now also feeling bad about it.</li><li><strong>The tell:</strong> your reply would fit any submission in the course. If you could paste it under someone else's code, it says nothing about theirs.</li><li><strong>The trap:</strong> this is the mistake new TAs actually make, because it feels kind and it is quick to write.</li></ul>
+
+</section>
+
+<section data-obj="1" class="tight">
+<h2>Reply C: it asks first</h2>
+<p class="tiny"><strong>C.</strong> "Two hours is too long to be stuck, so I am glad you wrote. Before I look: what did you expect line 12 to do, and what did it do when you ran it? If you have not tried it with an empty list, try that first and tell me what happens. I am in office hours until four if it is easier out loud."</p>
+<ul><li><strong>Names the cost.</strong> Two hours is too long, so the problem being solved is the being-stuck, not just the bug.</li><li><strong>Asks for expected against actual.</strong> The most useful diagnostic question there is. Most of the time the bug surfaces in their own explanation before you say anything.</li><li><strong>One concrete thing to try</strong>, not a checklist. They can do it in a minute and it produces a fact.</li><li><strong>Offers a way out that is not more typing.</strong> Some problems die in ten seconds out loud and never in a thread.</li></ul>
+
+</section>
+
+<section data-obj="1">
+<h2>Wise feedback</h2>
+<div class="callout">A high standard, plus a signal you think they can meet it. Either one on its own fails.</div>
+<ul><li><strong>A</strong> was a standard with no signal.</li><li><strong>B</strong> was a signal with no standard.</li><li><strong>C</strong> was both, and it cost one extra round trip.</li></ul>
 
 </section>
 
