@@ -154,6 +154,27 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 /* display:flex outranks the hidden attribute, so an empty pill rendered on every
    slide until this. Same trap as the journal tool's row grid. */
 .timer-pill[hidden]{ display:none !important; }
+
+/* ---- live tally ---------------------------------------------------------- */
+.tally{ margin:14px 0 0; }
+.tally-row{ display:flex; align-items:flex-end; gap:14px; margin:0 0 7px; }
+.tally-label{ flex:0 0 26px; font-size:24px; font-weight:900; color:var(--maroon);
+  line-height:1; padding-bottom:24px; }
+.tally-buckets{ flex:1; display:flex; gap:10px; }
+.tally-bucket{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; }
+.tally-track{ width:100%; height:42px; display:flex; align-items:flex-end;
+  background:var(--wash); border-radius:3px 3px 0 0; }
+.tally-track i{ display:block; width:100%; background:var(--go); border-radius:3px 3px 0 0;
+  transition:height .18s ease-out; min-height:2px; }
+.tally-track i.zero{ background:var(--rule); }
+.tally-bucket input{ width:100%; text-align:center; font-family:inherit; font-size:17px;
+  font-weight:700; color:var(--ink); border:1px solid var(--rule); border-radius:3px;
+  padding:2px 0; background:#fff; }
+.tally-bucket input:focus{ outline:2px solid var(--go); outline-offset:1px; }
+.tally-score{ font-size:13px; font-weight:700; color:var(--slate); }
+.tally-total{ flex:0 0 66px; font-size:14px; font-weight:700; color:var(--slate);
+  padding-bottom:26px; text-align:right; }
+.tally-total.off{ color:#9A6700; }
 </style>
 </head>
 <body>
@@ -180,7 +201,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 
 <section data-obj="0">
 <h2>Today</h2>
-<ul><li>Three replies to one stuck student. Score them, write yours. <strong>8 min</strong></li><li>What separated them. <strong>6 min</strong></li><li>Why your section goes quiet.</li><li>Plan the first five minutes of your next section. <strong>6 min</strong></li><li>In threes: would that make <em>you</em> talk? <strong>6 min</strong></li><li>What your syllabus promises, and what you would change. <strong>5 min</strong></li><li>Reflection 1, written here. <strong>14 min</strong></li><li>Find your pod, and why it was done that way. <strong>5 min</strong></li></ul>
+<ul><li>Three replies to one stuck student. Score them, write yours. <strong>8 min</strong></li><li>Score the replies, then what separated them. <strong>6 min</strong></li><li>Why your section goes quiet.</li><li>Plan the first five minutes of your next section. <strong>6 min</strong></li><li>In threes: would that make <em>you</em> talk? <strong>6 min</strong></li><li>What your syllabus promises, and what you would change. <strong>5 min</strong></li><li>Reflection 1, written here. <strong>14 min</strong></li><li>Find your pod, and why it was done that way. <strong>5 min</strong></li></ul>
 
 </section>
 
@@ -202,14 +223,20 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 
 </section>
 
+<section data-obj="1" class="go">
+<h2>What did you give them?</h2>
+<p>Hands up for each score. One reply at a time.</p>
+<div class="tally" data-rows="A,B,C" data-scale="1,2,3,4,5" data-n="28"></div>
+<div class="timer compact" data-phases="Discuss:360"></div>
+
+</section>
+
 <section data-obj="1" class="tight">
 <h2>What separated them</h2>
-<p>Hands up: who scored A a 4 or 5? B? C? Then say why.</p>
 <p class="fragment tiny"><strong>A does the work.</strong> Correct, fast, and it teaches the student you will do it next time too.</p>
 <p class="fragment tiny"><strong>B costs nothing and gives nothing.</strong> "You have got this" is encouragement, not feedback. They are still stuck at 1am.</p>
 <p class="fragment tiny"><strong>C asks before telling</strong>, names one thing to try, and offers a way out that is not more typing.</p>
 <div class="fragment callout">A high standard, plus a signal you think they can meet it. Either one alone fails.</div>
-<div class="timer compact" data-phases="Discuss:360"></div>
 
 </section>
 
@@ -419,6 +446,56 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     if(!t||!t.__timer) return;
     e.preventDefault(); e.stopPropagation(); t.__timer.toggle(); paintPill();
   },true);
+})();
+
+// ---- live tally --------------------------------------------------------------
+// Markup:  <div class="tally" data-rows="A,B,C" data-scale="1,2,3,4,5" data-n="28">
+// The presenter counts hands and types the number; bars grow as they type. Tab runs
+// left to right along a row, so you can enter a whole row without looking down.
+// Totals turn amber when a row does not add up to data-n, which is the mistake
+// counting hands in front of thirty people actually produces.
+(function(){
+  document.querySelectorAll('.tally').forEach(function(t){
+    var rows=(t.dataset.rows||'A,B,C').split(',').map(function(s){ return s.trim(); });
+    var scale=(t.dataset.scale||'1,2,3,4,5').split(',').map(function(s){ return s.trim(); });
+    var expect=parseInt(t.dataset.n,10)||0;
+    var counts=rows.map(function(){ return scale.map(function(){ return 0; }); });
+
+    var html='<div class="tally-grid">';
+    rows.forEach(function(r,ri){
+      html+='<div class="tally-row"><span class="tally-label">'+r+'</span><div class="tally-buckets">';
+      scale.forEach(function(s,si){
+        html+='<div class="tally-bucket">'
+           +  '<div class="tally-track"><i data-r="'+ri+'" data-s="'+si+'"></i></div>'
+           +  '<input type="number" min="0" inputmode="numeric" data-r="'+ri+'" data-s="'+si+'" value="">'
+           +  '<span class="tally-score">'+s+'</span></div>';
+      });
+      html+='</div><span class="tally-total" data-r="'+ri+'"></span></div>';
+    });
+    t.innerHTML=html+'</div>';
+
+    function paint(){
+      var max=1;
+      counts.forEach(function(row){ row.forEach(function(v){ if(v>max) max=v; }); });
+      t.querySelectorAll('.tally-track i').forEach(function(bar){
+        var v=counts[+bar.dataset.r][+bar.dataset.s];
+        bar.style.height=(v/max*100)+'%';
+        bar.classList.toggle('zero', v===0);
+      });
+      t.querySelectorAll('.tally-total').forEach(function(el){
+        var ri=+el.dataset.r;
+        var sum=counts[ri].reduce(function(a,b){ return a+b; },0);
+        el.textContent='n = '+sum;
+        el.classList.toggle('off', expect>0 && sum>0 && sum!==expect);
+      });
+    }
+    t.addEventListener('input',function(e){
+      var el=e.target; if(el.tagName!=='INPUT') return;
+      counts[+el.dataset.r][+el.dataset.s]=Math.max(0,parseInt(el.value,10)||0);
+      paint();
+    });
+    paint();
+  });
 })();
 </script>
 </body>
