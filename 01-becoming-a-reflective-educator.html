@@ -134,6 +134,23 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
    list items give up a few pixels too. Type size is untouched. */
 .tight .callout{ padding:12px 18px; }
 .tight li{ margin-bottom:6px; }
+
+/* A running timer follows you to the next slide as a corner pill, so the room can keep
+   working while the deck moves on. Lives outside .slides, so reveal's scale transform
+   and auto-animate never touch it. */
+.timer-pill{ position:fixed; right:18px; bottom:16px; z-index:60;
+  display:flex; align-items:baseline; gap:12px;
+  background:#fff; border:1px solid var(--rule); border-left:5px solid var(--go);
+  border-radius:5px; padding:9px 16px; box-shadow:0 2px 10px rgba(0,0,0,.10);
+  font-family:Lato,Helvetica,Arial,sans-serif; }
+.timer-pill .pill-label{ font-size:13px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--slate); }
+.timer-pill .pill-clock{ font-size:30px; font-weight:900; line-height:1; color:var(--go);
+  font-variant-numeric:tabular-nums; }
+.timer-pill.low{ border-left-color:#9A6700; }
+.timer-pill.low .pill-clock{ color:#9A6700; }
+.timer-pill.over{ border-left-color:var(--maroon); }
+.timer-pill.over .pill-clock{ color:var(--maroon); }
 </style>
 </head>
 <body>
@@ -493,21 +510,51 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     function go(n){ stop(); i=n; left=spec[i].secs; paint(); }
     btn.onclick=function(){ running?stop():run(); };
     t.__timer={run:run, stop:stop, toggle:function(){ running?stop():run(); },
-               next:function(){ if(i<spec.length-1) go(i+1); }};
+               next:function(){ if(i<spec.length-1) go(i+1); },
+               isRunning:function(){ return running; },
+               state:function(){ return {left:left, name:spec[i].name, text:fmt(left)}; }};
     paint();
   });
-  // space runs/pauses the timer on the visible slide, without hijacking it elsewhere
+  // A running timer used to stop the moment you advanced, which made it impossible to
+  // show the next slide while the room was still working. Now it follows you: the clock
+  // keeps counting in a corner pill until it is paused or its own slide comes back.
+  var pill=document.createElement('div');
+  pill.className='timer-pill'; pill.hidden=true;
+  pill.innerHTML='<span class="pill-label"></span><span class="pill-clock"></span>';
+  document.body.appendChild(pill);           // outside .slides, so reveal's transform
+  var pillLabel=pill.querySelector('.pill-label');   // and auto-animate leave it alone
+  var pillClock=pill.querySelector('.pill-clock');
+
+  function carried(){
+    // the one timer that is running but not on the slide we are looking at
+    var cur=Reveal.getCurrentSlide();
+    var found=null;
+    document.querySelectorAll('.timer').forEach(function(t){
+      if(t.__timer && t.__timer.isRunning() && !(cur&&cur.contains(t))) found=t; });
+    return found;
+  }
+  function paintPill(){
+    var t=carried();
+    if(!t){ pill.hidden=true; return; }
+    var s=t.__timer.state();
+    pill.hidden=false;
+    pill.classList.toggle('low', s.left<=15 && s.left>0);
+    pill.classList.toggle('over', s.left<=0);
+    pillLabel.textContent=s.name;
+    pillClock.textContent=s.text;
+  }
+  window.__paintPill=paintPill;
+  Reveal.on('slidechanged', paintPill);
+  setInterval(paintPill, 500);
+
+  // space toggles the timer on this slide, or the carried one if this slide has none
   document.addEventListener('keydown',function(e){
     if(e.key!==' '&&e.code!=='Space') return;
     var cur=Reveal.getCurrentSlide(); if(!cur) return;
-    var t=cur.querySelector('.timer'); if(!t||!t.__timer) return;
-    e.preventDefault(); e.stopPropagation(); t.__timer.toggle();
+    var t=cur.querySelector('.timer') || carried();
+    if(!t||!t.__timer) return;
+    e.preventDefault(); e.stopPropagation(); t.__timer.toggle(); paintPill();
   },true);
-  // leaving a slide stops its timer
-  Reveal.on('slidechanged',function(ev){
-    document.querySelectorAll('.timer').forEach(function(t){
-      if(t.__timer && !ev.currentSlide.contains(t)) t.__timer.stop(); });
-  });
 })();
 </script>
 </body>

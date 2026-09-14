@@ -134,12 +134,29 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
    list items give up a few pixels too. Type size is untouched. */
 .tight .callout{ padding:12px 18px; }
 .tight li{ margin-bottom:6px; }
+
+/* A running timer follows you to the next slide as a corner pill, so the room can keep
+   working while the deck moves on. Lives outside .slides, so reveal's scale transform
+   and auto-animate never touch it. */
+.timer-pill{ position:fixed; right:18px; bottom:16px; z-index:60;
+  display:flex; align-items:baseline; gap:12px;
+  background:#fff; border:1px solid var(--rule); border-left:5px solid var(--go);
+  border-radius:5px; padding:9px 16px; box-shadow:0 2px 10px rgba(0,0,0,.10);
+  font-family:Lato,Helvetica,Arial,sans-serif; }
+.timer-pill .pill-label{ font-size:13px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--slate); }
+.timer-pill .pill-clock{ font-size:30px; font-weight:900; line-height:1; color:var(--go);
+  font-variant-numeric:tabular-nums; }
+.timer-pill.low{ border-left-color:#9A6700; }
+.timer-pill.low .pill-clock{ color:#9A6700; }
+.timer-pill.over{ border-left-color:var(--maroon); }
+.timer-pill.over .pill-clock{ color:var(--maroon); }
 </style>
 </head>
 <body>
 <div class="strip">
   <div class="lbl">Today you should be able to</div>
-  <div class="obj" data-obj="1"><span class="box"></span><span>Reply to a stuck student without doing the work for them</span></div><div class="obj" data-obj="2"><span class="box"></span><span>Tell constructive feedback from destructive</span></div><div class="obj" data-obj="3"><span class="box"></span><span>Say what your own course promises, and what you would change</span></div>
+  <div class="obj" data-obj="1"><span class="box"></span><span>Reply to a stuck student without doing the work for them</span></div><div class="obj" data-obj="2"><span class="box"></span><span>Open a discussion so that someone other than you talks</span></div><div class="obj" data-obj="3"><span class="box"></span><span>Say what your own course promises, and what you would change</span></div>
 </div>
 
 <div class="reveal"><div class="slides">
@@ -147,35 +164,27 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <section data-obj="0">
 <h3>COMPSCI 879 · Unit 2 · Wed Sep 16</h3>
 <h1>Giving Feedback,<br>Leading Discussions</h1>
-<p class="lede">Three rounds of writing, three rounds of arguing about it, and your own course's syllabus open on the desk the whole time.</p>
+<p class="lede">Three things you will write today, all of them about the course you actually TA. Open that syllabus on your laptop now.</p>
 
 </section>
 
 <section data-obj="0">
 <h2>Where we are</h2>
-<p>Unit 1 was what the job is. This one is what to say.</p>
-<ul><li>You have met your students now. Some asked you things you did not expect.</li><li>At least one wanted the answer rather than the understanding.</li><li>Today is a catalogue of what actually works, tested against your own course.</li></ul>
+<p>Unit 1 was what the job is. This one is what to say, and what to do when nobody says anything back.</p>
+<ul><li>Half of today is <strong>feedback</strong>: answering one stuck student.</li><li>Half is <strong>discussion</strong>: getting a room to talk when it would rather not.</li><li>All of it is tested against the course you are a TA for.</li></ul>
 
 </section>
 
 <section data-obj="0">
 <h2>Today</h2>
-<ul><li>Three replies to the same student. Score them, then write yours.</li><li>What separated them.</li><li>Your syllabus: what does it actually promise?</li><li>In threes: whose course is toughest, and who is right?</li><li>One hard student, answered under your own course's rules.</li><li>Reflection 1, written here.</li><li>Exit ticket.</li></ul>
-
-</section>
-
-<section data-obj="3" class="go">
-<h2>Open your syllabus</h2>
-<div class="callout">Find the syllabus for the course you are a TA for. Have it open for the rest of the session. You will need it three times.</div>
-<p class="tiny">If you cannot find one, that is a finding. Say so when we get there.</p>
-<div class="timer compact" data-phases="Find it:120"></div>
+<ul><li>Three replies to one stuck student. Score them, write yours. <strong>8 min</strong></li><li>What separated them. <strong>6 min</strong></li><li>Why your section goes quiet.</li><li>Plan the first five minutes of your next section. <strong>6 min</strong></li><li>In threes: would that make <em>you</em> talk? <strong>6 min</strong></li><li>What your syllabus promises, and what you would change. <strong>5 min</strong></li><li>Reflection 1, written here. <strong>14 min</strong></li></ul>
 
 </section>
 
 <section data-obj="1" class="go tight">
 <h2>Three replies, one student</h2>
 <div class="callout"><em>"Hi, I'm stuck on question 3. I've been at it two hours and I don't know what to do. Can you just tell me if my approach is right?"</em> Thirty lines of code pasted underneath.</div>
-<ul><li>Score each reply out of 5 for how useful it is to that student.</li><li>Then write the one you would actually send. Real wording.</li></ul>
+<ul><li><strong>1.</strong> Read the three replies on the next slide.</li><li><strong>2.</strong> Score each out of 5 for how much it helps that student.</li><li><strong>3.</strong> Write the reply <em>you</em> would send. Real wording.</li></ul>
 <div class="timer" data-phases="Score then write:480"></div>
 
 </section>
@@ -185,70 +194,65 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p class="tiny"><strong>A.</strong> "Line 12 should be <code>i &lt; n-1</code>, not <code>i &lt;= n</code>. Your base case is also wrong, it needs to return 0 when the list is empty. Fix both and it should pass."</p>
 <p class="tiny"><strong>B.</strong> "Great effort, you are close! Take another look at your loop bounds and think about edge cases. You have got this."</p>
 <p class="tiny"><strong>C.</strong> "Two hours is too long to be stuck, so I am glad you wrote. Before I look: what did you expect line 12 to do, and what did it do when you ran it? If you have not tried it with an empty list, try that first and tell me what happens. I am in office hours until four if it is easier out loud."</p>
+<p class="tiny">Score each out of 5, then write the one you would send.</p>
 
 </section>
 
-<section data-obj="2">
+<section data-obj="1" class="tight">
 <h2>What separated them</h2>
-<p class="fragment tiny"><strong>A does the work.</strong> Correct, fast, and it teaches the student that you will do it next time too.</p>
+<p>Hands up: who scored A a 4 or 5? B? C? Then say why.</p>
+<p class="fragment tiny"><strong>A does the work.</strong> Correct, fast, and it teaches the student you will do it next time too.</p>
 <p class="fragment tiny"><strong>B costs nothing and gives nothing.</strong> "You have got this" is encouragement, not feedback. They are still stuck at 1am.</p>
-<p class="fragment tiny"><strong>C asks before telling</strong>, names one concrete thing to try, and offers a way out that is not more typing.</p>
-<div class="fragment callout">Wise feedback: a high standard, plus a signal that you think they can reach it. Either one on its own fails.</div>
+<p class="fragment tiny"><strong>C asks before telling</strong>, names one thing to try, and offers a way out that is not more typing.</p>
+<div class="fragment callout">A high standard, plus a signal you think they can meet it. Either one alone fails.</div>
 <div class="timer compact" data-phases="Discuss:360"></div>
+
+</section>
+
+<section data-obj="2" class="tight">
+<h2>Why your section goes quiet</h2>
+<p>You ask a question. Nobody answers. Four seconds feels like a minute, so you answer it yourself, and the room learns that waiting works.</p>
+<ul><li><strong>Wait longer than is comfortable.</strong> Count to ten. Someone breaks first, and it is not you.</li><li><strong>Never answer your own question.</strong> Rephrase it or hand it to a pair, but do not fill the gap.</li><li><strong>Have them talk to each other first.</strong> Thirty seconds in pairs, then ask a pair, not a person.</li><li><strong>Ask something with more than one defensible answer.</strong> "What is the complexity?" gets silence. "Which of these two would you ship?" gets an argument.</li></ul>
+
+</section>
+
+<section data-obj="2" class="go tight">
+<h2>Plan your next section</h2>
+<p>For the next section, lab or help session you run. Write all three down.</p>
+<ul><li><strong>1.</strong> The exact first question you will ask. Word for word.</li><li><strong>2.</strong> What you will do if nobody answers for ten seconds.</li><li><strong>3.</strong> One way you will get them talking to each other, not to you.</li></ul>
+<p class="tiny">No section of your own? Write it for your next office hour with more than one student in the room.</p>
+<div class="timer" data-phases="Write:360"></div>
+
+</section>
+
+<section data-obj="2" class="go tight">
+<h2>In threes: would that make you talk?</h2>
+<ul><li><strong>1.</strong> Read your first question to the other two. Just the question.</li><li><strong>2.</strong> They answer honestly: would you say something, or wait it out?</li><li><strong>3.</strong> If they would wait it out, fix the question together.</li></ul>
+<div class="fragment callout">You will never have a more generous audience than this one. If it does not work here, it will not work at eight in the morning.</div>
+<div class="timer" data-phases="In threes:360"></div>
 
 </section>
 
 <section data-obj="3" class="go tight">
 <h2>What does your syllabus promise?</h2>
-<p>In your own course's syllabus, find and write down:</p>
-<ul><li>What it says about feedback and how quickly work comes back.</li><li>What it says about the discussion section or lab, if anything.</li><li>One line you would change, and what you would change it to.</li></ul>
+<p>In the syllabus of the course you are a TA for, find and write down:</p>
+<ul><li><strong>1.</strong> What it says about feedback, and how fast work comes back.</li><li><strong>2.</strong> What it says about your section or lab, if anything at all.</li><li><strong>3.</strong> One line you would change, and what you would change it to.</li></ul>
+<p class="tiny">No syllabus? Write what you were told instead, and where you got it from. That is a finding, not a failure.</p>
 <div class="timer" data-phases="Read and write:300"></div>
-
-</section>
-
-<section data-obj="3" class="go tight">
-<h2>In threes: whose course is toughest?</h2>
-<ul><li>Read each other your three answers.</li><li>Whose course asks most of its students? Whose asks most of its TAs?</li><li>Where do two of your syllabi flatly contradict each other?</li></ul>
-<div class="fragment callout">You are enforcing a document you did not write. This is the only hour all term where you get to read someone else's.</div>
-<div class="timer" data-phases="In threes:480"></div>
-
-</section>
-
-<section data-obj="1" class="go tight">
-<h2>One hard student, your rules</h2>
-<ul><li><strong>1.</strong> Wants the answer, not the learning. &nbsp; <strong>2.</strong> Has not attended or read.</li><li><strong>3.</strong> Expects special treatment. &nbsp; <strong>4.</strong> Blames you for the grade.</li><li>Pick one. Write the reply you would send, under <strong>your</strong> course's rules.</li></ul>
-<p class="tiny">Quote the line of your syllabus you are relying on. If there is no such line, say what you would do instead and who you would ask.</p>
-<div class="timer" data-phases="Write:600"></div>
-
-</section>
-
-<section data-obj="2">
-<h2>Read two out</h2>
-<p>Two people read their reply and the syllabus line they leaned on.</p>
-<p class="lede">Then the room: would that answer be wrong in your course?</p>
-<div class="timer compact" data-phases="Read and contrast:420"></div>
-
-</section>
-
-<section data-obj="1">
-<h3>The move</h3>
-<h2>Ask before telling</h2>
-<div class="callout">Before you explain anything: what did you expect, and what happened instead?</div>
-<p>It costs one sentence, it works in office hours, on Ed, and in a lab, and it is the difference between a student who needed a hint and a student who needed twenty minutes.</p>
 
 </section>
 
 <section data-obj="0" class="go tight">
 <h2>Reflection 1: Hopes and Concerns</h2>
-<div class="callout">Canvas → Week 2 → Reflection 1: Hopes and Concerns. Ten points, written here, submitted before you leave.</div>
-<p>What you are hoping to get out of being a TA, and what you are worried about. There are no wrong answers and nothing here is held against you.</p>
+<div class="callout">Canvas &rarr; Week 2 &rarr; <strong>Reflection 1</strong>. Ten points, written here, submitted before you leave.</div>
+<ul><li>What you are hoping to get out of being a TA this semester.</li><li>What you are worried about.</li><li>No wrong answers, and nothing here is held against you.</li></ul>
 <div class="timer" data-phases="Write:840"></div>
 
 </section>
 
 <section data-obj="0">
 <h2>Before next time</h2>
-<ul><li>Fri Sep 18: Studio. Read the scenario before you come.</li><li>Practicum 1 is written in that session, so bring a laptop.</li><li>Your pod is on the Week 2 module. You are in it from Friday.</li></ul>
+<ul><li><strong>Fri Sep 18, Studio.</strong> Read the scenario before you come.</li><li>Practicum 1 is written in that session. Bring a laptop.</li><li>Your pod is on the Week 2 module. You are in it from Friday.</li></ul>
 <p class="tiny">timdrichards.github.io/cs879-decks/scenarios/the-discussion-that-will-not-start.html</p>
 
 </section>
@@ -350,21 +354,51 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     function go(n){ stop(); i=n; left=spec[i].secs; paint(); }
     btn.onclick=function(){ running?stop():run(); };
     t.__timer={run:run, stop:stop, toggle:function(){ running?stop():run(); },
-               next:function(){ if(i<spec.length-1) go(i+1); }};
+               next:function(){ if(i<spec.length-1) go(i+1); },
+               isRunning:function(){ return running; },
+               state:function(){ return {left:left, name:spec[i].name, text:fmt(left)}; }};
     paint();
   });
-  // space runs/pauses the timer on the visible slide, without hijacking it elsewhere
+  // A running timer used to stop the moment you advanced, which made it impossible to
+  // show the next slide while the room was still working. Now it follows you: the clock
+  // keeps counting in a corner pill until it is paused or its own slide comes back.
+  var pill=document.createElement('div');
+  pill.className='timer-pill'; pill.hidden=true;
+  pill.innerHTML='<span class="pill-label"></span><span class="pill-clock"></span>';
+  document.body.appendChild(pill);           // outside .slides, so reveal's transform
+  var pillLabel=pill.querySelector('.pill-label');   // and auto-animate leave it alone
+  var pillClock=pill.querySelector('.pill-clock');
+
+  function carried(){
+    // the one timer that is running but not on the slide we are looking at
+    var cur=Reveal.getCurrentSlide();
+    var found=null;
+    document.querySelectorAll('.timer').forEach(function(t){
+      if(t.__timer && t.__timer.isRunning() && !(cur&&cur.contains(t))) found=t; });
+    return found;
+  }
+  function paintPill(){
+    var t=carried();
+    if(!t){ pill.hidden=true; return; }
+    var s=t.__timer.state();
+    pill.hidden=false;
+    pill.classList.toggle('low', s.left<=15 && s.left>0);
+    pill.classList.toggle('over', s.left<=0);
+    pillLabel.textContent=s.name;
+    pillClock.textContent=s.text;
+  }
+  window.__paintPill=paintPill;
+  Reveal.on('slidechanged', paintPill);
+  setInterval(paintPill, 500);
+
+  // space toggles the timer on this slide, or the carried one if this slide has none
   document.addEventListener('keydown',function(e){
     if(e.key!==' '&&e.code!=='Space') return;
     var cur=Reveal.getCurrentSlide(); if(!cur) return;
-    var t=cur.querySelector('.timer'); if(!t||!t.__timer) return;
-    e.preventDefault(); e.stopPropagation(); t.__timer.toggle();
+    var t=cur.querySelector('.timer') || carried();
+    if(!t||!t.__timer) return;
+    e.preventDefault(); e.stopPropagation(); t.__timer.toggle(); paintPill();
   },true);
-  // leaving a slide stops its timer
-  Reveal.on('slidechanged',function(ev){
-    document.querySelectorAll('.timer').forEach(function(t){
-      if(t.__timer && !ev.currentSlide.contains(t)) t.__timer.stop(); });
-  });
 })();
 </script>
 </body>
