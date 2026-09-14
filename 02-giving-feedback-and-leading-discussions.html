@@ -151,6 +151,9 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .timer-pill.low .pill-clock{ color:#9A6700; }
 .timer-pill.over{ border-left-color:var(--maroon); }
 .timer-pill.over .pill-clock{ color:var(--maroon); }
+/* display:flex outranks the hidden attribute, so an empty pill rendered on every
+   slide until this. Same trap as the journal tool's row grid. */
+.timer-pill[hidden]{ display:none !important; }
 </style>
 </head>
 <body>
@@ -177,7 +180,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 
 <section data-obj="0">
 <h2>Today</h2>
-<ul><li>Three replies to one stuck student. Score them, write yours. <strong>8 min</strong></li><li>What separated them. <strong>6 min</strong></li><li>Why your section goes quiet.</li><li>Plan the first five minutes of your next section. <strong>6 min</strong></li><li>In threes: would that make <em>you</em> talk? <strong>6 min</strong></li><li>What your syllabus promises, and what you would change. <strong>5 min</strong></li><li>Reflection 1, written here. <strong>14 min</strong></li></ul>
+<ul><li>Three replies to one stuck student. Score them, write yours. <strong>8 min</strong></li><li>What separated them. <strong>6 min</strong></li><li>Why your section goes quiet.</li><li>Plan the first five minutes of your next section. <strong>6 min</strong></li><li>In threes: would that make <em>you</em> talk? <strong>6 min</strong></li><li>What your syllabus promises, and what you would change. <strong>5 min</strong></li><li>Reflection 1, written here. <strong>14 min</strong></li><li>Find your pod, and why it was done that way. <strong>5 min</strong></li></ul>
 
 </section>
 
@@ -250,9 +253,25 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 
 </section>
 
+<section data-obj="0" class="go tight">
+<h2>Find your pod</h2>
+<ul><li><strong>1.</strong> Stand along the back wall, in order of the course number you TA. Lowest by the door.</li><li><strong>2.</strong> Count off <strong>one to five</strong> down the line. Your number is your pod.</li><li><strong>3.</strong> Open Canvas &rarr; Groups &rarr; join that pod.</li></ul>
+<p class="tiny">Two courses? Stand at the one you spend more hours on. Not assigned to a course yet? Go to the far end.</p>
+<div class="timer" data-phases="Line up:120,Count off and join:180"></div>
+
+</section>
+
+<section data-obj="0" class="tight">
+<h2>Why we did it that way</h2>
+<p>None of that was arbitrary.</p>
+<ul><li><strong>The line was a histogram.</strong> You saw the shape of this cohort before we broke it up.</li><li><strong>Sorting put same-course people side by side</strong>, so counting off guaranteed you are <em>not</em> with them.</li><li><strong>Every pod spans the curriculum.</strong> That is what makes a share-out worth sitting through.</li><li><strong>One instruction did all of it.</strong> Nobody chose and nobody was picked last.</li></ul>
+<div class="callout">When you plan your own section, ask what the mechanic does for you. The best activities enforce themselves.</div>
+
+</section>
+
 <section data-obj="0">
 <h2>Before next time</h2>
-<ul><li><strong>Fri Sep 18, Studio.</strong> Read the scenario before you come.</li><li>Practicum 1 is written in that session. Bring a laptop.</li><li>Your pod is on the Week 2 module. You are in it from Friday.</li></ul>
+<ul><li><strong>Fri Sep 18, Studio.</strong> Read the scenario before you come.</li><li>Practicum 1 is written in that session. Bring a laptop.</li><li>You are in a pod as of today. Friday is the first time it meets.</li></ul>
 <p class="tiny">timdrichards.github.io/cs879-decks/scenarios/the-discussion-that-will-not-start.html</p>
 
 </section>

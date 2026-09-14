@@ -151,6 +151,9 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .timer-pill.low .pill-clock{ color:#9A6700; }
 .timer-pill.over{ border-left-color:var(--maroon); }
 .timer-pill.over .pill-clock{ color:var(--maroon); }
+/* display:flex outranks the hidden attribute, so an empty pill rendered on every
+   slide until this. Same trap as the journal tool's row grid. */
+.timer-pill[hidden]{ display:none !important; }
 </style>
 </head>
 <body>
