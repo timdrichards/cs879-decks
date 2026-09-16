@@ -341,6 +341,7 @@ footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding:1.2rem 0;color
   <p class="hint">Most people have one. If your appointment is split across two, add both and give each
   the hours allocated to it. Every entry is then tagged with its course, the dashboard breaks the
   totals down, and you can produce a report for one instructor covering only their course.</p>
+  <datalist id="course-codes"></datalist>
   <div id="courses"></div>
   <div class="bar" style="margin-top:.4rem">
     <button class="tiny" id="c-add">Add another course</button>
@@ -522,12 +523,35 @@ const CHECKS = [
 ];
 
 const blank = () => ({
-  version: 3,
+  version: 4,
   student: {name:"", role:"TA", hours:10, reserved:0, ctx:"general", start:"", end:"",
             courses:[{code:"", instructor:"", hours:0}]},
   entries: [], checks: {}, weeks: [],
   updated: null
 });
+/* Week one of Fall 2026 produced "COMPSCI 240", "COMPSCI240" and "CS660" from three
+   different TAs. Everything downstream groups by the code as an exact string, so those
+   variants split one course into two and the per-course totals stop meaning anything.
+   Split the letters off the digits rather than trusting the space the student typed.
+   Declared, not assigned, because migrate() runs before a const would initialise. */
+var DEPTS = {CS:"COMPSCI", CMPSCI:"COMPSCI", COMPSCI:"COMPSCI", CICS:"CICS",
+             MATH:"MATH", STAT:"STAT", INFO:"INFO", ENGIN:"ENGIN"};
+function normCode(s){
+  var v = (s||"").trim().replace(/\s+/g," ").toUpperCase().replace(/\.$/,"");
+  if (!v) return "";
+  var m = v.match(/^([A-Z]+)\s*([0-9].*)$/);
+  if (!m) return v;                     // no digits, so leave whatever they meant alone
+  return (DEPTS[m[1]] || m[1]) + " " + m[2].replace(/\s+/g,"");
+}
+
+/* Suggestions, not a catalogue. The field stays free text because cross-listings like
+   COMPSCI 461/661 and one-off sections have to remain typeable. */
+var CODE_HINTS = ["COMPSCI 110","COMPSCI 121","COMPSCI 186","COMPSCI 187","COMPSCI 210",
+  "COMPSCI 220","COMPSCI 230","COMPSCI 240","COMPSCI 250","COMPSCI 305","COMPSCI 311",
+  "COMPSCI 326","COMPSCI 345","COMPSCI 377","COMPSCI 383","COMPSCI 389","COMPSCI 445",
+  "COMPSCI 453","COMPSCI 461/661","COMPSCI 514","COMPSCI 520","COMPSCI 532","COMPSCI 550",
+  "COMPSCI 571","COMPSCI 585","COMPSCI 590","COMPSCI 660","COMPSCI 682"];
+
 // v1 stored hours as 10 or 20 and assumed the 879 encumbrance. Anything written by
 // that version belongs to an 879 TA, so carry the 3 hours across explicitly.
 function migrate(d){
@@ -544,9 +568,33 @@ function migrate(d){
     d.entries.forEach(e => { if (e.course === undefined) e.course = d.student.courses[0].code; });
     d.version = 3;
   }
+  // v3 let the code through exactly as typed. Canonicalise it, and move the entries
+  // with it, because e.course stores the code as a string and would otherwise orphan.
+  if (d.version === 3){
+    (d.student.courses||[]).forEach(c => {
+      const was = c.code, now = normCode(was);
+      if (was && now && was !== now)
+        d.entries.forEach(e => { if (e.course === was) e.course = now; });
+      c.code = now;
+    });
+    d.version = 4;
+  }
   if (d.student.start === undefined){ d.student.start = ""; d.student.end = ""; }
   if (d.student.role === undefined) d.student.role = "TA";
   return d;
+}
+/* Renaming a course has to carry its log with it, for the same reason the migration
+   does: the entries point at the old spelling and would drop to zero hours.
+
+   The previous code comes off the element rather than out of db, because the input
+   handler has already written the half-typed value there by the time this runs. Reading
+   db gave us "cs240h" as the thing to look for and every entry orphaned. */
+function setCode(t){
+  const i = +t.dataset.i, was = t.dataset.was || "", now = normCode(t.value);
+  db.student.courses[i].code = now;
+  t.value = now; t.dataset.was = now;
+  if (was && now && was !== now)
+    db.entries.forEach(e => { if (e.course === was) e.course = now; });
 }
 const courses = () => (db.student.courses||[]).filter(c=>c.code.trim());
 const available = () => Math.max(0, (+db.student.hours||0) - (+db.student.reserved||0));
@@ -601,7 +649,15 @@ async function idbClear(){
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
-    if (raw) db = migrate(Object.assign(blank(), JSON.parse(raw)));
+    if (!raw) return;
+    const stored = JSON.parse(raw);
+    db = migrate(Object.assign(blank(), stored));
+    /* Write the upgrade back. Migration ran only in memory before, so the stored copy
+       kept its old shape and every load re-ran the same conversion. That is harmless
+       while the change is additive, but the v4 course-code fix rewrites values, and a
+       student who opens the page and closes it would still hold "CS660" on disk. */
+    if (db.version !== stored.version)
+      try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){}
   }catch(e){ /* private window, blocked storage: run in memory */ }
 }
 async function save(){
@@ -980,7 +1036,7 @@ function render(){
   const cs = db.student.courses||[];
   $("courses").innerHTML = cs.map((c,i)=>
      '<div class="row c3" style="margin-bottom:.5rem">'
-   + '<div><label>Course</label><input data-c="code" data-i="'+i+'" value="'+esc(c.code)+'" placeholder="COMPSCI 187"></div>'
+   + '<div><label>Course</label><input data-c="code" data-i="'+i+'" list="course-codes" data-was="'+esc(c.code)+'" value="'+esc(c.code)+'" placeholder="COMPSCI 187"></div>'
    + '<div><label>Supervising instructor</label><input data-c="instructor" data-i="'+i+'" value="'+esc(c.instructor)+'"></div>'
    + '<div style="display:flex;gap:.4rem;align-items:flex-end">'
    +   '<div style="flex:1"><label>Hours a week</label><input type="number" min="0" step="0.5" data-c="hours" data-i="'+i+'" value="'+(c.hours||0)+'"></div>'
@@ -1144,9 +1200,15 @@ $("f-course").onchange = render;
 $("f-clear").onclick = ()=>{ $("f-cat").value=""; $("f-course").value=""; render(); };
 $("courses").oninput = ev => {
   const t=ev.target, i=+t.dataset.i, k=t.dataset.c; if(k===undefined) return;
+  // the code is settled on blur by setCode, so a half-typed one never reaches db
+  if (k==="code") return;
   db.student.courses[i][k] = (k==="hours") ? (parseFloat(t.value)||0) : t.value;
 };
-$("courses").onchange = async ev => { if(ev.target.dataset.c) await save(); };
+$("courses").onchange = async ev => {
+  const t = ev.target; if (!t.dataset.c) return;
+  if (t.dataset.c === "code") setCode(t);
+  await save();
+};
 $("courses").onclick = async ev => {
   const i = ev.target.dataset.crm; if(i===undefined) return;
   db.student.courses.splice(+i,1); await save();
@@ -1396,6 +1458,12 @@ function fill(){
 
   $("e-date").value=new Date().toISOString().slice(0,10);
   $("w-of").value=sunday(new Date().toISOString().slice(0,10));
+
+  // Anything the TA already typed stays on the list, so a cross-listed or unusual code
+  // is still one click away on the second course rather than retyped from memory.
+  const own = (db.student.courses||[]).map(c=>c.code).filter(Boolean);
+  const all = [...new Set(CODE_HINTS.concat(own))].sort();
+  $("course-codes").innerHTML = all.map(c=>'<option value="'+esc(c)+'">').join("");
 }
 initTheme(); load(); fill(); initFs(); render(); restoreFs();
 $("nf-toggle").onclick = toggleNotify;
