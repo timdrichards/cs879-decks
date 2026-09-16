@@ -376,7 +376,17 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     pillClock.textContent=s.text;
   }
   window.__paintPill=paintPill;
-  Reveal.on('slidechanged', paintPill);
+  // Arriving at a slide that has its own timer means the previous activity is over, so
+  // the carried clock stops rather than following you for the rest of the session. The
+  // opening gauge otherwise kept counting in the pill through every later block.
+  Reveal.on('slidechanged', function(){
+    var cur=Reveal.getCurrentSlide();
+    if(cur && cur.querySelector('.timer')){
+      var c=carried();
+      if(c) c.__timer.stop();
+    }
+    paintPill();
+  });
   setInterval(paintPill, 500);
 
   // space toggles the timer on this slide, or the carried one if this slide has none

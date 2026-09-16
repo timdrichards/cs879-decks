@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Unit 2 · Giving Feedback and Leading Discussions · COMPSCI 879</title>
@@ -191,20 +192,26 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <h1>Giving Feedback,<br>Leading Discussions</h1>
 <p class="lede">Three things you will write today, all of them about the course you actually TA. Open that syllabus on your laptop now.</p>
 <div class="timer compact" data-phases="Up front:180"></div>
+<aside class="notes">Seventy five minutes, of which 58 are on a clock. The rest is yours: this deck is built with slack so you can chase what the room brings up instead of racing.
 
+The clock on this slide is the opening gauge and it follows you through 'Where we are' and 'Today' as a pill in the bottom right. Three minutes covers all three, which is ninety seconds on 'Where we are' and fifteen on 'Today'. It stops by itself the moment you reach the first activity, so there is nothing to remember to kill.
+
+Every slide says what to do without you having to explain it, so read the room rather than reading the slide aloud.
+
+Space starts and pauses whichever timer is live, including the carried one.</aside>
 </section>
 
 <section data-obj="0">
 <h2>Where we are</h2>
 <p>Unit 1 was what the job is. This one is what to say, and what to do when nobody says anything back.</p>
 <ul><li>Half of today is <strong>feedback</strong>: answering one stuck student.</li><li>Half is <strong>discussion</strong>: getting a room to talk when it would rather not.</li><li>All of it is tested against the course you are a TA for.</li></ul>
-
+<aside class="notes">Ninety seconds. Do not linger.</aside>
 </section>
 
 <section data-obj="0">
 <h2>Today</h2>
 <ul><li>Three replies to one stuck student. Score them, write yours. <strong>8 min</strong></li><li>Score them, then A, B and C one at a time. <strong>6 min</strong></li><li>Why your section goes quiet.</li><li>Plan the first five minutes of your next section. <strong>6 min</strong></li><li>In threes: would that make <em>you</em> talk? <strong>6 min</strong></li><li>What your syllabus promises, and what you would change. <strong>5 min</strong></li><li>Reflection 1, written here. <strong>14 min</strong></li><li>Find your pod, and why it was done that way. <strong>5 min</strong></li></ul>
-
+<aside class="notes">Fifteen seconds. Say only: everything you write today is about your own course, and none of it is homework.</aside>
 </section>
 
 <section data-obj="1" class="go tight">
@@ -212,7 +219,11 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <div class="callout"><em>"Hi, I'm stuck on question 3. I've been at it two hours and I don't know what to do. Can you just tell me if my approach is right?"</em> Thirty lines of code pasted underneath.</div>
 <ul><li><strong>1.</strong> Read the three replies on the next slide.</li><li><strong>2.</strong> Score each out of 5 for how much it helps that student.</li><li><strong>3.</strong> Write the reply <em>you</em> would send. Real wording.</li></ul>
 <div class="timer" data-phases="Score then write:480"></div>
+<aside class="notes">Start the timer, then advance to the replies slide and leave it up. The clock follows you into the corner.
 
+At four minutes say: you should be writing by now. Most people over-spend on scoring.
+
+Do not say which reply is the good one.</aside>
 </section>
 
 <section data-obj="1" class="tight">
@@ -222,7 +233,9 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p class="tiny"><strong>B.</strong> "Great effort, you are close! Take another look at your loop bounds and think about edge cases. You have got this."</p>
 <p class="tiny"><strong>C.</strong> "Two hours is too long to be stuck, so I am glad you wrote. Before I look: what did you expect line 12 to do, and what did it do when you ran it? If you have not tried it with an empty list, try that first and tell me what happens. I am in office hours until four if it is easier out loud."</p>
 <p class="tiny">Score each out of 5, then write the one you would send.</p>
+<aside class="notes">Leave this up for the whole eight minutes. The clock is in the corner.
 
+What gets defended: A because it is efficient and answers the question asked, B because it is kind. Both are worth hearing out loud.</aside>
 </section>
 
 <section data-obj="1" class="go">
@@ -230,42 +243,74 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p>Hands up for each score. One reply at a time.</p>
 <div class="tally" data-rows="A,B,C" data-scale="1,2,3,4,5" data-n="28"></div>
 <div class="timer compact" data-phases="Discuss:360"></div>
+<aside class="notes">Ask one reply at a time, lowest score first: who gave A a one? a two? Type each count as you go and the bars grow while they watch.
 
+The grey n on the right should land on twenty eight. If it goes amber you have miscounted or somebody voted twice, and it is easier to fix now than to explain a wrong chart.
+
+Start the timer here and leave it running. It follows you to the next slide as a pill in the corner.
+
+What you are looking for is B. It usually splits hardest: some score "you have got this" a four for kindness and some score it a one for uselessness. Two peaks on B is the best thing that can happen, and it is the argument for the next slide.
+
+If A comes out uniformly high, do not correct it yet. Let them defend it first.</aside>
 </section>
 
 <section data-obj="1" class="tight">
 <h2>Reply A: it fixes the bug</h2>
 <p class="tiny"><strong>A.</strong> "Line 12 should be <code>i &lt; n-1</code>, not <code>i &lt;= n</code>. Your base case is also wrong, it needs to return 0 when the list is empty. Fix both and it should pass."</p>
 <ul><li><strong>It is not worthless.</strong> It is correct, it is fast, and the student is unblocked in one message.</li><li><strong>What it costs:</strong> they learn the quickest route to an answer is you. Next time they send the code sooner and try less.</li><li><strong>The tell:</strong> you wrote more of the solution than they did.</li><li><strong>When it is right:</strong> they have shown their work and are stuck on something they could not have known. A library quirk, an ambiguous spec, a typo they cannot see. Then just answer.</li></ul>
+<aside class="notes">Take the defence of A seriously and say so. Somebody scored it high and they are not wrong that it answers the question asked.
 
+The last bullet is the one that stops this being a rule. Plenty of questions deserve a direct answer, and pretending otherwise makes you the TA who will not just say it.
+
+The distinction is whether the student has already done the thinking. If they have, telling them is respect. If they have not, telling them is doing it for them.</aside>
 </section>
 
 <section data-obj="1" class="tight">
 <h2>Reply B: it fixes nothing</h2>
 <p class="tiny"><strong>B.</strong> "Great effort, you are close! Take another look at your loop bounds and think about edge cases. You have got this."</p>
 <ul><li><strong>It is not worthless either.</strong> The tone is right, and a student who feels dismissed stops asking.</li><li><strong>What it costs:</strong> there is no information in it. They are still stuck, now at one in the morning, and now also feeling bad about it.</li><li><strong>The tell:</strong> your reply would fit any submission in the course. If you could paste it under someone else's code, it says nothing about theirs.</li><li><strong>The trap:</strong> this is the mistake new TAs actually make, because it feels kind and it is quick to write.</li></ul>
+<aside class="notes">This is the one worth spending time on, because it is the failure mode in this room.
 
+Nobody sets out to write A by accident. People write B constantly, under time pressure, at the end of a grading session, and it feels generous.
+
+The paste test in the third bullet is the thing to give them: if this comment would fit anyone's submission, it is not feedback.
+
+If the tally showed B splitting, point at the chart: half of you rated this useful and half rated it useless, and you are both describing the same sentence.</aside>
 </section>
 
 <section data-obj="1" class="tight">
 <h2>Reply C: it asks first</h2>
 <p class="tiny"><strong>C.</strong> "Two hours is too long to be stuck, so I am glad you wrote. Before I look: what did you expect line 12 to do, and what did it do when you ran it? If you have not tried it with an empty list, try that first and tell me what happens. I am in office hours until four if it is easier out loud."</p>
 <ul><li><strong>Names the cost.</strong> Two hours is too long, so the problem being solved is the being-stuck, not just the bug.</li><li><strong>Asks for expected against actual.</strong> The most useful diagnostic question there is. Most of the time the bug surfaces in their own explanation before you say anything.</li><li><strong>One concrete thing to try</strong>, not a checklist. They can do it in a minute and it produces a fact.</li><li><strong>Offers a way out that is not more typing.</strong> Some problems die in ten seconds out loud and never in a thread.</li></ul>
+<aside class="notes">The honest cost of C: it takes a round trip, so today it is slower than A. That is the trade, and say it plainly rather than pretending C is free.
 
+It is cheaper across the term, because the student who answers "I expected the loop to stop at n-1" has just debugged it themselves, and the one who got A has not.
+
+The callout is the whole unit in one line. Wise feedback is a high standard plus the signal they can reach it. A is a standard with no signal. B is a signal with no standard.
+
+If time is short, this is the slide to land and the other two can be read later.</aside>
 </section>
 
 <section data-obj="1">
 <h2>Wise feedback</h2>
 <div class="callout">A high standard, plus a signal you think they can meet it. Either one on its own fails.</div>
 <ul><li><strong>A</strong> was a standard with no signal.</li><li><strong>B</strong> was a signal with no standard.</li><li><strong>C</strong> was both, and it cost one extra round trip.</li></ul>
+<aside class="notes">Two minutes. This is the line to carry out of the room and it is the one that shows up again in Unit 3 when they are writing rubric comments at speed.
 
+The mapping in the bullets is what makes it stick. Say it slowly.
+
+The round trip in the third bullet is the honest cost. Do not sell C as free: it is slower today and cheaper by October, and they should choose it knowing that.</aside>
 </section>
 
 <section data-obj="2" class="tight">
 <h2>Why your section goes quiet</h2>
 <p>You ask a question. Nobody answers. Four seconds feels like a minute, so you answer it yourself, and the room learns that waiting works.</p>
 <ul><li><strong>Wait longer than is comfortable.</strong> Count to ten. Someone breaks first, and it is not you.</li><li><strong>Never answer your own question.</strong> Rephrase it or hand it to a pair, but do not fill the gap.</li><li><strong>Have them talk to each other first.</strong> Thirty seconds in pairs, then ask a pair, not a person.</li><li><strong>Ask something with more than one defensible answer.</strong> "What is the complexity?" gets silence. "Which of these two would you ship?" gets an argument.</li></ul>
+<aside class="notes">Three minutes, no clock, and this is the one place today you should be the one talking.
 
+The framing that matters: silence is a design problem, not a discipline problem. A question with one right answer they either know or do not is a quiz, and nobody volunteers for a quiz.
+
+Asking a pair rather than a person is the single most useful move on this slide. It removes the personal risk, which is what the silence is actually about.</aside>
 </section>
 
 <section data-obj="2" class="go tight">
@@ -274,7 +319,11 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <ul><li><strong>1.</strong> The exact first question you will ask. Word for word.</li><li><strong>2.</strong> What you will do if nobody answers for ten seconds.</li><li><strong>3.</strong> One way you will get them talking to each other, not to you.</li></ul>
 <p class="tiny">No section of your own? Write it for your next office hour with more than one student in the room.</p>
 <div class="timer" data-phases="Write:360"></div>
+<aside class="notes">Six minutes. Circulate, because the failure is visible on the page: a first question with exactly one right answer.
 
+When you spot one, ask what a student could disagree with in it. That usually rewrites it on the spot.
+
+Several of them only grade and will assume this does not apply. The tiny line covers it, but say it out loud too.</aside>
 </section>
 
 <section data-obj="2" class="go tight">
@@ -282,7 +331,11 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <ul><li><strong>1.</strong> Read your first question to the other two. Just the question.</li><li><strong>2.</strong> They answer honestly: would you say something, or wait it out?</li><li><strong>3.</strong> If they would wait it out, fix the question together.</li></ul>
 <div class="fragment callout">You will never have a more generous audience than this one. If it does not work here, it will not work at eight in the morning.</div>
 <div class="timer" data-phases="In threes:360"></div>
+<aside class="notes">Threes, and mix courses if people from the same course have clustered.
 
+This is the test that matters: a room of peers who want to help and still would not answer tells them more than I can.
+
+Last ninety seconds, ask for two questions that got rewritten and what changed. Do not run a full report-out; the next block needs the time.</aside>
 </section>
 
 <section data-obj="3" class="go tight">
@@ -291,7 +344,13 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <ul><li><strong>1.</strong> What it says about feedback, and how fast work comes back.</li><li><strong>2.</strong> What it says about your section or lab, if anything at all.</li><li><strong>3.</strong> One line you would change, and what you would change it to.</li></ul>
 <p class="tiny">No syllabus? Write what you were told instead, and where you got it from. That is a finding, not a failure.</p>
 <div class="timer" data-phases="Read and write:300"></div>
+<aside class="notes">Five minutes of quiet. Most of them are reading, for the first time, a document they are already enforcing.
 
+The third item is the one people skip. Push on it: one line, and what it would say instead.
+
+What you will hear: no turnaround time stated anywhere, section attendance called required with no mechanism, and a feedback policy that describes the instructor and never mentions the TA who writes it.
+
+This is also the exit ticket answer, so tell them to keep it.</aside>
 </section>
 
 <section data-obj="3" class="go tight">
@@ -305,7 +364,15 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p class="tiny">&ldquo;May not use AI to write answers or code. It is an honesty violation.&rdquo;</p>
 <p><strong>A student asks: can I use AI for this?</strong> What do you say, and who decides?</p>
 <div class="timer compact" data-phases="Turn and talk:180"></div>
+<aside class="notes">Say up front that these are unattributed and nobody is being called out. If someone wants to claim one, that is their call, not yours.
 
+Read two aloud, not all six. 'Whatever they want' and 'frowned upon' do the most work: neither is something a TA can enforce at a desk with a student waiting.
+
+The point is not that these courses are badly run. It is that the ambiguity lands on them, in person, and they are the ones holding it.
+
+Three minutes. What you will hear back: most would say 'let me check with the instructor.' That is the right answer and worth naming as the right answer out loud.
+
+If it runs hot, let it. The next slide is one minute and there is buffer after it.</aside>
 </section>
 
 <section data-obj="3" class="tight">
@@ -314,7 +381,11 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p>That is a TA who read a policy closely enough to catch it contradicting itself, in week one, before anyone asked them to.</p>
 <div class="callout">&ldquo;If a case is unclear, I would ask Joe or Nikko before telling a student it is allowed.&rdquo;</div>
 <p>You are not the policy. You are the person who notices when it does not hold, and asks before improvising an answer a student will rely on.</p>
+<aside class="notes">One minute, and it is a compliment, so land it as one.
 
+This is the behaviour the whole unit is pointing at. Reading the document, finding the seam, and then not filling the seam yourself. Every instinct says be helpful and answer the question. The job is to notice you cannot answer it yet.
+
+Do not moralise past this. Say it and move to Reflection 1.</aside>
 </section>
 
 <section data-obj="0" class="go tight">
@@ -323,7 +394,15 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <ul><li>What you are hoping to get out of being a TA this semester.</li><li>What you are worried about.</li><li><strong>Is this course an asset to your TA work?</strong> Be blunt.</li></ul>
 <p class="tiny">No wrong answers, nothing held against you, and an honest <em>no</em> about 879 beats a polite yes.</p>
 <div class="timer" data-phases="Write:840"></div>
+<aside class="notes">Point at the asset question before they start, and say the quiet part out loud: an honest no is worth more to me than a polite yes, it does not affect their grade, and I do not take it personally. Say it once, plainly, and then leave the room alone to write. Labouring it makes it sound like there is a right answer.
 
+Fourteen minutes. Protect this over everything else: ten points, written here.
+
+Tell them what it is for. Several later sessions are built out of what comes up, and the Tips and Advice discussion in November is seeded from it.
+
+Quiet room, and do not read over shoulders for this one.
+
+Finished early: start this week's journal entry.</aside>
 </section>
 
 <section data-obj="0" class="go tight">
@@ -331,7 +410,17 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <ul><li><strong>1.</strong> Stand along the back wall, in order of the course number you TA. Lowest by the door.</li><li><strong>2.</strong> Count off <strong>one to five</strong> down the line. Your number is your pod.</li><li><strong>3.</strong> In Canvas: <strong>People</strong> &rarr; <strong>Practicum Pods</strong> &rarr; Join your pod.</li></ul>
 <p class="tiny">Two courses? Stand at the one you spend more hours on. Not assigned to a course yet? Go to the far end.</p>
 <div class="timer" data-phases="Line up:120,Count off and join:180"></div>
+<aside class="notes">The join route is People, not Groups. This course has no Groups tab in the student navigation, and the global Groups menu only lists groups somebody is already in, so 'go to Groups' sends them nowhere. People, then the Practicum Pods tab, then Join.
 
+Five minutes, and it is the energy change after fourteen minutes of silent writing, so let it be a bit loud.
+
+The lining up is the slow part because they have to ask each other what course they are on, which is fine and is half the value. Ninety seconds is usually enough.
+
+Count off yourself, walking the line, rather than letting them do it. It goes wrong otherwise and you lose two minutes.
+
+Twenty eight people gives pods of six, six, six, five, five. If someone is absent, put them in a five afterwards rather than reshuffling.
+
+Before they sit down, look at the line and say what you see: where the room bunches up. Then the next slide.</aside>
 </section>
 
 <section data-obj="0" class="tight">
@@ -339,25 +428,53 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p>None of that was arbitrary.</p>
 <ul><li><strong>The line was a histogram.</strong> You saw the shape of this cohort before we broke it up.</li><li><strong>Sorting put same-course people side by side</strong>, so counting off guaranteed you are <em>not</em> with them.</li><li><strong>Every pod spans the curriculum.</strong> That is what makes a share-out worth sitting through.</li><li><strong>One instruction did all of it.</strong> Nobody chose and nobody was picked last.</li></ul>
 <div class="callout">When you plan your own section, ask what the mechanic does for you. The best activities enforce themselves.</div>
+<aside class="notes">Two minutes, no clock. This is the slide that matters more than the one before it.
 
+The point is not the pods. It is that the shape of an activity can do the work that rules and enforcement otherwise have to do, and that is a thing they can steal for their own sections on Friday.
+
+Tie it back explicitly to the first question they wrote earlier: a question with one right answer needs you to cold call, and a question with two defensible answers does not. Same principle.
+
+If you only have one minute, say the last bullet and the callout.</aside>
 </section>
 
 <section data-obj="0">
 <h2>Before next time</h2>
 <ul><li><strong>Fri Sep 18, Studio.</strong> Read the scenario before you come.</li><li>Practicum 1 is written in that session. Bring a laptop.</li><li>You are in a pod as of today. Friday is the first time it meets.</li><li><strong>Staff Journal, week of Sep 13.</strong> Due Friday 11:59 PM.</li><li>Tick <strong>&ldquo;I have read the syllabus&rdquo;</strong> in your journal. You did that work today, so write the answer while it is fresh.</li></ul>
 <p class="tiny">Still owe the week of Sep 6? It locks Friday at 11:59 PM. timdrichards.github.io/cs879-decks/scenarios/the-discussion-that-will-not-start.html</p>
+<aside class="notes">Thirty seconds. Say the scenario twice: Friday collapses if nobody has read it, and it happens to be about exactly the silence problem we did today.
 
+Pods were formed ten minutes ago, so just point at the Canvas group.
+
+The checklist bullet is the one worth a extra beat. Last week 10 of 19 journals had not a single box ticked, and the five that were complete are where everything useful came from. They just spent five minutes doing item one, so this costs them nothing and it is the difference between the journal being a timesheet and the journal being worth reading.
+
+Eight people still owe the week of Sep 6. Say it to the room, not to them, and leave it at that. It locks Friday night and after that it is a zero they cannot fix.</aside>
+</section>
+
+<section data-obj="0" data-instructor-only>
+<h3>Wed Sep 16 · last 5 minutes</h3>
+<h2>Exit ticket</h2>
+<p>Canvas &rarr; Week 2 &rarr; 🎟️ Exit Ticket: Wed 9/16</p>
+<div class="callout"><strong>What does your course's syllabus promise about feedback, and what is the one line you would change?</strong></div>
+<p class="tiny">Copy the prompt into question two. Closes at 5:20, five minutes after we finish.</p>
+<div class="timer compact" data-phases="Exit ticket:300"></div>
+<aside class="notes">Do not post this prompt anywhere. It is the part of the ticket that cannot be answered from a dorm room.
+
+They wrote the answer forty minutes ago, so three minutes is enough.
+
+The ticket now also asks which course they are a TA for. That is new on every submission from today, and it is what lets us compare across the fourteen courses in this room. If anyone asks why: it is how we take specifics back to the instructors who run those courses.</aside>
 </section>
 
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.min.js"></script>
 <script>
 Reveal.initialize({
   width:1100, height:620, margin:0.04, minScale:0.2, maxScale:2.0,
   hash:true, slideNumber:'c/t', transition:'fade', transitionSpeed:'fast', center:false,
   controls:true, progress:true,
-  autoAnimateDuration:0.7, autoAnimateEasing:'ease-in-out'
+  autoAnimateDuration:0.7, autoAnimateEasing:'ease-in-out',
+  plugins:[ RevealNotes ]
 });
 // The strip lives outside .slides so auto-animate cannot touch it, which also means it does not
 // inherit reveal's transform. Size and place it from Reveal.getScale() instead.

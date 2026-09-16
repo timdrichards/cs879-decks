@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Unit 12 · Accessibility and Technologies for Teaching · COMPSCI 879</title>
@@ -190,7 +191,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <h3>COMPSCI 879 · Unit 12 · Tue Nov 24</h3>
 <h1>Accessibility and<br>Technologies for Teaching</h1>
 <p class="lede">Act three: reflecting on your own practice</p>
-
+<aside class="notes">Wednesday schedule on a Tuesday. Second half is bespoke topics, so keep the tool content to 40 minutes.</aside>
 </section>
 
 <section data-obj="0">
@@ -205,7 +206,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p>Why should we use technology in the classroom?</p>
 <p class="lede">And why shouldn't we?</p>
 <div class="timer" data-phases="Think:60,Pair:180"></div>
-
+<aside class="notes">Get the second list on the board too. It is usually shorter and more honest.</aside>
 </section>
 
 <section data-obj="3">
@@ -234,7 +235,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p>Pick a tool each that you could actually use in your own section. Use the worksheet.</p>
 <p class="lede">Then report out: what problem it solves, and where it fails.</p>
 <div class="timer" data-phases="Evaluate:600,Report out:300"></div>
-
+<aside class="notes">Insist on a real tool for a real section. A general survey of ed tech is a waste of the slot.</aside>
 </section>
 
 <section data-obj="1">
@@ -248,7 +249,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <h2>GenAI in your TA work</h2>
 <div class="two"><div class="card no"><h4>You may not</h4><ul><li>Use it in TA duties without your instructor's permission</li><li>Enter any student data into a non-UMass tool. Names, schedules, work.</li></ul></div><div class="card yes"><h4>You may, with permission</h4><ul><li>Refresh your own understanding of a concept</li><li>Draft an explanation containing nothing identifiable</li></ul></div></div>
 <div class="callout">This course's policy is more permissive. It does not travel to the course you assist.</div>
-
+<aside class="notes">Third time they have heard this. Say it anyway. It is the one that produces a FERPA problem rather than a grade problem.</aside>
 </section>
 
 <section data-obj="1">
@@ -263,7 +264,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <div class="two"><div class="card"><h4>If you stay in academia</h4><ul><li>Tools change every three years</li><li>The standard does not</li></ul></div><div class="card"><h4>If you go to industry</h4><ul><li>Legal requirement for what you ship</li><li>A build-time property, not a fix</li></ul></div></div>
 <div class="callout">No captions on the video, and a student who needs them has the exam on Friday.</div>
 <p class="lede">And if neither is yours: what do you want from the job you have?</p>
-
+<aside class="notes">Do not rush this slide. The question at the bottom is the real one and it is worth thirty seconds of silence. Say the line: if you cannot find what makes the job matter to you, come and tell me and we will work it out together. Some of them will.</aside>
 </section>
 
 <section data-obj="0">
@@ -271,7 +272,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <p>What do you still want covered?</p>
 <p class="lede">This slot exists because in September you did not yet know what you would need in November.</p>
 <div class="timer compact" data-phases="Bespoke:1500"></div>
-
+<aside class="notes">Ask for topics in the Friday Studio the week before so you can prepare rather than improvise.</aside>
 </section>
 
 <section data-obj="0">
@@ -292,12 +293,14 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.min.js"></script>
 <script>
 Reveal.initialize({
   width:1100, height:620, margin:0.04, minScale:0.2, maxScale:2.0,
   hash:true, slideNumber:'c/t', transition:'fade', transitionSpeed:'fast', center:false,
   controls:true, progress:true,
-  autoAnimateDuration:0.7, autoAnimateEasing:'ease-in-out'
+  autoAnimateDuration:0.7, autoAnimateEasing:'ease-in-out',
+  plugins:[ RevealNotes ]
 });
 // The strip lives outside .slides so auto-animate cannot touch it, which also means it does not
 // inherit reveal's transform. Size and place it from Reveal.getScale() instead.
