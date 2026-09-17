@@ -187,8 +187,24 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 /* Fixed to the viewport rather than the slide, so reveal's scale transform leaves it
    alone and it reads the same size on a projector as on a laptop. Top right, because
    the carried-timer pill already owns the bottom right. */
-.class-clock{ position:fixed; top:14px; right:16px; z-index:60;
-  display:flex; align-items:baseline; gap:8px;
+/* Both fixtures live in one flex row anchored to the corner. A hand-tuned right offset
+   on the pace pill collided with the clock as soon as the clock's text got wider. */
+.hud{ position:fixed; top:14px; right:16px; z-index:60; display:flex; gap:8px;
+  align-items:stretch; }
+.pace{ display:flex; align-items:baseline; gap:8px;
+  background:var(--wash); border:1px solid var(--rule); border-radius:999px;
+  padding:6px 14px; user-select:none; font-family:Lato,system-ui,sans-serif;
+  box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.pace[hidden]{ display:none !important; }
+.pace .pc-word{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); }
+.pace .pc-time{ font-size:17px; font-weight:800; color:var(--ink);
+  font-variant-numeric:tabular-nums; }
+.pace.ahead{ border-color:var(--go); }
+.pace.ahead .pc-word, .pace.ahead .pc-time{ color:var(--go); }
+.pace.behind{ background:#FDF3F3; border-color:var(--maroon); }
+.pace.behind .pc-word, .pace.behind .pc-time{ color:var(--maroon); }
+
+.class-clock{ display:flex; align-items:baseline; gap:8px;
   background:var(--wash); border:1px solid var(--rule); border-radius:999px;
   padding:6px 14px; cursor:pointer; user-select:none;
   font-family:Lato,system-ui,sans-serif; box-shadow:0 1px 3px rgba(0,0,0,.08); }
@@ -216,6 +232,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 <h3>COMPSCI 879 · Unit 12 · Tue Nov 24</h3>
 <h1>Accessibility and<br>Technologies for Teaching</h1>
 <p class="lede">Act three: reflecting on your own practice</p>
+<div class="timer compact" data-phases="Up front:120"></div>
 <aside class="notes">Wednesday schedule on a Tuesday. Second half is bespoke topics, so keep the tool content to 40 minutes.</aside>
 </section>
 
@@ -415,15 +432,28 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     var touched=false;
     function stop(){ running=false; clearInterval(tick); tick=null; paint(); }
     function run(){ if(running) return; running=true; touched=true;
+      // starting the opening timer is how class begins, so the session clock goes with it
+      if(window.__startClass) window.__startClass();
       tick=setInterval(function(){ left--; paint(); },1000); paint(); }
     function go(n){ stop(); i=n; left=spec[i].secs; paint(); }
     function reset(){ stop(); i=0; left=spec[0].secs; touched=false; paint(); }
     btn.onclick=function(){ running?stop():run(); };
     rst.onclick=function(){ reset(); if(window.__paintPill) window.__paintPill(); };
+    function total(){ return spec.reduce(function(a,p){ return a+p.secs; },0); }
+    // What this timer still owes the plan: the current phase's remainder plus every
+    // phase after it. Overrun counts as zero rather than as negative, because time
+    // already spent is the class clock's problem, not the plan's.
+    function remaining(){
+      if(!touched) return total();
+      var r=Math.max(0,left);
+      for(var n=i+1;n<spec.length;n++) r+=spec[n].secs;
+      return r;
+    }
     t.__timer={run:run, stop:stop, reset:reset, toggle:function(){ running?stop():run(); },
                next:function(){ if(i<spec.length-1) go(i+1); },
                isRunning:function(){ return running; },
                isFresh:function(){ return !touched; },
+               total:total, remaining:remaining,
                state:function(){ return {left:left, name:spec[i].name, text:fmt(left)}; }};
     paint();
   });
@@ -470,6 +500,7 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
       if(own.__timer && !own.__timer.isRunning() && own.__timer.isFresh()) own.__timer.run();
     }
     startClassClock();          // the session clock begins when you leave the title slide
+    paintPace();
     paintPill();
   });
   setInterval(paintPill, 500);
@@ -494,8 +525,47 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
   var clk=document.createElement('div');
   clk.className='class-clock'; clk.hidden=true;
   clk.innerHTML='<span class="cc-label">Class</span><span class="cc-time"></span>';
-  if(sessOn) document.body.appendChild(clk);
+  var hud=document.createElement('div');
+  hud.className='hud';
+  if(sessOn){ document.body.appendChild(hud); hud.appendChild(clk); }
   var ccTime=clk.querySelector('.cc-time');
+
+  /* Pace. What the rest of the deck still owes, against what the period still has.
+     The difference is the unallocated time: transitions, the talk slides with no timer,
+     and whatever you want to say that is not on a clock. It starts at
+     (period - sum of every timer) and should stay roughly there. When it goes negative
+     the plan no longer fits the room. */
+  var pace=document.createElement('div');
+  pace.className='pace'; pace.hidden=true;
+  pace.innerHTML='<span class="pc-word"></span><span class="pc-time"></span>';
+  if(sessOn) hud.insertBefore(pace, clk);
+  var pcWord=pace.querySelector('.pc-word'), pcTime=pace.querySelector('.pc-time');
+
+  function planRemaining(){
+    var idx=Reveal.getIndices().h, secs=0;
+    var all=document.querySelectorAll('.reveal .slides > section');
+    for(var n=0;n<all.length;n++){
+      if(n<idx) continue;
+      var t=all[n].querySelector('.timer');
+      if(!t||!t.__timer) continue;
+      secs += (n===idx) ? t.__timer.remaining() : t.__timer.total();
+    }
+    return secs;
+  }
+  function paintPace(){
+    if(!sessOn) return;
+    var slack=sessLeft-planRemaining();
+    pace.hidden=false;
+    var word, cls;
+    if(slack <= -60){ word='Speed up'; cls='behind'; }
+    else if(slack >= 180){ word='Ease off'; cls='ahead'; }
+    else { word='On plan'; cls='onplan'; }
+    pace.className='pace '+cls;
+    pcWord.textContent=word;
+    pcTime.textContent=(slack<0?'\u2212':'+')+fmt(Math.abs(slack)).replace('+','');
+    pace.title='Slides still to run need '+fmt(planRemaining())
+      +'. The period has '+fmt(sessLeft)+' left.';
+  }
 
   function paintClock(){
     if(!sessOn) return;
@@ -505,6 +575,7 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     clk.classList.toggle('low', sessLeft<=300 && sessLeft>0);
     clk.classList.toggle('over', sessLeft<=0);
     clk.classList.toggle('paused', !sessRun);
+    paintPace();
   }
   function runClassClock(){
     if(!sessOn||sessRun) return;
@@ -514,12 +585,13 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
   }
   function stopClassClock(){ sessRun=false; clearInterval(sessTick); sessTick=null; paintClock(); }
   function startClassClock(){ runClassClock(); }          // first slide change starts it
+  window.__startClass=startClassClock;
   function toggleClassClock(){ sessRun?stopClassClock():runClassClock(); }
   function resetClassClock(){ stopClassClock(); sessLeft=sessMin*60; paintClock(); }
   clk.onclick=function(){ toggleClassClock(); };
   clk.ondblclick=function(e){ e.preventDefault(); resetClassClock(); };
   clk.title='Click to pause or resume, double-click to reset, or press c';
-  paintClock();
+  paintClock(); paintPace();
 
   // r resets the timer on this slide, c starts or pauses the class clock
   document.addEventListener('keydown',function(e){
