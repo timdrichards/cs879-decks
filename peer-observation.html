@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peer Observation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#7B1416; --brand-hi:#8f1a1c;
+  --maroon:#7B1416; --ink:#24292f; --muted:#57606a; --rule:#d8d8d8;
+  --bg:#ffffff; --panel:#ffffff; --wash:#f6f6f5;
+  --go:#1F7A4D; --amber:#9A6700; --red:#A4262C;
+  --warn-bg:#FFF8E5; --stop-bg:#FDF3F3; --ok-bg:#F3FAF6;
+  --font:Lato,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --brand:#7B1416; --brand-hi:#8f1a1c;
+    --maroon:#E9899B; --ink:#e6e6e6; --muted:#a6adb5; --rule:#3a3f45;
+    --bg:#16181b; --panel:#1e2125; --wash:#24282d;
+    --go:#5FB98A; --amber:#D9A62E; --red:#E38089;
+    --warn-bg:#2b2617; --stop-bg:#2b1c1e; --ok-bg:#16241d;
+  }
+}
+[data-theme="dark"]{
+  --brand:#7B1416; --brand-hi:#8f1a1c;
+  --maroon:#E9899B; --ink:#e6e6e6; --muted:#a6adb5; --rule:#3a3f45;
+  --bg:#16181b; --panel:#1e2125; --wash:#24282d;
+  --go:#5FB98A; --amber:#D9A62E; --red:#E38089;
+  --warn-bg:#2b2617; --stop-bg:#2b1c1e; --ok-bg:#16241d;
+}
+/* display rules outrank the hidden attribute, so this has to be explicit or every
+   panel renders at once. Same trap the journal tool hit with its row grid. */
+[hidden]{ display:none !important; }
+*{ box-sizing:border-box; }
+body{ margin:0; font:16px/1.55 var(--font); color:var(--ink); background:var(--bg); }
+header{ background:var(--brand); color:#fff; padding:1.1rem 1rem; }
+.wrap{ max-width:820px; margin:0 auto; padding:0 16px; }
+header .wrap{ display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
+header h1{ margin:0; font-size:1.3rem; }
+header .sub{ color:#f0d9da; font-size:.9rem; }
+header .spacer{ flex:1 1 auto; }
+main{ padding:1.2rem 0 4rem; }
+section.card{ background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:1rem 1.1rem; margin:0 0 1.1rem; }
+h2{ font-size:1.05rem; margin:0 0 .2rem; color:var(--maroon); }
+h3{ font-size:.95rem; margin:1.1rem 0 .3rem; }
+.lede{ color:var(--muted); margin:.1rem 0 .9rem; font-size:.93rem; }
+label{ display:block; font-weight:700; font-size:.87rem; margin:.8rem 0 .2rem; }
+.hint{ color:var(--muted); font-size:.83rem; margin:.1rem 0 .3rem; }
+input[type=text], input[type=date], input[type=time], textarea, select{
+  width:100%; font:inherit; color:inherit; background:var(--bg);
+  border:1px solid var(--rule); border-radius:6px; padding:.5rem .6rem; }
+textarea{ min-height:5.2rem; resize:vertical; }
+input:focus, textarea:focus, select:focus{ outline:2px solid var(--brand-hi); outline-offset:1px; }
+.row{ display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
+.row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:.7rem; }
+@media (max-width:620px){ .row, .row3{ grid-template-columns:1fr; } }
+.opts{ display:grid; gap:.5rem; margin:.5rem 0 0; }
+.opt{ border:1px solid var(--rule); border-radius:6px; padding:.6rem .7rem; cursor:pointer;
+  background:var(--wash); display:flex; gap:.6rem; align-items:flex-start; }
+.opt.sel{ border-color:var(--brand); background:var(--ok-bg); }
+.opt input{ margin-top:.25rem; }
+.opt b{ display:block; }
+.opt span{ color:var(--muted); font-size:.85rem; }
+.note{ background:var(--warn-bg); border-left:3px solid var(--amber);
+  padding:.6rem .8rem; border-radius:0 6px 6px 0; font-size:.88rem; margin:.8rem 0; }
+.ferpa{ background:var(--stop-bg); border-left:3px solid var(--red); }
+button{ font:inherit; border-radius:6px; border:1px solid var(--rule); padding:.5rem .9rem;
+  background:var(--wash); color:inherit; cursor:pointer; }
+button.solid{ background:var(--brand); border-color:var(--brand); color:#fff; font-weight:700; }
+button:hover{ border-color:var(--brand); }
+.bar{ display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+.saved{ color:var(--go); font-size:.85rem; }
+.check li{ margin:.25rem 0; font-size:.9rem; }
+.check .no{ color:var(--muted); }
+.check .yes{ color:var(--go); font-weight:700; }
+pre.out{ background:var(--wash); border:1px solid var(--rule); border-radius:6px;
+  padding:.8rem; overflow-x:auto; font-size:.83rem; white-space:pre-wrap; max-height:22rem; }
+.tiny{ font-size:.82rem; color:var(--muted); }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Peer Observation</h1>
+  <span class="sub">COMPSCI 879 · Observer's notes</span>
+  <span class="spacer"></span>
+  <button id="theme" title="Light, dark or system">◐</button>
+</div></header>
+
+<main class="wrap">
+
+<section class="card">
+  <h2>What this is</h2>
+  <p class="lede">Your notes from observing your partner, taken while you watch or straight
+  afterwards. Nothing here is sent anywhere. It saves in this browser, and when you are done you
+  copy the report out and submit it to Canvas in the Friday October 30 session.</p>
+  <div class="note ferpa"><strong>Do not write down any student's name.</strong> You are sitting in
+  on someone else's class. Describe what people did, not who they were. "A student asked why the
+  base case returns zero" is the level of detail that helps; a name is an education record and does
+  not belong in your notes.</div>
+</section>
+
+<section class="card">
+  <h2>Setup</h2>
+  <div class="row">
+    <div><label for="me">Your name</label><input type="text" id="me" placeholder="For the exported report"></div>
+    <div><label for="partner">Your partner's name</label><input type="text" id="partner" placeholder="The TA you observed"></div>
+  </div>
+  <div class="row">
+    <div><label for="mycourse">Your course</label>
+      <input type="text" id="mycourse" placeholder="COMPSCI 187 Programming with Data Structures">
+      <p class="hint">Number and title. This becomes the first line of your submission.</p></div>
+    <div><label for="theircourse">Their course</label>
+      <input type="text" id="theircourse" placeholder="COMPSCI 220 Programming Methodology"></div>
+  </div>
+  <div class="row3">
+    <div><label for="date">Date observed</label><input type="date" id="date"></div>
+    <div><label for="time">Start time</label><input type="time" id="time"></div>
+    <div><label for="place">Where</label><input type="text" id="place" placeholder="LGRT 121, or Zoom"></div>
+  </div>
+
+  <label>What you observed</label>
+  <div class="opts" id="opts">
+    <label class="opt"><input type="radio" name="kind" value="teaching">
+      <span><b>A section, lab, recitation or review session</b>
+      <span>About an hour, between October 12 and 30.</span></span></label>
+    <label class="opt"><input type="radio" name="kind" value="hours">
+      <span><b>An office hour or help session</b>
+      <span>In person or on Zoom, about an hour, same window.</span></span></label>
+    <label class="opt"><input type="radio" name="kind" value="talk">
+      <span><b>A topic presentation</b>
+      <span>Ten minutes, for a partner whose job has nothing observable in it. Not a lesser
+      option: explaining a system you know well to someone who does not is the harder skill.</span></span></label>
+  </div>
+
+  <label for="asked">Did your partner ask you to look for anything in particular?</label>
+  <p class="hint">Optional. If they did, note it here so your report answers it.</p>
+  <textarea id="asked" placeholder="They asked whether their examples were landing with the people at the back."></textarea>
+</section>
+
+<section class="card" id="sec-teaching" hidden>
+  <h2>What happened in the session</h2>
+  <p class="lede">Describe what you actually saw. The single thing this report is graded on is
+  whether it could only have been written about the session you sat in.</p>
+  <div id="q-teaching"></div>
+</section>
+
+<section class="card" id="sec-hours" hidden>
+  <h2>What happened in the office hour</h2>
+  <p class="lede">Describe what you actually saw. The single thing this report is graded on is
+  whether it could only have been written about the session you sat in.</p>
+  <div id="q-hours"></div>
+</section>
+
+<section class="card" id="sec-talk" hidden>
+  <h2>What happened in the presentation</h2>
+  <p class="lede">You are the audience they were explaining it to, so your confusion is data.</p>
+  <div id="q-talk"></div>
+</section>
+
+<section class="card" id="sec-common" hidden>
+  <h2>The three questions everyone answers</h2>
+  <div id="q-common"></div>
+  <div class="note"><strong>The third one is the one that gets wasted.</strong> A report saying
+  everything was great is a report your partner cannot use. You are not being asked to be harsh.
+  You are being asked to name one thing they could try next time, and why you think it would help.</div>
+</section>
+
+<section class="card" id="sec-out" hidden>
+  <h2>Before you submit</h2>
+  <ul class="check" id="check"></ul>
+  <h3>Your report</h3>
+  <p class="hint">Copy this into the Canvas submission, or download it and upload the file.</p>
+  <pre class="out" id="out"></pre>
+  <div class="bar">
+    <button class="solid" id="copy">Copy to clipboard</button>
+    <button id="dl-md">Download as Markdown</button>
+    <button id="dl-json">Save a copy (JSON)</button>
+    <button id="load">Load a saved copy</button>
+    <input type="file" id="file" accept=".json" hidden>
+    <span class="saved" id="msg"></span>
+  </div>
+  <p class="tiny">The JSON is so you can carry these notes between machines or pick them up next
+  year. The Markdown is what you hand in.</p>
+</section>
+
+</main>
+
+<script>
+(function(){
+"use strict";
+var KEY="cs879-peer-observation-v1", TKEY=KEY+"-theme";
+var $=function(id){ return document.getElementById(id); };
+
+/* Prompts carry a behavioural anchor rather than a rating. The peer-evaluation research
+   this course draws on is blunt about why: Likert scales fail because the response
+   choices do not describe the behaviour associated with each level, so raters supply
+   their own meaning and agreement collapses. Asking what someone did has no such gap. */
+var Q = {
+ teaching:[
+  ["open","The first five minutes","How did it start? What were students doing while it started?"],
+  ["doing","How much of the hour were students working rather than listening?","A rough split is fine. What were they actually doing in the working parts?"],
+  ["stuck","A moment where someone was lost","What was the confusion, and what did your partner do next? If nobody got stuck, say so."],
+  ["qs","How questions were handled","Answered outright, turned back, parked for later? Pick one you watched and describe it."],
+  ["close","How it ended","Did it end, or did it stop because the clock ran out?"]
+ ],
+ hours:[
+  ["arrive","How students arrived and waited","Queue, sign-up, drop-in? What did the waiting look like?"],
+  ["first","The first question you heard, and the answer","As close to what was actually said as you can manage."],
+  ["given","Given or drawn out?","Did your partner hand over the answer, or get the student to produce it? Neither is automatically right. What did the situation call for?"],
+  ["second","What happened with a later student","Did the approach change? Should it have?"],
+  ["repeat","Anything that came up more than once","Repeated questions usually point at something upstream in the course."]
+ ],
+ talk:[
+  ["setup","How they set the problem up for an outsider","You do not TA their course. Did you know enough to follow by the end of the first minute?"],
+  ["clear","The clearest part, and what made it clear","An analogy, a diagram, an example, an order they put things in?"],
+  ["lost","Where you lost the thread","If you never did, say so. If you did, say exactly where."],
+  ["change","What they are changing, and whether you understood why","The presentation is drawn from their practicum focus."],
+  ["qa","How they handled the question afterwards","Including if the honest answer was that they did not know."]
+ ],
+ common:[
+  ["students","What do you think the students got out of this?","And what did you see that makes you think so? “I could not tell” is a real answer if you say why."],
+  ["strength","What were your partner's real strengths here?","Tie it to a moment you watched. Praise that would fit anyone is not useful to them."],
+  ["change","What would you suggest they change?","One thing, concrete enough to try next session, and why you think it would help."]
+ ]
+};
+
+var db = load();
+
+function blank(){
+  return { v:1, me:"", partner:"", mycourse:"", theircourse:"",
+           date:"", time:"", place:"", kind:"", asked:"", a:{}, updated:null };
+}
+function load(){
+  try{ var raw=localStorage.getItem(KEY); if(raw) return Object.assign(blank(), JSON.parse(raw)); }
+  catch(e){ /* private window or blocked storage: run in memory */ }
+  return blank();
+}
+function save(){
+  db.updated=new Date().toISOString();
+  try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){}
+  flash("Saved");
+  render();
+}
+var t=null;
+function flash(m){ $("msg").textContent=m; clearTimeout(t); t=setTimeout(function(){ $("msg").textContent=""; },1600); }
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+
+/* Answers are keyed by section, not by the bare question id. The talk section asks what
+   your partner is changing and the common section asks what you would have them change,
+   and both were once id "change", so one textarea silently overwrote the other and the
+   export printed the same paragraph under two headings. */
+function pre(kind){ return kind==="common" ? "c." : "o."+kind+"."; }
+function buildQs(hostId, list, kind){
+  var host=$(hostId), px=pre(kind);
+  if(host.dataset.built) return;
+  host.innerHTML = list.map(function(q){
+    return '<label for="a-'+px+q[0]+'">'+esc(q[1])+'</label>'
+         + '<p class="hint">'+esc(q[2])+'</p>'
+         + '<textarea id="a-'+px+q[0]+'" data-a="'+px+q[0]+'"></textarea>';
+  }).join("");
+  host.dataset.built="1";
+  host.addEventListener("input", function(ev){
+    var k=ev.target.dataset.a; if(!k) return; db.a[k]=ev.target.value;
+  });
+  host.addEventListener("change", function(ev){ if(ev.target.dataset.a) save(); });
+}
+
+function fill(){
+  ["me","partner","mycourse","theircourse","date","time","place","asked"].forEach(function(k){
+    $(k).value = db[k]||"";
+  });
+  [].forEach.call(document.querySelectorAll('input[name=kind]'), function(r){
+    r.checked = (r.value===db.kind);
+  });
+}
+
+function activeQs(){
+  return (Q[db.kind]||[]).map(function(q){ return [pre(db.kind)+q[0], q[1], q[2]]; })
+    .concat(Q.common.map(function(q){ return ["c."+q[0], q[1], q[2]]; }));
+}
+
+function render(){
+  ["teaching","hours","talk"].forEach(function(k){
+    $("sec-"+k).hidden = (db.kind!==k);
+  });
+  [].forEach.call(document.querySelectorAll(".opt"), function(el){
+    el.classList.toggle("sel", el.querySelector("input").checked);
+  });
+  if(db.kind){
+    buildQs("q-"+db.kind, Q[db.kind], db.kind);
+    buildQs("q-common", Q.common, "common");
+    $("sec-common").hidden=false; $("sec-out").hidden=false;
+    activeQs().forEach(function(q){
+      var el=document.querySelector('[data-a="'+q[0]+'"]');
+      if(el && el.value!==(db.a[q[0]]||"")) el.value = db.a[q[0]]||"";
+    });
+  } else {
+    $("sec-common").hidden=true; $("sec-out").hidden=true;
+  }
+  paintCheck();
+  $("out").textContent = markdown();
+}
+
+/* The checklist is the grading rubric turned into something you can act on before you
+   hand in, which is the whole argument for publishing a rubric in advance rather than
+   applying it afterwards. */
+function paintCheck(){
+  var a=db.a||{};
+  var words=function(k){ return (a[k]||"").trim().split(/\s+/).filter(Boolean).length; };
+  var obs=(Q[db.kind]||[]).map(function(q){ return pre(db.kind)+q[0]; });
+  var answered=obs.filter(function(k){ return words(k)>0; }).length;
+  var items=[
+   [!!db.mycourse.trim(), "Your course is named, so the first line of the submission is right"],
+   [!!db.date && !!db.kind, "What you observed and when it happened are recorded"],
+   [answered===obs.length && obs.length>0, "All "+obs.length+" questions about the session are answered ("+answered+" done)"],
+   [words("c.students")>0, "You have said what you think the students got out of it"],
+   [words("c.strength")>0, "You have named a strength"],
+   [words("c.change")>=15, "Your suggestion is long enough to be usable (needs about 15 words, you have "+words("c.change")+")"]
+  ];
+  $("check").innerHTML = items.map(function(it){
+    return '<li class="'+(it[0]?"yes":"no")+'">'+(it[0]?"✓":"○")+" "+esc(it[1])+"</li>";
+  }).join("");
+}
+
+function markdown(){
+  var a=db.a||{}, L=[];
+  L.push(db.mycourse.trim() || "[your course number and title]");
+  L.push("");
+  L.push("# Peer Observation: Observer's Report");
+  L.push("");
+  L.push("- **Observer:** "+(db.me||"—"));
+  L.push("- **Observed:** "+(db.partner||"—")+(db.theircourse?", "+db.theircourse:""));
+  var kindName={teaching:"Section, lab, recitation or review session",
+                hours:"Office hour or help session", talk:"Topic presentation"}[db.kind]||"—";
+  L.push("- **What I observed:** "+kindName);
+  L.push("- **When:** "+(db.date||"—")+(db.time?" at "+db.time:"")+(db.place?", "+db.place:""));
+  L.push("");
+  if((db.asked||"").trim()){
+    L.push("**They asked me to look for:** "+db.asked.trim());
+    L.push("");
+  }
+  L.push("## What happened");
+  L.push("");
+  (Q[db.kind]||[]).forEach(function(q){
+    L.push("### "+q[1]);
+    L.push("");
+    L.push((a[pre(db.kind)+q[0]]||"").trim() || "_not answered_");
+    L.push("");
+  });
+  L.push("## The three questions");
+  L.push("");
+  Q.common.forEach(function(q){
+    L.push("### "+q[1]);
+    L.push("");
+    L.push((a["c."+q[0]]||"").trim() || "_not answered_");
+    L.push("");
+  });
+  return L.join("\n").trim()+"\n";
+}
+
+function download(name, text, type){
+  var b=new Blob([text],{type:type}), u=URL.createObjectURL(b);
+  var el=document.createElement("a"); el.href=u; el.download=name;
+  document.body.appendChild(el); el.click(); el.remove();
+  setTimeout(function(){ URL.revokeObjectURL(u); }, 800);
+}
+function slug(){
+  return ("peer-observation-"+(db.partner||"partner")+"-"+(db.date||"")).toLowerCase()
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+}
+
+["me","partner","mycourse","theircourse","date","time","place","asked"].forEach(function(k){
+  $(k).addEventListener("input", function(){ db[k]=$(k).value; });
+  $(k).addEventListener("change", save);
+});
+$("opts").addEventListener("change", function(ev){
+  if(ev.target.name!=="kind") return;
+  db.kind=ev.target.value; save();
+});
+$("copy").onclick=function(){
+  var txt=markdown();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){ flash("Copied"); },
+                                            function(){ flash("Could not copy, select it instead"); });
+  } else { flash("Could not copy, select it instead"); }
+};
+$("dl-md").onclick=function(){ download(slug()+".md", markdown(), "text/markdown"); };
+$("dl-json").onclick=function(){ download(slug()+".json", JSON.stringify(db,null,2), "application/json"); };
+$("load").onclick=function(){ $("file").click(); };
+$("file").addEventListener("change", function(ev){
+  var f=ev.target.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var d=JSON.parse(r.result);
+      db=Object.assign(blank(), d);
+      ["q-teaching","q-hours","q-talk","q-common"].forEach(function(id){
+        var h=$(id); h.innerHTML=""; delete h.dataset.built;
+      });
+      fill(); save(); flash("Loaded");
+    }catch(e){ flash("That file did not parse"); }
+  };
+  r.readAsText(f);
+  ev.target.value="";
+});
+
+/* Theme: an explicit choice stamps the root, and no choice leaves prefers-color-scheme
+   to decide, so the toggle wins in both directions without a colour being defined only
+   inside a media query. */
+function setTheme(v){
+  try{ localStorage.setItem(TKEY,v); }catch(e){}
+  if(v==="auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme",v);
+}
+(function(){
+  var v="auto"; try{ v=localStorage.getItem(TKEY)||"auto"; }catch(e){}
+  setTheme(v);
+  $("theme").onclick=function(){
+    var cur="auto"; try{ cur=localStorage.getItem(TKEY)||"auto"; }catch(e){}
+    setTheme(cur==="auto"?"light":cur==="light"?"dark":"auto");
+  };
+})();
+
+fill(); render();
+})();
+</script>
+</body>
+</html>
