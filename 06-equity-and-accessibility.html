@@ -176,6 +176,31 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .tally-total{ flex:0 0 66px; font-size:14px; font-weight:700; color:var(--slate);
   padding-bottom:26px; text-align:right; }
 .tally-total.off{ color:#9A6700; }
+
+/* ---- reset control on a timer ------------------------------------------------ */
+.timer .rst{ font:inherit; font-size:14px; padding:6px 12px; border-radius:5px;
+  border:1px solid var(--rule); background:#fff; color:var(--slate); cursor:pointer; }
+.timer .rst:hover{ border-color:var(--maroon); color:var(--maroon); }
+
+/* ---- the session clock ------------------------------------------------------- */
+/* Fixed to the viewport rather than the slide, so reveal's scale transform leaves it
+   alone and it reads the same size on a projector as on a laptop. Top right, because
+   the carried-timer pill already owns the bottom right. */
+.class-clock{ position:fixed; top:14px; right:16px; z-index:60;
+  display:flex; align-items:baseline; gap:8px;
+  background:var(--wash); border:1px solid var(--rule); border-radius:999px;
+  padding:6px 14px; cursor:pointer; user-select:none;
+  font-family:Lato,system-ui,sans-serif; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.class-clock[hidden]{ display:none !important; }
+.class-clock .cc-label{ font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--slate); }
+.class-clock .cc-time{ font-size:19px; font-weight:800; color:var(--ink);
+  font-variant-numeric:tabular-nums; }
+.class-clock.low .cc-time{ color:#9A6700; }
+.class-clock.over{ background:#FDF3F3; border-color:var(--maroon); }
+.class-clock.over .cc-time{ color:var(--maroon); }
+.class-clock.paused{ opacity:.55; }
+.class-clock.paused .cc-label::after{ content:" paused"; }
 </style>
 </head>
 <body>
@@ -184,7 +209,7 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
   <div class="obj" data-obj="1"><span class="box"></span><span>Explain the difference between equality and equity in office hours</span></div><div class="obj" data-obj="2"><span class="box"></span><span>Name your own biases about who gets help first</span></div><div class="obj" data-obj="3"><span class="box"></span><span>Say what you do when an accommodation applies in your section</span></div>
 </div>
 
-<div class="reveal"><div class="slides">
+<div class="reveal" data-session-minutes="75"><div class="slides">
 
 <section data-obj="0">
 <h3>COMPSCI 879 · Unit 6 · Wed Oct 14</h3>
@@ -375,10 +400,11 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     var i=0, left=spec[0].secs, tick=null, running=false;
     t.innerHTML='<div class="phases"></div><div class="face">'
       +'<span class="clock"></span><button class="btn"></button>'
+      +'<button class="rst" title="Reset this timer">Reset</button>'
       +'<span class="hint"></span></div><div class="track"><span class="fill"></span></div>';
     var chips=t.querySelector('.phases'), clock=t.querySelector('.clock'),
-        btn=t.querySelector('.btn'), fill=t.querySelector('.fill'),
-        hint=t.querySelector('.hint');
+        btn=t.querySelector('.btn'), rst=t.querySelector('.rst'),
+        fill=t.querySelector('.fill'), hint=t.querySelector('.hint');
     if(spec.length>1) t.classList.add('multi');
     spec.forEach(function(p,n){
       var c=document.createElement('span'); c.className='ph'; c.textContent=p.name;
@@ -394,14 +420,21 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
       [].forEach.call(chips.children,function(c,n){
         c.classList.toggle('active',n===i); c.classList.toggle('done',n<i); });
     }
+    // touched separates "never started" from "paused on purpose", which is what lets a
+    // timer auto-start on arrival without overriding a presenter who paused it and
+    // stepped back to the previous slide.
+    var touched=false;
     function stop(){ running=false; clearInterval(tick); tick=null; paint(); }
-    function run(){ if(running) return; running=true;
+    function run(){ if(running) return; running=true; touched=true;
       tick=setInterval(function(){ left--; paint(); },1000); paint(); }
     function go(n){ stop(); i=n; left=spec[i].secs; paint(); }
+    function reset(){ stop(); i=0; left=spec[0].secs; touched=false; paint(); }
     btn.onclick=function(){ running?stop():run(); };
-    t.__timer={run:run, stop:stop, toggle:function(){ running?stop():run(); },
+    rst.onclick=function(){ reset(); if(window.__paintPill) window.__paintPill(); };
+    t.__timer={run:run, stop:stop, reset:reset, toggle:function(){ running?stop():run(); },
                next:function(){ if(i<spec.length-1) go(i+1); },
                isRunning:function(){ return running; },
+               isFresh:function(){ return !touched; },
                state:function(){ return {left:left, name:spec[i].name, text:fmt(left)}; }};
     paint();
   });
@@ -439,10 +472,15 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
   // opening gauge otherwise kept counting in the pill through every later block.
   Reveal.on('slidechanged', function(){
     var cur=Reveal.getCurrentSlide();
-    if(cur && cur.querySelector('.timer')){
+    var own=cur && cur.querySelector('.timer');
+    if(own){
       var c=carried();
       if(c) c.__timer.stop();
+      // Arriving at an activity starts its clock. Only when the timer has never been
+      // run, so stepping back to a slide you paused on purpose does not restart it.
+      if(own.__timer && !own.__timer.isRunning() && own.__timer.isFresh()) own.__timer.run();
     }
+    startClassClock();          // the session clock begins when you leave the title slide
     paintPill();
   });
   setInterval(paintPill, 500);
@@ -454,6 +492,58 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     var t=cur.querySelector('.timer') || carried();
     if(!t||!t.__timer) return;
     e.preventDefault(); e.stopPropagation(); t.__timer.toggle(); paintPill();
+  },true);
+
+  /* ---- the session clock -------------------------------------------------------
+     One countdown for the whole period, independent of the per-activity timers, so
+     you can see at a glance whether the plan still fits the room you are standing in.
+     Length comes from data-session-minutes on .reveal, which build_deck.py writes from
+     the deck's "minutes" field. No field, no clock. */
+  var sess=document.querySelector('.reveal'),
+      sessMin=sess ? parseInt(sess.dataset.sessionMinutes,10) : 0,
+      sessLeft=(sessMin>0? sessMin*60 : 0), sessTick=null, sessRun=false, sessOn=(sessMin>0);
+  var clk=document.createElement('div');
+  clk.className='class-clock'; clk.hidden=true;
+  clk.innerHTML='<span class="cc-label">Class</span><span class="cc-time"></span>';
+  if(sessOn) document.body.appendChild(clk);
+  var ccTime=clk.querySelector('.cc-time');
+
+  function paintClock(){
+    if(!sessOn) return;
+    clk.hidden=false;
+    var neg=sessLeft<0, a=Math.abs(sessLeft);
+    ccTime.textContent=(neg?'+':'')+Math.floor(a/60)+':'+String(a%60).padStart(2,'0');
+    clk.classList.toggle('low', sessLeft<=300 && sessLeft>0);
+    clk.classList.toggle('over', sessLeft<=0);
+    clk.classList.toggle('paused', !sessRun);
+  }
+  function runClassClock(){
+    if(!sessOn||sessRun) return;
+    sessRun=true;
+    sessTick=setInterval(function(){ sessLeft--; paintClock(); },1000);
+    paintClock();
+  }
+  function stopClassClock(){ sessRun=false; clearInterval(sessTick); sessTick=null; paintClock(); }
+  function startClassClock(){ runClassClock(); }          // first slide change starts it
+  function toggleClassClock(){ sessRun?stopClassClock():runClassClock(); }
+  function resetClassClock(){ stopClassClock(); sessLeft=sessMin*60; paintClock(); }
+  clk.onclick=function(){ toggleClassClock(); };
+  clk.ondblclick=function(e){ e.preventDefault(); resetClassClock(); };
+  clk.title='Click to pause or resume, double-click to reset, or press c';
+  paintClock();
+
+  // r resets the timer on this slide, c starts or pauses the class clock
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    var k=(e.key||'').toLowerCase();
+    if(k==='r'){
+      var cur=Reveal.getCurrentSlide(); if(!cur) return;
+      var t=cur.querySelector('.timer') || carried();
+      if(!t||!t.__timer) return;
+      e.preventDefault(); e.stopPropagation(); t.__timer.reset(); paintPill();
+    } else if(k==='c'){
+      e.preventDefault(); e.stopPropagation(); toggleClassClock();
+    }
   },true);
 })();
 
