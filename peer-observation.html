@@ -196,9 +196,9 @@ pre.out{ background:var(--wash); border:1px solid var(--rule); border-radius:6px
 var KEY="cs879-peer-observation-v1", TKEY=KEY+"-theme";
 var $=function(id){ return document.getElementById(id); };
 
-/* Prompts carry a behavioural anchor rather than a rating. The peer-evaluation research
+/* Prompts carry a behavioral anchor rather than a rating. The peer-evaluation research
    this course draws on is blunt about why: Likert scales fail because the response
-   choices do not describe the behaviour associated with each level, so raters supply
+   choices do not describe the behavior associated with each level, so raters supply
    their own meaning and agreement collapses. Asking what someone did has no such gap. */
 var Q = {
  teaching:[
@@ -412,7 +412,7 @@ $("file").addEventListener("change", function(ev){
 });
 
 /* Theme: an explicit choice stamps the root, and no choice leaves prefers-color-scheme
-   to decide, so the toggle wins in both directions without a colour being defined only
+   to decide, so the toggle wins in both directions without a color being defined only
    inside a media query. */
 function setTheme(v){
   try{ localStorage.setItem(TKEY,v); }catch(e){}
