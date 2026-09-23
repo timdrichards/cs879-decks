@@ -22,17 +22,19 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .reveal h1{ font-size:2.05em; font-weight:900; color:var(--maroon); letter-spacing:-.01em;
   text-transform:none; line-height:1.1; }
 .reveal h2{ font-size:1.42em; font-weight:900; color:var(--maroon); text-transform:none;
-  line-height:1.15; margin-bottom:.5em; letter-spacing:-.005em; }
+  line-height:1.12; margin-bottom:.36em; letter-spacing:-.005em; }
 .reveal h3{ font-size:1.0em; font-weight:700; color:var(--slate); text-transform:uppercase;
-  letter-spacing:.10em; margin-bottom:.7em; }
-.reveal p,.reveal li{ font-size:.82em; line-height:1.45; }
-.reveal ul{ margin-left:.6em; } .reveal li{ margin-bottom:.42em; }
+  letter-spacing:.10em; margin-bottom:.45em; }
+.reveal p,.reveal li{ font-size:.90em; line-height:1.36; }
+.reveal ul{ margin-left:.6em; } .reveal li{ margin-bottom:.30em; }
 .reveal strong{ color:var(--maroon); font-weight:900; }
 .reveal em{ color:var(--slate); font-style:italic; }
 .lede{ font-size:.95em !important; color:var(--slate); }
-.tiny{ font-size:.62em !important; color:var(--slate); line-height:1.4; }
+.tiny{ font-size:.68em !important; color:var(--slate); line-height:1.35; }
 /* signature: the rubric strip. Lives INSIDE each section so reveal's transform scales it. */
-.reveal .slides > section{ box-sizing:border-box; padding:48px 250px 0 40px; height:620px; }
+.reveal .slides > section{ box-sizing:border-box; padding:24px 250px 0 40px; height:620px; }
+/* reveal's theme puts a top margin on headings; at the top of a slide it is dead space */
+.reveal .slides > section > :first-child{ margin-top:0 !important; }
 /* fixed, so auto-animate never touches it. JS scales it to match the deck. */
 .strip{ position:fixed; background:var(--wash); border-left:1px solid var(--rule);
   box-sizing:border-box; color:var(--slate); text-align:left; z-index:30;
@@ -90,13 +92,13 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .go .tag{ display:inline-block; background:var(--go); color:#fff; font-weight:900; font-size:.5em;
   letter-spacing:.14em; text-transform:uppercase; padding:5px 12px; border-radius:3px;
   margin-bottom:.8em; }
-.callout{ background:var(--wash); border-left:5px solid var(--maroon); padding:.8em 1.1em;
-  margin:.7em 0; font-size:.78em; line-height:1.45; }
-.two{ display:grid; grid-template-columns:1fr 1fr; gap:1.6em; }
-.card{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:.9em 1.1em; }
-.card h4{ margin:0 0 .5em; color:var(--maroon); font-size:.78em; font-weight:900;
+.callout{ background:var(--wash); border-left:5px solid var(--maroon); padding:.62em 1em;
+  margin:.5em 0; font-size:.78em; line-height:1.45; }
+.two{ display:grid; grid-template-columns:1fr 1fr; gap:1.25em; }
+.card{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:.75em 1em; }
+.card h4{ margin:0 0 .38em; color:var(--maroon); font-size:.82em; font-weight:900;
   text-transform:uppercase; letter-spacing:.08em; }
-.card ul{ margin:0; } .card li{ font-size:.72em; }
+.card ul{ margin:0; } .card li{ font-size:.80em; }
 .no h4{ color:#8B2E2E; } .yes h4{ color:var(--go); }
 /* simulator */
 #sim{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:16px 18px; }
@@ -285,7 +287,7 @@ Then the standing change, in one sentence: nothing in this course will ask you t
 </section>
 
 <section data-obj="1">
-<h2>You are grading for a data structures course</h2>
+<h2>Grading a data structures problem</h2>
 <div class="callout">In 100 to 150 words, explain when you would choose an ArrayList over a LinkedList, and when you would choose the reverse. Include a short code example showing one operation where the choice matters, and give the running time of that operation for each. (10 points)</div>
 <div class="card"><h4>The whole brief you get</h4><ul><li>"I just want to see that they get the tradeoff and can show it in code."</li><li>"The code doesn't have to compile, pseudocode is fine."</li><li>"Knock something off if the explanation is hand-wavy."</li><li>"Out of 10. It's early in the semester, so don't be too harsh."</li></ul></div>
 <p class="tiny">The handout: <a href="https://timdrichards.github.io/cs879-decks/unit03-problem-1-data-structures.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 1</a></p>
