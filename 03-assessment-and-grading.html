@@ -806,31 +806,6 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
 
   paint();
 })();
-
-/* ---- word of the day ---------------------------------------------------------
-   Fills any .ticket-word with a word derived from today's date, so it is the same
-   all session and survives a reload, but is not knowable in advance without the
-   deck. The slide carrying it is instructor-only and never published, which is the
-   whole point: the word is proof you were in the room.
-
-   Short, common, unambiguous to hear and to spell. Nothing that sounds like
-   something else when read aloud across a lecture hall. */
-(function(){
-  var marks=document.querySelectorAll('.ticket-word');
-  if(!marks.length) return;
-  var WORDS=['anchor','basket','candle','copper','dolphin','ember','fabric','garden',
-             'harbor','island','jacket','kettle','lantern','marble','needle','orchard',
-             'pepper','quarry','ribbon','saddle','timber','umbrella','velvet','walnut',
-             'yellow','zebra','bridge','compass','driftwood','feather','granite','hollow',
-             'juniper','ladder','meadow','nutmeg','otter','pebble','rooster','satchel'];
-  var d=new Date(), key=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
-  // a small mixing step, so consecutive days do not land on neighbouring words
-  var h=key%2147483647;
-  h=(h*48271)%2147483647;
-  h=(h*48271)%2147483647;
-  var word=WORDS[h%WORDS.length];
-  marks.forEach(function(el){ el.textContent=word; });
-})();
 </script>
 </body>
 </html>

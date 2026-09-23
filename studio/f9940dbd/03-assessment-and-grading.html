@@ -425,8 +425,9 @@ The Rubric Builder makes a link that carries a rubric, so a group can send their
 <h2>Exit ticket</h2>
 <p>Canvas &rarr; Week 3 &rarr; Exit Ticket: Wed 9/23</p>
 <div class="callout">Which rubric line caused the biggest disagreement, and what would you change about it?</div>
-<p>Question 4 asks for today's word. It is: <span class="ticket-word">&hellip;</span></p>
+<p>The last question asks for today's word. It is: <span class="ticket-word">&hellip;</span></p>
 <p class="tiny">Copy the prompt into question two. Closes at 5:20, five minutes after we finish.</p>
+<script>/* The word lives on this slide, not in the shared chrome, because the chrome is published and this slide is not. */(function(){var W=['anchor','basket','candle','copper','dolphin','ember','fabric','garden','harbor','island','jacket','kettle','lantern','marble','needle','orchard','pepper','quarry','ribbon','saddle','timber','umbrella','velvet','walnut','yellow','zebra','bridge','compass','driftwood','feather','granite','hollow','juniper','ladder','meadow','nutmeg','otter','pebble','rooster','satchel'];var t=new Date(),h=(t.getFullYear()*10000+(t.getMonth()+1)*100+t.getDate())%2147483647;h=(h*48271)%2147483647;h=(h*48271)%2147483647;var w=W[h%W.length];document.querySelectorAll('.ticket-word').forEach(function(e){e.textContent=w;});})();</script>
 <aside class="notes">Press T and set it to 10.
 
 The word is generated from today's date, so it is the same all day and survives a reload, and it only exists on this slide, which is not published. Read it out once and leave it up.
@@ -880,31 +881,6 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
   }, true);
 
   paint();
-})();
-
-/* ---- word of the day ---------------------------------------------------------
-   Fills any .ticket-word with a word derived from today's date, so it is the same
-   all session and survives a reload, but is not knowable in advance without the
-   deck. The slide carrying it is instructor-only and never published, which is the
-   whole point: the word is proof you were in the room.
-
-   Short, common, unambiguous to hear and to spell. Nothing that sounds like
-   something else when read aloud across a lecture hall. */
-(function(){
-  var marks=document.querySelectorAll('.ticket-word');
-  if(!marks.length) return;
-  var WORDS=['anchor','basket','candle','copper','dolphin','ember','fabric','garden',
-             'harbor','island','jacket','kettle','lantern','marble','needle','orchard',
-             'pepper','quarry','ribbon','saddle','timber','umbrella','velvet','walnut',
-             'yellow','zebra','bridge','compass','driftwood','feather','granite','hollow',
-             'juniper','ladder','meadow','nutmeg','otter','pebble','rooster','satchel'];
-  var d=new Date(), key=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
-  // a small mixing step, so consecutive days do not land on neighbouring words
-  var h=key%2147483647;
-  h=(h*48271)%2147483647;
-  h=(h*48271)%2147483647;
-  var word=WORDS[h%WORDS.length];
-  marks.forEach(function(el){ el.textContent=word; });
 })();
 </script>
 </body>
