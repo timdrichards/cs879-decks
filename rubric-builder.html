@@ -146,12 +146,13 @@ build underneath, then export or hand it to someone else.</p>
 <div class="card noprint">
   <div class="field">
     <label for="importbox">Open someone else's rubric</label>
-    <textarea id="importbox" placeholder="Paste a share link or the JSON export here."></textarea>
+    <textarea id="importbox" placeholder="Paste a share link here. The JSON or Markdown export works too."></textarea>
   </div>
   <div class="btns">
     <button id="doimport" class="ghost">Open it</button>
     <span class="hint" style="align-self:center;">This replaces what is on screen. Save yours first.</span>
   </div>
+  <p class="hint" id="importmsg" style="color:var(--maroon);font-weight:700;"></p>
 </div>
 
 <h2 class="noprint">Saved on this computer</h2>
@@ -524,31 +525,78 @@ in this course or not. Everything happens in your browser.</p>
     }
   });
 
+  // Anything a person could plausibly paste: a share link, a link a mail client has
+  // percent-encoded or wrapped in quoted text, the bare code out of one, the JSON export,
+  // or the Markdown export. Whatever arrives, try to make a rubric out of it.
+  function fromJSON(raw){
+    var o = JSON.parse(raw);
+    if (!Array.isArray(o.criteria)) return null;
+    return {
+      name: o.name || "", course: o.course || "", target: Number(o.outOf) || 0,
+      prompt: o.assignment || "",
+      lines: o.criteria.map(function(c){
+        return {t: c.earnsThePointWhen || "", p: Number(c.points) || 0,
+                n: c.whatEarningItLooksLike || ""};
+      })
+    };
+  }
+
+  function fromMarkdown(raw){
+    var rows = raw.split(/\r?\n/), name = "", lines = [];
+    for (var i = 0; i < rows.length; i++){
+      var L = rows[i].trim();
+      if (!name && /^#\s+/.test(L)){ name = L.replace(/^#\s+/, "").trim(); continue; }
+      if (L.charAt(0) !== "|") continue;
+      var cells = L.replace(/^\|/, "").replace(/\|$/, "").split("|")
+                   .map(function(c){ return c.trim(); });
+      if (cells.length < 2) continue;
+      var pts = cells[0].replace(/\*/g, "").trim();
+      if (!/^\d+(\.\d+)?$/.test(pts)) continue;                 // header and separator rows
+      var text = cells[1].replace(/\*\*/g, "").replace(/\\\|/g, "|").trim();
+      if (/^total$/i.test(text)) continue;                      // the footer row
+      lines.push({t: text, p: Number(pts),
+                  n: (cells[2] || "").replace(/\\\|/g, "|").trim()});
+    }
+    if (!lines.length) return null;
+    return {name: name, course: "", prompt: "", lines: lines,
+            target: lines.reduce(function(s,l){ return s + l.p; }, 0)};
+  }
+
+  function parseAny(raw){
+    var tries = [raw];
+    if (/%2[35]|%3D/i.test(raw)){
+      try { tries.push(decodeURIComponent(raw)); } catch(e){}
+    }
+    for (var i = 0; i < tries.length; i++){
+      var t = tries[i];
+      var m = t.match(/[#?&]r=([A-Za-z0-9\-_]+)/);
+      if (m){ try { return unpack(m[1]); } catch(e){} }
+      var bare = t.trim();
+      if (/^[A-Za-z0-9\-_]{24,}$/.test(bare)){ try { return unpack(bare); } catch(e){} }
+      try { var j = fromJSON(bare); if (j) return j; } catch(e){}
+      try { var md = fromMarkdown(t); if (md) return md; } catch(e){}
+    }
+    return null;
+  }
+
+  function importMsg(text){
+    $("importmsg").textContent = text || "";
+    if (text) flash(text);
+  }
+
   $("doimport").addEventListener("click", function(){
     var raw = $("importbox").value.trim();
-    if (!raw){ flash("Paste a link or the JSON first."); return; }
-    var next = null;
-    try {
-      var m = raw.match(/#r=([A-Za-z0-9\-_]+)/);
-      if (m) next = unpack(m[1]);
-      else {
-        var o = JSON.parse(raw);
-        if (Array.isArray(o.criteria)){
-          next = {
-            name: o.name || "", course: o.course || "", target: Number(o.outOf) || 0,
-            prompt: o.assignment || "",
-            lines: o.criteria.map(function(c){
-              return {t: c.earnsThePointWhen || "", p: Number(c.points) || 0,
-                      n: c.whatEarningItLooksLike || ""};
-            })
-          };
-        } else next = unpack(raw);
-      }
-    } catch(e){ next = null; }
-    if (!next){ flash("That did not look like a rubric link or a rubric export."); return; }
+    if (!raw){ importMsg("Paste a link, the JSON or the Markdown first."); return; }
+    var next = parseAny(raw);
+    if (!next){
+      importMsg("That was not a rubric link, a JSON export or a Markdown export. "
+                + "The link is the one that always works.");
+      return;
+    }
     state = next; endEdit(); writeForm(); render();
     $("importbox").value = "";
-    flash("Opened " + (state.name || "the rubric") + ". It is not saved until you save it.");
+    importMsg("Opened " + (state.name || "the rubric")
+              + ". It is not saved on this computer until you save it.");
     window.scrollTo({top: 0, behavior: "smooth"});
   });
 
