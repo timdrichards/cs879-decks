@@ -1,0 +1,592 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rubric Builder &middot; COMPSCI 879</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --maroon:#7B1416; --ink:#1F2328; --ground:#FAF8F6; --slate:#5A6570;
+  --rule:#DCD6D2; --go:#2D6A4F; --wash:#F1ECE8;
+}
+*{box-sizing:border-box;}
+body{font-family:Lato,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--ground);
+  line-height:1.6;max-width:52em;margin:0 auto;padding:2.5rem 1.2rem 5rem;font-size:17px;}
+a{color:var(--maroon);}
+h1{color:var(--maroon);font-weight:900;font-size:2rem;margin:0 0 .2em;}
+h2{color:var(--maroon);font-weight:900;font-size:1.2rem;margin:2.2rem 0 .7rem;}
+.sub{color:var(--slate);margin:0 0 1.6em;}
+.card{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:1.1em 1.2em;margin:0 0 1em;}
+label{display:block;font-size:.78em;font-weight:900;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--slate);margin:0 0 .3em;}
+input,textarea,select{width:100%;font-family:inherit;font-size:1em;color:var(--ink);
+  background:var(--ground);border:1px solid var(--rule);border-radius:4px;padding:.55em .7em;}
+input:focus,textarea:focus{outline:2px solid var(--go);outline-offset:-1px;background:#fff;}
+textarea{resize:vertical;min-height:4.5em;line-height:1.5;}
+.field{margin:0 0 .9em;}
+.row{display:flex;gap:.7em;flex-wrap:wrap;}
+.row .field{flex:1;min-width:8em;margin-bottom:0;}
+.row .pts{flex:0 0 6.5em;min-width:6.5em;}
+button{font-family:inherit;font-size:.95em;font-weight:900;cursor:pointer;
+  border:2px solid var(--go);background:var(--go);color:#fff;border-radius:4px;padding:.5em 1.1em;}
+button:hover{filter:brightness(1.12);}
+button.ghost{background:#fff;color:var(--go);}
+button.ghost:hover{background:var(--go);color:#fff;filter:none;}
+button.quiet{background:#fff;color:var(--slate);border-color:var(--rule);font-weight:700;}
+button.quiet:hover{border-color:var(--slate);color:var(--ink);background:#fff;}
+button.mini{font-size:.8em;padding:.25em .55em;border-width:1px;}
+.btns{display:flex;gap:.55em;flex-wrap:wrap;margin:.9em 0 0;}
+.line{display:flex;gap:.7em;align-items:flex-start;padding:.65em 0;border-top:1px solid var(--rule);}
+.line:first-child{border-top:0;}
+.line .p{flex:0 0 2.6em;text-align:right;font-weight:900;color:var(--maroon);font-size:1.05em;
+  padding-top:.05em;}
+.line .b{flex:1;min-width:0;}
+.line .t{word-wrap:break-word;}
+.line .n{color:var(--slate);font-size:.88em;margin:.15em 0 0;}
+.line .acts{flex:0 0 auto;display:flex;gap:.25em;}
+.warn{color:var(--maroon);font-size:.85em;margin:.25em 0 0;}
+.empty{color:var(--slate);font-style:italic;}
+table{width:100%;border-collapse:collapse;margin:.4em 0 0;}
+th{text-align:left;font-size:.75em;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--slate);border-bottom:2px solid var(--rule);padding:.4em .6em;}
+th.num,td.num{text-align:right;width:4.5em;}
+td{border-bottom:1px solid var(--rule);padding:.55em .6em;vertical-align:top;}
+td.num{font-weight:900;color:var(--maroon);}
+tfoot td{border-bottom:0;border-top:2px solid var(--rule);font-weight:900;}
+.hint{color:var(--slate);font-size:.88em;margin:.5em 0 0;}
+.flash{background:var(--wash);border-left:4px solid var(--go);padding:.6em .9em;margin:0 0 1em;
+  font-size:.92em;display:none;}
+.saved{display:flex;align-items:center;gap:.6em;padding:.5em 0;border-top:1px solid var(--rule);}
+.saved:first-child{border-top:0;}
+.saved .nm{flex:1;font-weight:700;word-wrap:break-word;}
+.saved .dt{color:var(--slate);font-size:.82em;}
+.tag{display:inline-block;background:var(--wash);color:var(--slate);font-size:.72em;
+  font-weight:900;letter-spacing:.06em;text-transform:uppercase;padding:.2em .55em;
+  border-radius:3px;margin:0 0 .5em;}
+@media print{
+  body{padding:0;max-width:none;}
+  .noprint{display:none !important;}
+  .card{border:0;padding:0;}
+}
+</style>
+</head><body>
+
+<p class="noprint" style="margin:0 0 1.4em;"><a href="index.html" style="color:var(--slate);text-decoration:none;">&larr; COMPSCI 879</a></p>
+
+<h1>Rubric Builder</h1>
+<p class="sub">One yes-or-no line per point. Type the criteria as they get decided, see the rubric
+build underneath, then export or hand it to someone else.</p>
+
+<div class="flash" id="flash"></div>
+
+<div class="card noprint">
+  <div class="field">
+    <label for="name">Rubric name</label>
+    <input id="name" placeholder="Problem 1: ArrayList vs LinkedList" autocomplete="off">
+  </div>
+  <div class="row">
+    <div class="field">
+      <label for="course">Course (optional)</label>
+      <input id="course" placeholder="COMPSCI 187" autocomplete="off">
+    </div>
+    <div class="field pts">
+      <label for="target">Out of</label>
+      <input id="target" type="number" min="0" step="1" value="10">
+    </div>
+  </div>
+  <div class="field" style="margin-top:.9em;">
+    <label for="prompt">The assignment (optional)</label>
+    <textarea id="prompt" placeholder="Paste the assignment text, so whoever reads the rubric knows what it is scoring."></textarea>
+  </div>
+</div>
+
+<h2 class="noprint">Criteria</h2>
+
+<div class="card noprint">
+  <div class="field">
+    <label for="ctext">Earns the point when</label>
+    <input id="ctext" placeholder="Names a case where the linked list wins and says why" autocomplete="off">
+  </div>
+  <div class="row">
+    <div class="field">
+      <label for="cnote">What earning it looks like (optional)</label>
+      <input id="cnote" placeholder="Any concrete case, front insertion or a queue, counts" autocomplete="off">
+    </div>
+    <div class="field pts">
+      <label for="cpts">Points</label>
+      <input id="cpts" type="number" min="0" step="0.5" value="1">
+    </div>
+  </div>
+  <div class="btns">
+    <button id="add">Add line</button>
+    <button id="cancel" class="quiet" style="display:none;">Cancel edit</button>
+    <span class="hint" style="align-self:center;">Enter adds the line and puts the cursor back.</span>
+  </div>
+</div>
+
+<div class="card noprint" id="lines"></div>
+
+<h2>The rubric</h2>
+<div class="card" id="rendered"></div>
+
+<h2 class="noprint">Share and export</h2>
+<div class="card noprint">
+  <div class="btns" style="margin-top:0;">
+    <button id="share">Share</button>
+    <button id="copylink" class="ghost">Copy link</button>
+    <button id="copymd" class="ghost">Copy Markdown</button>
+    <button id="dlmd" class="ghost">Download .md</button>
+    <button id="dljson" class="ghost">Download .json</button>
+    <button id="email" class="ghost">Email</button>
+    <button id="print" class="quiet">Print</button>
+  </div>
+  <p class="hint">The link carries the whole rubric in the address itself, so nothing is stored on
+  any server and it works for anyone who opens it. That is the one to send when you swap rubrics
+  with another group.</p>
+</div>
+
+<div class="card noprint">
+  <div class="field">
+    <label for="importbox">Open someone else's rubric</label>
+    <textarea id="importbox" placeholder="Paste a share link or the JSON export here."></textarea>
+  </div>
+  <div class="btns">
+    <button id="doimport" class="ghost">Open it</button>
+    <span class="hint" style="align-self:center;">This replaces what is on screen. Save yours first.</span>
+  </div>
+</div>
+
+<h2 class="noprint">Saved on this computer</h2>
+<div class="card noprint">
+  <div class="btns" style="margin:0 0 .6em;">
+    <button id="save">Save this rubric</button>
+    <button id="new" class="quiet">Start a new one</button>
+  </div>
+  <div id="savedlist"></div>
+  <p class="hint">Saved rubrics live in this browser only. They are not uploaded anywhere, and
+  clearing your browsing data deletes them. Export anything you want to keep.</p>
+</div>
+
+<p class="hint noprint" style="margin-top:2.5em;">Built for COMPSCI 879. Free for any TA to use,
+in this course or not. Everything happens in your browser.</p>
+
+<script>
+(function(){
+  "use strict";
+
+  var KEY_ALL = "cs879.rubrics.v1", KEY_CUR = "cs879.rubric.current.v1";
+  var VAGUE = /\b(clear|clearly|good|well|thorough|thoroughly|appropriate|appropriately|adequate|sufficient|quality|effort|nice|nicely|strong|reasonable|properly|excellent|poor)\b/i;
+
+  var state = {name:"", course:"", target:10, prompt:"", lines:[]};
+  var editIndex = -1;
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+                    .replace(/"/g,"&quot;");
+  }
+
+  function flash(msg){
+    var f = $("flash");
+    f.textContent = msg; f.style.display = "block";
+    clearTimeout(flash._t);
+    flash._t = setTimeout(function(){ f.style.display = "none"; }, 3500);
+  }
+
+  // ---- storage, all of it best-effort: private windows and blocked site data both throw
+  function readLS(k, fallback){
+    try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function writeLS(k, v){
+    try { localStorage.setItem(k, JSON.stringify(v)); return true; }
+    catch(e){ return false; }
+  }
+
+  // ---- share link. Compact array form, then URL-safe base64, so a ten-line rubric
+  // fits in an address bar with room to spare.
+  function b64enc(str){
+    var bytes = new TextEncoder().encode(str), bin = "";
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  }
+  function b64dec(str){
+    var s = str.replace(/-/g,"+").replace(/_/g,"/");
+    while (s.length % 4) s += "=";
+    var bin = atob(s), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function pack(st){
+    return b64enc(JSON.stringify([
+      st.name, st.course, st.target, st.prompt,
+      st.lines.map(function(l){ return [l.t, l.p, l.n]; })
+    ]));
+  }
+  function unpack(code){
+    var a = JSON.parse(b64dec(code));
+    return {
+      name: a[0] || "", course: a[1] || "", target: Number(a[2]) || 0, prompt: a[3] || "",
+      lines: (a[4] || []).map(function(l){
+        return {t: String(l[0] || ""), p: Number(l[1]) || 0, n: String(l[2] || "")};
+      })
+    };
+  }
+  function shareUrl(){
+    return location.origin + location.pathname + "#r=" + pack(state);
+  }
+
+  function total(){
+    return state.lines.reduce(function(s,l){ return s + (Number(l.p) || 0); }, 0);
+  }
+  function fileStem(){
+    var n = (state.name || "rubric").toLowerCase().replace(/[^a-z0-9]+/g,"-")
+              .replace(/^-|-$/g,"");
+    return n || "rubric";
+  }
+
+  // ---- exports
+  function toJSON(){
+    return JSON.stringify({
+      name: state.name, course: state.course, assignment: state.prompt,
+      outOf: state.target, totalPoints: total(),
+      criteria: state.lines.map(function(l){
+        return {points: l.p, earnsThePointWhen: l.t, whatEarningItLooksLike: l.n};
+      }),
+      exported: new Date().toISOString(),
+      tool: "COMPSCI 879 Rubric Builder"
+    }, null, 2);
+  }
+
+  function mdCell(s){ return String(s || "").replace(/\|/g,"\\|").replace(/\n+/g," "); }
+
+  function toMarkdown(){
+    var out = [];
+    out.push("# " + (state.name || "Rubric"));
+    out.push("");
+    var meta = [];
+    if (state.course) meta.push(state.course);
+    meta.push(total() + " points" + (state.target && total() !== state.target
+              ? " (out of a stated " + state.target + ")" : ""));
+    out.push(meta.join(" · "));
+    out.push("");
+    if (state.prompt){
+      out.push("## The assignment");
+      out.push("");
+      out.push(state.prompt.trim());
+      out.push("");
+    }
+    out.push("## Criteria");
+    out.push("");
+    var anyNote = state.lines.some(function(l){ return l.n; });
+    if (!state.lines.length){
+      out.push("_No criteria yet._");
+    } else if (anyNote){
+      out.push("| Points | Earns the point when | What earning it looks like |");
+      out.push("|---:|---|---|");
+      state.lines.forEach(function(l){
+        out.push("| " + l.p + " | " + mdCell(l.t) + " | " + mdCell(l.n) + " |");
+      });
+      out.push("| **" + total() + "** | **Total** | |");
+    } else {
+      out.push("| Points | Earns the point when |");
+      out.push("|---:|---|");
+      state.lines.forEach(function(l){
+        out.push("| " + l.p + " | " + mdCell(l.t) + " |");
+      });
+      out.push("| **" + total() + "** | **Total** |");
+    }
+    out.push("");
+    out.push("Built with the COMPSCI 879 Rubric Builder.");
+    out.push("");
+    return out.join("\n");
+  }
+
+  function download(text, filename, mime){
+    var blob = new Blob([text], {type: mime + ";charset=utf-8"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  }
+
+  function copy(text, what){
+    function fallback(){
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); flash(what + " copied."); }
+      catch(e){ flash("Could not copy. Select the text and copy it by hand."); }
+      ta.remove();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ flash(what + " copied."); }, fallback);
+    } else fallback();
+  }
+
+  // ---- rendering
+  function render(){
+    var list = $("lines");
+    if (!state.lines.length){
+      list.innerHTML = '<p class="empty">No lines yet. Add the first criterion above.</p>';
+    } else {
+      list.innerHTML = state.lines.map(function(l, i){
+        var vague = VAGUE.test(l.t);
+        return '<div class="line">'
+          + '<div class="p">' + esc(l.p) + '</div>'
+          + '<div class="b"><div class="t">' + esc(l.t) + '</div>'
+          + (l.n ? '<div class="n">' + esc(l.n) + '</div>' : '')
+          + (vague ? '<div class="warn">Two graders may read this differently. Can it be '
+                   + 'phrased so the answer is yes or no?</div>' : '')
+          + '</div>'
+          + '<div class="acts">'
+          + '<button class="mini quiet" data-up="' + i + '" title="Move up"'
+          + (i === 0 ? ' disabled' : '') + '>&uarr;</button>'
+          + '<button class="mini quiet" data-down="' + i + '" title="Move down"'
+          + (i === state.lines.length - 1 ? ' disabled' : '') + '>&darr;</button>'
+          + '<button class="mini quiet" data-edit="' + i + '">Edit</button>'
+          + '<button class="mini quiet" data-del="' + i + '" title="Delete">&times;</button>'
+          + '</div></div>';
+      }).join("");
+    }
+
+    var t = total(), r = $("rendered"), h = [];
+    h.push('<div class="tag">Rubric</div>');
+    h.push('<h3 style="color:var(--maroon);margin:0 0 .1em;font-size:1.3em;">'
+           + esc(state.name || "Untitled rubric") + '</h3>');
+    var meta = [];
+    if (state.course) meta.push(esc(state.course));
+    meta.push(t + (t === 1 ? " point" : " points"));
+    h.push('<p style="color:var(--slate);margin:0 0 1em;font-size:.92em;">'
+           + meta.join(" &middot; ") + '</p>');
+    if (state.prompt){
+      h.push('<div style="background:var(--wash);border-left:4px solid var(--maroon);'
+             + 'padding:.7em 1em;margin:0 0 1.1em;font-size:.95em;white-space:pre-wrap;">'
+             + esc(state.prompt) + '</div>');
+    }
+    if (!state.lines.length){
+      h.push('<p class="empty">Nothing here yet.</p>');
+    } else {
+      var anyNote = state.lines.some(function(l){ return l.n; });
+      h.push('<table><thead><tr><th class="num">Points</th>'
+             + '<th>Earns the point when</th>'
+             + (anyNote ? '<th>What earning it looks like</th>' : '')
+             + '</tr></thead><tbody>');
+      state.lines.forEach(function(l){
+        h.push('<tr><td class="num">' + esc(l.p) + '</td><td>' + esc(l.t) + '</td>'
+               + (anyNote ? '<td style="color:var(--slate);">' + esc(l.n || "") + '</td>' : '')
+               + '</tr>');
+      });
+      h.push('</tbody><tfoot><tr><td class="num">' + t + '</td><td>Total</td>'
+             + (anyNote ? '<td></td>' : '') + '</tr></tfoot></table>');
+    }
+    if (state.target && t !== state.target){
+      h.push('<p class="warn">The lines add up to ' + t + ', and you said out of '
+             + esc(state.target) + '.</p>');
+    }
+    r.innerHTML = h.join("");
+
+    writeLS(KEY_CUR, state);
+  }
+
+  function renderSaved(){
+    var all = readLS(KEY_ALL, {}), names = Object.keys(all).sort();
+    var el = $("savedlist");
+    if (!names.length){
+      el.innerHTML = '<p class="empty">Nothing saved yet.</p>';
+      return;
+    }
+    el.innerHTML = names.map(function(n){
+      var d = all[n].savedAt ? new Date(all[n].savedAt).toLocaleDateString() : "";
+      return '<div class="saved"><span class="nm">' + esc(n) + '</span>'
+        + '<span class="dt">' + esc(d) + '</span>'
+        + '<button class="mini quiet" data-load="' + esc(n) + '">Open</button>'
+        + '<button class="mini quiet" data-drop="' + esc(n) + '">Delete</button></div>';
+    }).join("");
+  }
+
+  // ---- form wiring
+  function readForm(){
+    state.name = $("name").value;
+    state.course = $("course").value;
+    state.target = Number($("target").value) || 0;
+    state.prompt = $("prompt").value;
+  }
+  function writeForm(){
+    $("name").value = state.name;
+    $("course").value = state.course;
+    $("target").value = state.target;
+    $("prompt").value = state.prompt;
+  }
+
+  ["name","course","target","prompt"].forEach(function(id){
+    $(id).addEventListener("input", function(){ readForm(); render(); });
+  });
+
+  function addLine(){
+    var t = $("ctext").value.trim();
+    if (!t){ $("ctext").focus(); return; }
+    var line = {t: t, p: Number($("cpts").value) || 0, n: $("cnote").value.trim()};
+    if (editIndex >= 0){ state.lines[editIndex] = line; endEdit(); }
+    else state.lines.push(line);
+    $("ctext").value = ""; $("cnote").value = "";
+    render();
+    $("ctext").focus();
+  }
+  function startEdit(i){
+    editIndex = i;
+    $("ctext").value = state.lines[i].t;
+    $("cpts").value = state.lines[i].p;
+    $("cnote").value = state.lines[i].n;
+    $("add").textContent = "Update line";
+    $("cancel").style.display = "";
+    $("ctext").focus();
+  }
+  function endEdit(){
+    editIndex = -1;
+    $("add").textContent = "Add line";
+    $("cancel").style.display = "none";
+    $("ctext").value = ""; $("cnote").value = ""; $("cpts").value = 1;
+  }
+
+  $("add").addEventListener("click", addLine);
+  $("cancel").addEventListener("click", function(){ endEdit(); render(); });
+  ["ctext","cpts","cnote"].forEach(function(id){
+    $(id).addEventListener("keydown", function(e){
+      if (e.key === "Enter"){ e.preventDefault(); addLine(); }
+    });
+  });
+
+  $("lines").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if (!b) return;
+    var i;
+    if ((i = b.getAttribute("data-del")) !== null){
+      state.lines.splice(Number(i), 1);
+      if (editIndex === Number(i)) endEdit();
+      render();
+    } else if ((i = b.getAttribute("data-edit")) !== null){
+      startEdit(Number(i));
+    } else if ((i = b.getAttribute("data-up")) !== null){
+      i = Number(i);
+      var a = state.lines[i]; state.lines[i] = state.lines[i-1]; state.lines[i-1] = a;
+      render();
+    } else if ((i = b.getAttribute("data-down")) !== null){
+      i = Number(i);
+      var c = state.lines[i]; state.lines[i] = state.lines[i+1]; state.lines[i+1] = c;
+      render();
+    }
+  });
+
+  // ---- share and export
+  $("copylink").addEventListener("click", function(){ copy(shareUrl(), "Link"); });
+  $("copymd").addEventListener("click", function(){ copy(toMarkdown(), "Markdown"); });
+  $("dlmd").addEventListener("click", function(){
+    download(toMarkdown(), fileStem() + ".md", "text/markdown");
+  });
+  $("dljson").addEventListener("click", function(){
+    download(toJSON(), fileStem() + ".json", "application/json");
+  });
+  $("print").addEventListener("click", function(){ window.print(); });
+
+  $("email").addEventListener("click", function(){
+    var subject = "Rubric: " + (state.name || "untitled");
+    var body = "Open it here:\n" + shareUrl() + "\n\n" + toMarkdown();
+    location.href = "mailto:?subject=" + encodeURIComponent(subject)
+                  + "&body=" + encodeURIComponent(body);
+  });
+
+  $("share").addEventListener("click", function(){
+    var url = shareUrl();
+    if (navigator.share){
+      navigator.share({
+        title: state.name || "Rubric",
+        text: "Rubric: " + (state.name || "untitled"),
+        url: url
+      }).catch(function(){ /* the person closed the sheet */ });
+    } else {
+      copy(url, "Link");
+    }
+  });
+
+  $("doimport").addEventListener("click", function(){
+    var raw = $("importbox").value.trim();
+    if (!raw){ flash("Paste a link or the JSON first."); return; }
+    var next = null;
+    try {
+      var m = raw.match(/#r=([A-Za-z0-9\-_]+)/);
+      if (m) next = unpack(m[1]);
+      else {
+        var o = JSON.parse(raw);
+        if (Array.isArray(o.criteria)){
+          next = {
+            name: o.name || "", course: o.course || "", target: Number(o.outOf) || 0,
+            prompt: o.assignment || "",
+            lines: o.criteria.map(function(c){
+              return {t: c.earnsThePointWhen || "", p: Number(c.points) || 0,
+                      n: c.whatEarningItLooksLike || ""};
+            })
+          };
+        } else next = unpack(raw);
+      }
+    } catch(e){ next = null; }
+    if (!next){ flash("That did not look like a rubric link or a rubric export."); return; }
+    state = next; endEdit(); writeForm(); render();
+    $("importbox").value = "";
+    flash("Opened " + (state.name || "the rubric") + ". It is not saved until you save it.");
+    window.scrollTo({top: 0, behavior: "smooth"});
+  });
+
+  // ---- saved rubrics
+  $("save").addEventListener("click", function(){
+    readForm();
+    var n = (state.name || "").trim();
+    if (!n){ flash("Give it a name first."); $("name").focus(); return; }
+    var all = readLS(KEY_ALL, {});
+    if (all[n] && !confirm("Replace the saved rubric called \"" + n + "\"?")) return;
+    var copyOf = JSON.parse(JSON.stringify(state));
+    copyOf.savedAt = new Date().toISOString();
+    all[n] = copyOf;
+    if (writeLS(KEY_ALL, all)){ renderSaved(); flash("Saved as \"" + n + "\"."); }
+    else flash("This browser would not let the page save. Export the file instead.");
+  });
+
+  $("new").addEventListener("click", function(){
+    if (state.lines.length && !confirm("Clear what is on screen and start a new rubric?")) return;
+    state = {name:"", course:"", target:10, prompt:"", lines:[]};
+    endEdit(); writeForm(); render();
+    if (location.hash) history.replaceState(null, "", location.pathname);
+    $("name").focus();
+  });
+
+  $("savedlist").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if (!b) return;
+    var all = readLS(KEY_ALL, {}), n;
+    if ((n = b.getAttribute("data-load")) !== null){
+      if (!all[n]) return;
+      state = {name: all[n].name, course: all[n].course || "", target: all[n].target,
+               prompt: all[n].prompt || "", lines: all[n].lines || []};
+      endEdit(); writeForm(); render();
+      flash("Opened \"" + n + "\".");
+      window.scrollTo({top: 0, behavior: "smooth"});
+    } else if ((n = b.getAttribute("data-drop")) !== null){
+      if (!confirm("Delete the saved rubric \"" + n + "\"? This cannot be undone.")) return;
+      delete all[n]; writeLS(KEY_ALL, all); renderSaved(); flash("Deleted \"" + n + "\".");
+    }
+  });
+
+  // ---- start up: a shared link wins over whatever was last on screen
+  (function init(){
+    var m = location.hash.match(/#r=([A-Za-z0-9\-_]+)/);
+    if (m){
+      try {
+        state = unpack(m[1]);
+        flash("Opened from a link. It is not saved on this computer until you save it.");
+      } catch(e){ flash("That link did not carry a readable rubric."); }
+    } else {
+      var cur = readLS(KEY_CUR, null);
+      if (cur && cur.lines) state = cur;
+    }
+    writeForm(); render(); renderSaved();
+  })();
+})();
+</script>
+</body></html>

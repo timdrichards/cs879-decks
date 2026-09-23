@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 3 handout: problem 1, data structures</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head><body style="font-family:Lato,Helvetica,Arial,sans-serif;color:#1F2328;background:#FAF8F6;
+line-height:1.65;max-width:44em;margin:0 auto;padding:2.5rem 1.5rem;font-size:17px;">
+<p style="margin:0 0 1.6em;"><a href="index.html" style="color:#5A6570;text-decoration:none;">&larr; COMPSCI 879 decks</a></p>
+<h1 style="color:#7B1416;font-weight:900;font-size:2em;margin:0 0 .5em;">Unit 3, problem 1 &mdash; Data structures</h1>
+<p style="margin:0 0 1.4em;">You are the grader for a second-semester data structures course. Here is the assignment, the note your instructor sent you, and three submissions.</p>
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">The assignment</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #7B1416;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">In 100&ndash;150 words, explain when you would choose an <code>ArrayList</code> over a <code>LinkedList</code>, and when you would choose the reverse. Include a short code example (5&ndash;10 lines) showing one operation where the choice matters, and give the running time of that operation for each structure. <strong>(10 points)</strong></blockquote>
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">What the instructor told you</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #5A6570;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">Thanks for taking these. Quick one, shouldn't take you long.<br><br>I just want to see that they get the tradeoff and can show it in code. The code doesn't have to compile, pseudocode is fine. Knock something off if the explanation is hand-wavy or if they're just reciting definitions back at me. Out of 10. It's early in the semester, so don't be too harsh.<br><br>Shout if anything's weird.</blockquote>
+
+<p style="background:#F1ECE8;border-left:4px solid #2D6A4F;margin:0 0 1.6em;padding:.8em 1.1em;font-size:.97em;">Build your rubric in the <a href="rubric-builder.html" style="color:#7B1416;font-weight:700;">Rubric Builder</a>. It exports to Markdown or JSON, and it makes a link that carries the whole rubric, which is how you hand yours to another group.</p>
+<p style="margin:0 0 1.1em;"><strong style="color:#7B1416;">Before you read the submissions,</strong> we will build a rubric together as a room.</p>
+
+<hr style="border:0;border-top:1px solid #DCD6D2;margin:2.4em 0;">
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">Submission A</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #7B1416;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">ArrayList when you index a lot. LinkedList when you insert or delete at the front a lot.<br><br>ArrayList <code>get(i)</code> is O(1) since it's backed by an array. LinkedList <code>get(i)</code> is O(n) because you walk the chain from the head. Adding at the front is the reverse: LinkedList is O(1), ArrayList is O(n) because every element shifts up one.
+<pre style="background:#FAF8F6;border:1px solid #DCD6D2;border-radius:4px;padding:.8em 1em;margin:1em 0 0;font-size:.92em;overflow-x:auto;">for (int i = 0; i &lt; n; i++) {
+    total += list.get(i);   // O(1) ArrayList, O(n) LinkedList
+}                           // so the whole loop is O(n) vs O(n^2)</pre></blockquote>
+
+<hr style="border:0;border-top:1px solid #DCD6D2;margin:2.4em 0;">
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">Submission B</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #7B1416;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">Both <code>ArrayList</code> and <code>LinkedList</code> implement the same <code>List</code> interface, so choosing between them is a performance decision rather than a correctness one.<br><br><code>ArrayList</code> stores its elements in a contiguous backing array. This gives it excellent cache locality and makes iteration fast in practice. Its main weakness is growth: when the backing array fills up, the entire contents must be copied into a larger array, so an append is O(n) in the worst case.<br><br><code>LinkedList</code> stores each element in its own node, along with a pointer to the next node. Because each node holds a direct reference, retrieving an element is O(1) &mdash; you follow the pointer straight to the node you want. Insertion and deletion are likewise O(1) once you hold a reference, since only two pointers need to change. The cost is memory overhead, as every element carries pointer fields alongside its data.<br><br>In short, <code>ArrayList</code> is preferable when memory is tight and the collection is stable, while <code>LinkedList</code> is preferable when the collection changes shape frequently.
+<pre style="background:#FAF8F6;border:1px solid #DCD6D2;border-radius:4px;padding:.8em 1em;margin:1em 0 0;font-size:.92em;overflow-x:auto;">List&lt;String&gt; names = new LinkedList&lt;&gt;();
+names.add("Ada");
+names.add("Grace");
+String second = names.get(1);  // O(1), follows the pointer directly</pre></blockquote>
+
+<hr style="border:0;border-top:1px solid #DCD6D2;margin:2.4em 0;">
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">Submission C</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #7B1416;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">The two differ in how they lay out memory, and that decides which operations are cheap.<br><br><code>ArrayList</code> is backed by an array, so <code>get(i)</code> is O(1). <code>LinkedList</code> has to walk from the head, so <code>get(i)</code> is O(n). If your workload is mostly random access, <code>ArrayList</code> wins and it isn't close.<br><br>Insertion is where it gets interesting. <code>ArrayList</code>'s <code>add</code> is amortized O(1), and that holds whether you're adding at the end or at the front, because the amortization covers the copying. <code>LinkedList</code>'s insertion is O(1) only when you already hold a reference to the node, which you often don't. So for a workload that pushes items onto the front of the list, <code>ArrayList</code> is still the better choice.<br><br><code>LinkedList</code> does cost more memory, since every element carries two pointer fields as well as its value.
+<pre style="background:#FAF8F6;border:1px solid #DCD6D2;border-radius:4px;padding:.8em 1em;margin:1em 0 0;font-size:.92em;overflow-x:auto;">// Building a list by pushing onto the front
+ArrayList&lt;Integer&gt; a = new ArrayList&lt;&gt;();
+LinkedList&lt;Integer&gt; l = new LinkedList&lt;&gt;();
+for (int i = 0; i &lt; n; i++) {
+    a.add(0, i);        // amortized O(1)
+    l.addFirst(i);      // O(1), but allocates a node each time
+}
+// ArrayList is the better pick here: same time bound, less overhead.</pre></blockquote>
+
+<hr style="border:0;border-top:1px solid #DCD6D2;margin:2.4em 0;">
+<p style="color:#5A6570;font-size:.92em;">The instructor key is not published here. It is in the course repository.</p>
+</body></html>

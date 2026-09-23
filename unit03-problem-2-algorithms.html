@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 3 handout: problem 2, algorithms</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head><body style="font-family:Lato,Helvetica,Arial,sans-serif;color:#1F2328;background:#FAF8F6;
+line-height:1.65;max-width:44em;margin:0 auto;padding:2.5rem 1.5rem;font-size:17px;">
+<p style="margin:0 0 1.6em;"><a href="index.html" style="color:#5A6570;text-decoration:none;">&larr; COMPSCI 879 decks</a></p>
+<h1 style="color:#7B1416;font-weight:900;font-size:2em;margin:0 0 .5em;">Unit 3, problem 2 &mdash; Algorithms</h1>
+<p style="margin:0 0 1.4em;">Different course, different instructor, same shape of problem. This time you write the rubric yourself, on your own, before you read the submissions.</p>
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">The assignment</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #7B1416;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">In 100&ndash;150 words, explain why binary search requires its input to be sorted. Include a short code example (5&ndash;10 lines) showing a case where binary search on unsorted input returns a wrong answer, and give the running time of binary search and of sorting the input first. <strong>(10 points)</strong></blockquote>
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">What the instructor told you</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #5A6570;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">I'm looking for whether they understand the invariant, not just that they've memorized the rule. The code should actually demonstrate the failure, not assert it. Out of 10, partial credit is fine.</blockquote>
+
+<p style="background:#F1ECE8;border-left:4px solid #2D6A4F;margin:0 0 1.6em;padding:.8em 1.1em;font-size:.97em;">Build your rubric in the <a href="rubric-builder.html" style="color:#7B1416;font-weight:700;">Rubric Builder</a>. It exports to Markdown or JSON, and it makes a link that carries the whole rubric, which is how you hand yours to another group.</p>
+<p style="margin:0 0 1.1em;"><strong style="color:#7B1416;">Five minutes.</strong> Write your rubric before you turn the page. One yes-or-no line per point.</p>
+
+<hr style="border:0;border-top:1px solid #DCD6D2;margin:2.4em 0;">
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">Submission D</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #7B1416;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">Binary search works by maintaining an invariant: if the target is in the array at all, it is inside the current <code>[lo, hi]</code> window. Each step compares the middle element to the target and throws away the half that cannot contain it.<br><br>Throwing away that half is only justified if the array is sorted, because sortedness is what tells you that everything to the left of the middle is smaller and everything to the right is larger. On unsorted input that inference is false, so the half you discard may be the half holding your target. The algorithm still terminates and still returns an answer. The answer is just wrong.
+<pre style="background:#FAF8F6;border:1px solid #DCD6D2;border-radius:4px;padding:.8em 1em;margin:1em 0 0;font-size:.92em;overflow-x:auto;">int[] a = {7, 2, 9, 1, 5};   // not sorted
+binarySearch(a, 1);
+// mid = a[2] = 9. Target 1 &lt; 9, so we keep the left half {7, 2}.
+// 1 isn't there, so we return -1.
+// But 1 is in the array, at index 3, in the half we threw away.</pre></blockquote>
+
+<hr style="border:0;border-top:1px solid #DCD6D2;margin:2.4em 0;">
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">Submission E</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #7B1416;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">Binary search needs the array sorted, and it also needs the elements to be distinct. The reason is that at each step you compare the target against the middle element and decide which half to keep. If there are duplicates, the middle element can equal the target while other copies sit in both halves, so you cannot tell which half to keep and the search becomes ambiguous.<br><br>Binary search runs in O(log n), because the window halves on every step. Sorting first costs O(n log n) with a comparison sort. So if you only need one lookup, it is cheaper to scan the array once in O(n) than to sort it and then search.
+<pre style="background:#FAF8F6;border:1px solid #DCD6D2;border-radius:4px;padding:.8em 1em;margin:1em 0 0;font-size:.92em;overflow-x:auto;">int[] a = {2, 5, 5, 5, 9};
+binarySearch(a, 5);
+// mid = a[2] = 5, so it matches and we return index 2.
+// But which 5 did the student want? The algorithm can't say.</pre></blockquote>
+
+<hr style="border:0;border-top:1px solid #DCD6D2;margin:2.4em 0;">
+
+<h2 style="color:#7B1416;font-weight:900;font-size:1.35em;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:2px solid #DCD6D2;">Submission F</h2>
+<blockquote style="background:#F1ECE8;border-left:4px solid #7B1416;margin:0 0 1.4em;padding:1em 1.3em;font-size:1.02em;">Binary search is O(log n), and the reason is worth spelling out. Start with n candidates. After one comparison you have n/2 of them left, after two you have n/4, and in general after k comparisons you have n/2<sup>k</sup>. The search ends when that count reaches 1, which happens at k = log<sub>2</sub>(n). A million-element array takes about twenty comparisons and a billion-element array takes about thirty. Doubling the input adds a single step.<br><br>Sorting the input first costs O(n log n) with a comparison sort, which dominates the search itself. That is why you sort once and search many times, rather than sorting on every query.
+<pre style="background:#FAF8F6;border:1px solid #DCD6D2;border-radius:4px;padding:.8em 1em;margin:1em 0 0;font-size:.92em;overflow-x:auto;">int lo = 0, hi = a.length - 1;
+while (lo &lt;= hi) {
+    int mid = lo + (hi - lo) / 2;
+    if (a[mid] == target) return mid;
+    if (a[mid] &lt; target) lo = mid + 1;
+    else hi = mid - 1;
+}
+return -1;</pre></blockquote>
+
+<hr style="border:0;border-top:1px solid #DCD6D2;margin:2.4em 0;">
+<p style="color:#5A6570;font-size:.92em;">The instructor key is not published here. It is in the course repository.</p>
+</body></html>
