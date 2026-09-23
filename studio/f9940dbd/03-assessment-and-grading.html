@@ -255,6 +255,10 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .ticket-word{ display:inline-block; font-weight:900; color:var(--maroon);
   background:var(--wash); border:2px dashed var(--maroon); border-radius:6px;
   padding:.05em .4em; letter-spacing:.01em; }
+.word-again{ font-family:inherit; font-size:.5em; font-weight:900; text-transform:uppercase;
+  letter-spacing:.06em; border:2px solid var(--slate); background:#fff; color:var(--slate);
+  border-radius:4px; padding:.3em .7em; cursor:pointer; vertical-align:middle; margin-left:.5em; }
+.word-again:hover{ border-color:var(--maroon); color:var(--maroon); }
 </style>
 </head>
 <body>
@@ -381,29 +385,35 @@ Say the second half twice. Quietly giving points back to the one who asked is th
 The record is what turns a decision into something you can defend, to a student or to the grader who inherits the stack.</aside>
 </section>
 
-<section data-obj="1" class="go">
+<section data-obj="1" class="go tight">
 <h2>Different course, same shape</h2>
 <div class="callout">In 100 to 150 words, explain why binary search requires its input to be sorted. Include a short code example showing a case where it returns a wrong answer on unsorted input, and give the running time of the search and of sorting first. (10 points)</div>
-<p>In groups of two or three. Five minutes to write the rubric, before you read anything.</p>
-<p class="tiny">The handout: <a href="https://timdrichards.github.io/cs879-decks/unit03-problem-2-algorithms.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 2</a> · Write it in the <a href="https://timdrichards.github.io/cs879-decks/rubric-builder.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Rubric Builder</a></p>
+<p>Groups of two or three. Five minutes, before you read anything.</p>
+<div class="card"><h4>Then hand it to another group</h4><ul><li>Name it, then press Save this rubric</li><li>Press Copy link. The link carries the rubric itself</li><li>Post the link to the Rubric swap discussion</li></ul></div>
+<p class="tiny"><a href="https://timdrichards.github.io/cs879-decks/unit03-problem-2-algorithms.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 2</a> · <a href="https://timdrichards.github.io/cs879-decks/rubric-builder.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Rubric Builder</a> · <a href="https://umamherst.instructure.com/courses/38094/discussion_topics/592750" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Rubric swap discussion</a></p>
 <aside class="notes">Groups of two or three, and keep them together for the swap on the next slide.
 
 Five minutes is tight on purpose. A group that argues about one line for five minutes has done the exercise.
+
+Say the save step out loud. Opening another group's link replaces what is on their screen, and a group that skipped Save loses the rubric they just wrote.
+
+Nothing is stored on a server. The rubric is encoded in the link, which is why it works with no accounts at all.
 
 The brief here is shorter: the instructor wants the invariant rather than the rule, and the code has to demonstrate the failure rather than assert it.</aside>
 </section>
 
 <section data-obj="2" class="go">
 <h2>Score, swap, score again</h2>
-<ul><li>Score D, E and F against your group's rubric.</li><li>Swap rubrics with the group next to you.</li><li>Score the same three again, using theirs.</li><li>Did the two rubrics give the same totals?</li></ul>
+<ul><li>Score D, E and F against your group's rubric.</li><li>Open the link posted by the group next to you.</li><li>Score the same three again, using their rubric.</li><li>Reply to their post with your three totals and the line that broke.</li></ul>
 <div class="callout">Where the totals differ, find the line that caused it and read it aloud. It will be the one that was not yes-or-no.</div>
+<p class="tiny"><a href="https://umamherst.instructure.com/courses/38094/discussion_topics/592750" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Rubric swap discussion</a></p>
 <aside class="notes">Twenty minutes including the swap. Same groups of two or three.
+
+The replies are the record. You can read them back later without anyone writing anything up, and a pair of totals that disagree is sitting there with both rubrics attached.
 
 F produces the biggest spread, somewhere between 3 and 8. It is correct, well written, has the right running times, and explains why binary search is O(log n) rather than why sortedness is required. Excellent, and off target.
 
-Find the two groups that disagree most on F and have each read their own line out. That is the whole lesson in ninety seconds.
-
-The Rubric Builder makes a link that carries a rubric, so a group can send theirs rather than hand over a laptop.</aside>
+Find the two groups that disagree most on F and have each read their own line out. That is the whole lesson in ninety seconds.</aside>
 </section>
 
 <section data-obj="2">
@@ -425,16 +435,18 @@ The Rubric Builder makes a link that carries a rubric, so a group can send their
 <h2>Exit ticket</h2>
 <p>Canvas &rarr; Week 3 &rarr; Exit Ticket: Wed 9/23</p>
 <div class="callout">Which rubric line caused the biggest disagreement, and what would you change about it?</div>
-<p>The last question asks for today's word. It is: <span class="ticket-word">&hellip;</span></p>
+<p>The last question asks for today's word. It is: <span class="ticket-word">&mdash;</span><button class="word-again" type="button">New word</button></p>
 <p class="tiny">Copy the prompt into question two. Closes at 5:20, five minutes after we finish.</p>
-<script>/* The word lives on this slide, not in the shared chrome, because the chrome is published and this slide is not. */(function(){var W=['anchor','basket','candle','copper','dolphin','ember','fabric','garden','harbor','island','jacket','kettle','lantern','marble','needle','orchard','pepper','quarry','ribbon','saddle','timber','umbrella','velvet','walnut','yellow','zebra','bridge','compass','driftwood','feather','granite','hollow','juniper','ladder','meadow','nutmeg','otter','pebble','rooster','satchel'];var t=new Date(),h=(t.getFullYear()*10000+(t.getMonth()+1)*100+t.getDate())%2147483647;h=(h*48271)%2147483647;h=(h*48271)%2147483647;var w=W[h%W.length];document.querySelectorAll('.ticket-word').forEach(function(e){e.textContent=w;});})();</script>
+<script>/* The word lives on this slide, not in the shared chrome, because the chrome is published and this slide is not. Rolled when the slide is first reached, so it cannot exist before the room does, and kept once rolled. */(function(){var W=['anchor','basket','candle','copper','dolphin','ember','fabric','garden','harbor','island','jacket','kettle','lantern','marble','needle','orchard','pepper','quarry','ribbon','saddle','timber','umbrella','velvet','walnut','yellow','zebra','bridge','compass','driftwood','feather','granite','hollow','juniper','ladder','meadow','nutmeg','otter','pebble','rooster','satchel'];function start(){var el=document.querySelector('.ticket-word');if(!el||!window.Reveal)return;var sec=el.closest('section'),btn=document.querySelector('.word-again'),rolled=false;function roll(){el.textContent=W[Math.floor(Math.random()*W.length)];rolled=true;}function arrive(){if(!rolled&&Reveal.getCurrentSlide()===sec)roll();}if(btn)btn.onclick=roll;Reveal.on('ready',arrive);Reveal.on('slidechanged',arrive);arrive();}if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',start);else start();})();</script>
 <aside class="notes">Press T and set it to 10.
 
-The word is generated from today's date, so it is the same all day and survives a reload, and it only exists on this slide, which is not published. Read it out once and leave it up.
+The word is rolled at random the first time you reach this slide, so it does not exist until the room does. Once rolled it stays, so stepping back and forward will not change a word people have already copied. New word rolls a fresh one if you need it.
 
-Do not post this prompt anywhere. Being in the room is what makes the ticket an attendance record rather than a form.
+Read it out once and leave the slide up. It is the last question on the ticket.
 
-They argued about the rubric lines ten minutes ago, so this is a minute of writing. The answers tell you which lines the room found hardest.
+Question six is new: what they are struggling with, and what they want brought into class. Say out loud that it is anonymous and that you will alter anything you use so no person and no course can be identified. Say it, do not make them read it.
+
+Do not post the screen prompt anywhere. Being in the room is what makes the ticket an attendance record rather than a form.
 
 This block does not move. Start it at 5:05 whatever else is happening.
 
