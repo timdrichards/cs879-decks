@@ -138,9 +138,9 @@ build underneath, then export or hand it to someone else.</p>
     <button id="email" class="ghost">Email</button>
     <button id="print" class="quiet">Print</button>
   </div>
-  <p class="hint">The link carries the whole rubric in the address itself, so nothing is stored on
-  any server and it works for anyone who opens it. That is the one to send when you swap rubrics
-  with another group.</p>
+  <p class="hint" id="sharehint">The link carries the whole rubric in the address itself, so nothing
+  is stored on any server and it works for anyone who opens it. That is the one to send when you
+  swap rubrics with another group.</p>
 </div>
 
 <div class="card noprint">
@@ -231,8 +231,16 @@ in this course or not. Everything happens in your browser.</p>
       })
     };
   }
+  // Where a shared link should point. On file:// there is no usable origin (Chrome reports
+  // the literal string "null"), and a file path is no use to anyone else anyway, so links
+  // made from a local copy point at the published page instead.
+  var PUBLISHED = "https://timdrichards.github.io/cs879-decks/rubric-builder.html";
+  function onWeb(){
+    return location.protocol === "https:" || location.protocol === "http:";
+  }
   function shareUrl(){
-    return location.origin + location.pathname + "#r=" + pack(state);
+    var base = onWeb() ? location.origin + location.pathname : PUBLISHED;
+    return base + "#r=" + pack(state);
   }
 
   function total(){
@@ -494,15 +502,24 @@ in this course or not. Everything happens in your browser.</p>
                   + "&body=" + encodeURIComponent(body);
   });
 
+  // The system share sheet, but only where it is actually safe to call. Chrome exposes
+  // navigator.share on file:// pages and then kills the tab when the payload fails its
+  // IPC check, so the feature test alone is not enough: the page has to be on http(s),
+  // canShare has to accept the payload, and a synchronous throw still falls back to copy.
   $("share").addEventListener("click", function(){
     var url = shareUrl();
-    if (navigator.share){
-      navigator.share({
-        title: state.name || "Rubric",
-        text: "Rubric: " + (state.name || "untitled"),
-        url: url
-      }).catch(function(){ /* the person closed the sheet */ });
-    } else {
+    var data = {
+      title: state.name || "Rubric",
+      text: "Rubric: " + (state.name || "untitled"),
+      url: url
+    };
+    var usable = navigator.share && onWeb() && url.length < 4000
+                 && (!navigator.canShare || navigator.canShare(data));
+    if (!usable){ copy(url, "Link"); return; }
+    try {
+      var p = navigator.share(data);
+      if (p && p.catch) p.catch(function(){ /* the person closed the sheet */ });
+    } catch(e){
       copy(url, "Link");
     }
   });
@@ -584,6 +601,10 @@ in this course or not. Everything happens in your browser.</p>
     } else {
       var cur = readLS(KEY_CUR, null);
       if (cur && cur.lines) state = cur;
+    }
+    if (!onWeb()){
+      $("sharehint").innerHTML += " You are reading a local copy of this page, so the links it "
+        + "makes point at <a href=\"" + PUBLISHED + "\">the published version</a>.";
     }
     writeForm(); render(); renderSaved();
   })();
