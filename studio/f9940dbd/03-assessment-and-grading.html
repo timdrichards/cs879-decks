@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
+
 :root{
   --maroon:#7B1416; --ink:#1F2328; --ground:#FAF8F6;
   --slate:#5A6570; --rule:#DCD6D2; --go:#2D6A4F; --wash:#F1ECE8;
@@ -39,10 +40,18 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .strip .lbl{ text-transform:uppercase; letter-spacing:.10em; font-weight:900; font-size:14px;
   color:var(--maroon); margin-bottom:18px; line-height:1.25; }
 .strip .obj{ display:flex; gap:9px; margin-bottom:18px; opacity:.40; }
+/* done sits between not-yet (.40) and current (1) so the strip reads as progress:
+   faint = still to come, mid = covered, full weight = what we are on now */
+.strip .obj.done{ opacity:.75; color:var(--ink); }
 .strip .obj.on{ opacity:1; color:var(--ink); font-weight:700; }
 .strip .box{ flex:0 0 17px; height:17px; margin-top:2px; border:2px solid var(--slate);
-  border-radius:3px; box-sizing:border-box; }
+  border-radius:3px; box-sizing:border-box; position:relative; }
 .strip .obj.on .box{ border-color:var(--go); background:var(--go); }
+.strip .obj.done .box{ border-color:var(--go); background:var(--go); }
+/* the tick is drawn, not a glyph, so it scales with Reveal.getScale() like everything else */
+.strip .obj.done .box::after{ content:""; position:absolute; left:28%; top:6%;
+  width:30%; height:62%; border:solid #fff; border-width:0 2px 2px 0;
+  transform:rotate(42deg); }
 
 
 /* ---- phase timer. Reusable: <div class="timer" data-phases="Think:120,Pair:120,Share:120"></div>
@@ -106,164 +115,324 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .reveal .slide-number{ background:transparent; color:var(--slate); font-size:15px;
   right:auto; left:14px; bottom:10px; }
 .reveal .controls{ right:auto; left:8px; bottom:34px; color:var(--maroon); }
+
+/* Submission slides carry a full student answer, a rubric strip and a timer at once,
+   which does not fit at the deck's default rhythm. Tighten just these. */
+.sub h2{ margin-top:14px; margin-bottom:14px; }
+.sub .tiny{ margin:10px 0; line-height:1.34; }
+.sub .rubric{ border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+  padding:7px 0; margin:12px 0; color:var(--slate); }
+.sub .timer{ margin-top:12px; }
+
+/* For a slide that has to carry a callout, a list and a multi-phase timer at once. The
+   deck's default rhythm is built for three elements, not four; this tightens the gaps
+   without touching type size, so the slide still reads at the back of the room. */
+.tight h2{ margin-top:20px; margin-bottom:14px; }
+.tight .callout{ margin:10px 0; }
+.tight ul{ margin:14px 0; }
+.tight .tiny{ margin:10px 0; }
+.tight .timer{ margin-top:14px; }
+/* A .tight slide is dense by definition, so the callout's own box and the gaps between
+   list items give up a few pixels too. Type size is untouched. */
+.tight .callout{ padding:12px 18px; }
+.tight li{ margin-bottom:6px; }
+
+/* A running timer follows you to the next slide as a corner pill, so the room can keep
+   working while the deck moves on. Lives outside .slides, so reveal's scale transform
+   and auto-animate never touch it. */
+.timer-pill{ position:fixed; right:18px; bottom:16px; z-index:60;
+  display:flex; align-items:baseline; gap:12px;
+  background:#fff; border:1px solid var(--rule); border-left:5px solid var(--go);
+  border-radius:5px; padding:9px 16px; box-shadow:0 2px 10px rgba(0,0,0,.10);
+  font-family:Lato,Helvetica,Arial,sans-serif; }
+.timer-pill .pill-label{ font-size:13px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--slate); }
+.timer-pill .pill-clock{ font-size:30px; font-weight:900; line-height:1; color:var(--go);
+  font-variant-numeric:tabular-nums; }
+.timer-pill.low{ border-left-color:#9A6700; }
+.timer-pill.low .pill-clock{ color:#9A6700; }
+.timer-pill.over{ border-left-color:var(--maroon); }
+.timer-pill.over .pill-clock{ color:var(--maroon); }
+/* display:flex outranks the hidden attribute, so an empty pill rendered on every
+   slide until this. Same trap as the journal tool's row grid. */
+.timer-pill[hidden]{ display:none !important; }
+
+/* ---- live tally ---------------------------------------------------------- */
+.tally{ margin:14px 0 0; }
+.tally-row{ display:flex; align-items:flex-end; gap:14px; margin:0 0 7px; }
+.tally-label{ flex:0 0 26px; font-size:24px; font-weight:900; color:var(--maroon);
+  line-height:1; padding-bottom:24px; }
+.tally-buckets{ flex:1; display:flex; gap:10px; }
+.tally-bucket{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; }
+.tally-track{ width:100%; height:42px; display:flex; align-items:flex-end;
+  background:var(--wash); border-radius:3px 3px 0 0; }
+.tally-track i{ display:block; width:100%; background:var(--go); border-radius:3px 3px 0 0;
+  transition:height .18s ease-out; min-height:2px; }
+.tally-track i.zero{ background:var(--rule); }
+.tally-bucket input{ width:100%; text-align:center; font-family:inherit; font-size:17px;
+  font-weight:700; color:var(--ink); border:1px solid var(--rule); border-radius:3px;
+  padding:2px 0; background:#fff; }
+.tally-bucket input:focus{ outline:2px solid var(--go); outline-offset:1px; }
+.tally-score{ font-size:13px; font-weight:700; color:var(--slate); }
+.tally-total{ flex:0 0 66px; font-size:14px; font-weight:700; color:var(--slate);
+  padding-bottom:26px; text-align:right; }
+.tally-total.off{ color:#9A6700; }
+
+/* ---- reset control on a timer ------------------------------------------------ */
+.timer .rst{ font:inherit; font-size:14px; padding:6px 12px; border-radius:5px;
+  border:1px solid var(--rule); background:#fff; color:var(--slate); cursor:pointer; }
+.timer .rst:hover{ border-color:var(--maroon); color:var(--maroon); }
+
+/* ---- the session clock ------------------------------------------------------- */
+/* Fixed to the viewport rather than the slide, so reveal's scale transform leaves it
+   alone and it reads the same size on a projector as on a laptop. Top right, because
+   the carried-timer pill already owns the bottom right. */
+/* Both fixtures live in one flex row anchored to the corner. A hand-tuned right offset
+   on the pace pill collided with the clock as soon as the clock's text got wider. */
+.hud{ position:fixed; top:14px; right:16px; z-index:60; display:flex; gap:8px;
+  align-items:stretch; }
+.pace{ display:flex; align-items:baseline; gap:8px;
+  background:var(--wash); border:1px solid var(--rule); border-radius:999px;
+  padding:6px 14px; user-select:none; font-family:Lato,system-ui,sans-serif;
+  box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.pace[hidden]{ display:none !important; }
+.pace .pc-word{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); }
+.pace .pc-time{ font-size:17px; font-weight:800; color:var(--ink);
+  font-variant-numeric:tabular-nums; }
+.pace.ahead{ border-color:var(--go); }
+.pace.ahead .pc-word, .pace.ahead .pc-time{ color:var(--go); }
+.pace.behind{ background:#FDF3F3; border-color:var(--maroon); }
+.pace.behind .pc-word, .pace.behind .pc-time{ color:var(--maroon); }
+
+.class-clock{ display:flex; align-items:baseline; gap:8px;
+  background:var(--wash); border:1px solid var(--rule); border-radius:999px;
+  padding:6px 14px; cursor:pointer; user-select:none;
+  font-family:Lato,system-ui,sans-serif; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.class-clock[hidden]{ display:none !important; }
+.class-clock .cc-label{ font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--slate); }
+.class-clock .cc-time{ font-size:19px; font-weight:800; color:var(--ink);
+  font-variant-numeric:tabular-nums; }
+.class-clock.low .cc-time{ color:#9A6700; }
+.class-clock.over{ background:#FDF3F3; border-color:var(--maroon); }
+.class-clock.over .cc-time{ color:var(--maroon); }
+.class-clock.paused{ opacity:.55; }
+.class-clock.paused .cc-label::after{ content:" paused"; }
+
+/* ---- the summoned timer ------------------------------------------------------
+   One timer for the whole deck instead of one per slide. It sits outside .slides so
+   reveal's transform and auto-animate both leave it alone, which is also what lets it
+   keep running while you move through the deck. */
+.deck-timer{ position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:60;
+  display:flex; align-items:center; gap:11px; background:#fff; border:2px solid var(--go);
+  border-radius:9px; padding:10px 13px; box-shadow:0 7px 26px rgba(0,0,0,.17); }
+.deck-timer[hidden]{ display:none; }
+.deck-timer .dt-in{ width:66px; font-family:inherit; font-size:16px; font-weight:900;
+  text-align:center; color:var(--ink); background:var(--wash); border:1px solid var(--rule);
+  border-radius:4px; padding:7px 4px; }
+.deck-timer .dt-in:focus{ outline:2px solid var(--go); outline-offset:-1px; background:#fff; }
+.deck-timer .dt-clock{ font-size:46px; font-weight:900; line-height:1; color:var(--ink);
+  font-variant-numeric:tabular-nums; letter-spacing:-.02em; min-width:124px; text-align:center; }
+.deck-timer.running .dt-clock{ color:var(--go); }
+.deck-timer.low .dt-clock,
+.deck-timer.over .dt-clock{ color:var(--maroon); }
+.deck-timer button{ font-family:inherit; font-weight:900; font-size:13px; text-transform:uppercase;
+  letter-spacing:.06em; border:2px solid var(--go); background:#fff; color:var(--go);
+  border-radius:4px; padding:8px 13px; cursor:pointer; }
+.deck-timer button:hover{ background:var(--go); color:#fff; }
+.deck-timer .dt-pre{ display:flex; gap:4px; }
+.deck-timer .dt-pre button{ padding:6px 9px; font-size:12px; border-color:var(--rule);
+  color:var(--slate); }
+.deck-timer .dt-pre button:hover{ border-color:var(--go); background:var(--go); color:#fff; }
+.deck-timer .dt-x{ border-color:var(--rule); color:var(--slate); font-size:17px; padding:4px 10px;
+  line-height:1; }
+.deck-timer .dt-x:hover{ background:var(--slate); border-color:var(--slate); }
 </style>
 </head>
 <body>
 <div class="strip">
   <div class="lbl">Today you should be able to</div>
-  <div class="obj" data-obj="1"><span class="box"></span><span>Write a rubric line two graders apply the same way</span></div>
-  <div class="obj" data-obj="2"><span class="box"></span><span>Say what your practicum will count, before and after</span></div>
+  <div class="obj" data-obj="1"><span class="box"></span><span>Build a rubric from an assignment and a vague instructor brief</span></div><div class="obj" data-obj="2"><span class="box"></span><span>Test a rubric against real submissions and revise it when it fails</span></div><div class="obj" data-obj="3"><span class="box"></span><span>Justify a grade to a student who disagrees, or change it</span></div>
 </div>
 
 <div class="reveal"><div class="slides">
 
 <section data-obj="0">
-  <h3>COMPSCI 879 · Unit 3 · Wed Sep 23</h3>
-  <h1>Assessment<br>and Grading</h1>
-  <aside class="notes">75 minutes, three activities, and gaps on purpose.
+<h3>COMPSCI 879 · Unit 3 · Wed Sep 23</h3>
+<h1>Assessment<br>and Grading</h1>
+<p class="lede">Act one: finding your feet</p>
+<aside class="notes">Press T for a timer on any slide. Type minutes, or m:ss, and it keeps running while you move through the deck.
 
-4:00 what you told Boming, then the rubric hole
-4:15 practicum examples and the trio round
-4:30 rubric swap
-4:55 open time
-5:05 exit ticket, the full ten minutes
+4:00 Boming, then build the rubric out loud
+4:20 grade A, B and C
+4:35 how rubrics fail and how to repair one
+4:45 problem 2, write, score, swap, score again
+5:05 exit ticket
 
-If anything runs long, eat the open time. Never the exit ticket. Last Wednesday it got two minutes and we lost the whole session's data.
+If anything runs long it comes out of the 4:35 block. The exit ticket does not move.
 
-Everything that used to be lecture here (norm versus criterion, the curve, calibration, feedback, the GenAI rules) is on the unit page. Do not rebuild it from memory.</aside>
+Read instructor-key.md before this. Which submission is which trap is not obvious from reading them.</aside>
 </section>
 
 <section data-obj="0">
-  <h2>What you told Boming on Friday</h2>
-  <div class="two">
-    <div class="card"><h4>What we heard</h4>
-      <ul><li>The prompts assumed experience a lot of you don't have yet</li>
-          <li>Nobody could say what a finished practicum looks like</li>
-          <li>Friday felt like writing alone in a room</li>
-          <li>The materials read as generated</li></ul></div>
-    <div class="card"><h4>What changes</h4>
-      <ul><li>Fewer slides, more talking</li>
-          <li>Practicum examples, today, by kind of job</li>
-          <li>A different Friday, at the end of class</li>
-          <li>The Practicum 1 rubric gets fixed, starting now</li></ul></div>
-  </div>
-  <aside class="notes">No more than three minutes here. Say it plainly and do not defend anything. You wrote to Boming that the AI comment was fair; say that to the room too.
+<h2>What you told Boming on Friday</h2>
+<div class="two"><div class="card no"><h4>What we heard</h4><ul><li>The prompts assumed grading you have not done yet</li><li>Nobody could say what a finished practicum looks like</li><li>Friday felt like writing alone in a room</li><li>The materials read as generated</li></ul></div><div class="card yes"><h4>What changes</h4><ul><li>We supply the assignment and the submissions, every time</li><li>Fewer slides, more of you talking</li><li>The Practicum 1 rubric gets fixed, starting today</li></ul></div></div>
+<aside class="notes">Three minutes. Say it plainly and defend none of it. You already told Boming the AI comment was fair feedback, so say that here too.
 
-Thank Boming by name for running Friday in a double-booked room.</aside>
+Credit Boming by name. He is the reason you know any of this, he handled Friday in a double-booked room, and the people who raised it should hear that telling him worked.
+
+Then the standing change, in one sentence: nothing in this course will ask you to bring an assignment or a rubric from the course you assist, because half this room has not been handed a stack yet.</aside>
 </section>
 
-<section class="go" data-obj="1">
-  <span class="tag">Pairs · 3 min</span>
-  <h2>Our own rubric had a hole</h2>
-  <p>Practicum 1 asked for about 300 words. The rubric had no line about length.</p>
-  <p>One of you wrote 204 words, met every line, and said so in the submission. You were right.</p>
-  <div class="callout">With the person next to you: write the missing line. It has to be yes or no.</div>
-  <div class="timer compact" data-phases="Pairs:180"></div>
-  <aside class="notes">Do not name the student unless they have said you can.
+<section data-obj="1">
+<h2>You are grading for a data structures course</h2>
+<div class="callout">In 100 to 150 words, explain when you would choose an ArrayList over a LinkedList, and when you would choose the reverse. Include a short code example showing one operation where the choice matters, and give the running time of that operation for each. (10 points)</div>
+<div class="card"><h4>The whole brief you get</h4><ul><li>"I just want to see that they get the tradeoff and can show it in code."</li><li>"The code doesn't have to compile, pseudocode is fine."</li><li>"Knock something off if the explanation is hand-wavy."</li><li>"Out of 10. It's early in the semester, so don't be too harsh."</li></ul></div>
+<p class="tiny">The handout: <a href="https://timdrichards.github.io/cs879-decks/unit03-problem-1-data-structures.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 1</a></p>
+<aside class="notes">Read the instructor's note aloud. It is two sentences and it sounds completely reasonable, which is the point. It is also roughly what any of them would write at 11pm.
 
-Take two or three lines from the room and write them on the board. Pick one out loud and say it goes into the Practicum 1 rubric this week, then actually do it. Someone will propose "at least 300 words"; ask whether 290 fails. That argument is the unit in two minutes.
+Do not editorialise yet. The next slide does that work.</aside>
+</section>
 
-A yes-or-no line per point is also the instruction for the rubric swap later, so you do not need to teach it separately.</aside>
+<section data-obj="1" class="go">
+<h2>What has it not told you?</h2>
+<ul><li>How many of the ten points are the prose, and how many the code?</li><li>Does hand-wavy mean vague, or wrong?</li><li>Does the code have to be correct, if it does not have to compile?</li><li>The assignment says 100 to 150 words. The brief never mentions length. Does it count?</li></ul>
+<div class="callout">You answer all four today whether you decide to or not. Grading the stack answers them. The choice is whether you answer them once, on purpose, or forty times under time pressure.</div>
+<aside class="notes">Let the room find these rather than reading them out. Reveal the list after they have named two or three.
+
+Do not answer any of them. The room answers them in the next ten minutes and you write the answers on the board.</aside>
+</section>
+
+<section data-obj="1" class="go">
+<h2>Build the rubric</h2>
+<p>Out loud, as a room. One yes-or-no line per point, ten points.</p>
+<div class="two"><div class="card no"><h4>Not a rubric line</h4><ul><li>"Explains the tradeoff clearly"</li></ul></div><div class="card yes"><h4>A rubric line</h4><ul><li>"Names a case where the linked list wins and says why"</li></ul></div></div>
+<p class="tiny">Type it into the <a href="https://timdrichards.github.io/cs879-decks/rubric-builder.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Rubric Builder</a> as we go, and you all leave with a copy.</p>
+<aside class="notes">Thirteen minutes. You type, they decide. Put it on the board or in the Rubric Builder on the projector.
+
+Push on anything that is not yes-or-no. Clearly is doing all the work in the left-hand card, and two graders will read it differently.
+
+Whatever they decide about length, write it down, or write down that there is no line. Both are decisions. Only one of them is a decision they will remember making.</aside>
+</section>
+
+<section data-obj="2" class="go">
+<h2>Now grade three submissions</h2>
+<p>On your own first, then compare with the person next to you. Use the rubric we just wrote and nothing else.</p>
+<ul><li>A, then B, then C. In that order.</li><li>Write the number down before you talk to anyone.</li></ul>
+<aside class="notes">Fifteen minutes, five a submission, keep it moving.
+
+The order matters. C is the double jeopardy case and it has to arrive while they are already grading.
+
+A is correct and 62 words against a stated 100 to 150. If the rubric has no length line, half the room deducts anyway.
+
+B reads like the strongest writer in the set and says LinkedList get(i) is O(1). A grader skimming for understanding gives it 8 or 9.</aside>
 </section>
 
 <section data-obj="2">
-  <h2>A finished practicum, four ways</h2>
-  <div class="two" style="gap:.8em 1.2em;">
-    <div class="card"><h4>You mostly grade</h4>
-      <ul><li>Count regrade requests on one set. Write yes/no lines before the next set. Count again.</li></ul></div>
-    <div class="card"><h4>You hold office hours</h4>
-      <ul><li>Tally the visits that ended with you typing the code. Ask two questions first. Tally again.</li></ul></div>
-    <div class="card"><h4>You run a lab or discussion</h4>
-      <ul><li>Count who speaks. Add think time or pairs. Count again.</li></ul></div>
-    <div class="card"><h4>You make materials</h4>
-      <ul><li>Count setup questions in week one. Write the checklist. Count again next assignment.</li></ul></div>
-  </div>
-  <p class="tiny" style="margin-top:.9em;">One change, inside hours you already work. A number before and a number after. That is the whole project.</p>
-  <aside class="notes">Every one of these comes from a focus somebody in the room picked for Practicum 1. Say that.
+<h2>A had no length line to fail</h2>
+<p>The rubric never mentioned length, so there was nothing to deduct against. Half of you deducted anyway.</p>
+<div class="callout">Practicum 1 asked you for about 300 words. Its rubric had no length criterion either. One of you wrote 204 words, met every line, and said so in the submission. They were right, and it is fixed as of today.</div>
+<aside class="notes">This is the slide where the course admits it made the same mistake. Do not skip it and do not soften it.
 
-The point to land: none of them needs you to lead a section. Nearly half the room does not, and the Friday prompts assumed they did.
+Do not name the student unless they have told you it is fine.
 
-If someone asks what counts as "a number": a tally on a sticky note is fine. It only has to be the same tally before and after.</aside>
+The useful question is not whether to deduct. It is whether the rubric said so before anyone read a submission.</aside>
 </section>
 
-<section class="go" data-obj="2">
-  <span class="tag">Threes · 9 min</span>
-  <h2>Your focus in one sentence</h2>
-  <p>Each person says their practicum focus in one sentence.</p>
-  <p>The other two ask one question: <strong>what would you count?</strong></p>
-  <div class="timer" data-phases="First:180,Second:180,Third:180"></div>
-  <aside class="notes">Mixed threes if you can: put someone who grades only with someone who runs a section.
+<section data-obj="3">
+<h2>One misunderstanding, three deductions</h2>
+<p>Submission C believes inserting at the front of an ArrayList is amortized constant time, having confused it with appending at the end. That one belief shows up three times:</p>
+<ul><li>In the explanation</li><li>In the conclusion about which structure to pick</li><li>In the code, which picks front insertion and labels it amortized O(1)</li></ul>
+<div class="callout">C lands around 4. B, which does not understand linked lists at all, lands around 8.</div>
+<aside class="notes">Put both numbers on the board next to each other and let the room sit with it.
 
-Walk the room with Boming. The people who come up blank here are the ones to catch before Friday, because the Baseline is due then.</aside>
+Then ask: is 4 the right grade for one misunderstanding?
+
+The principle is that the cost should be proportional to the size of the misunderstanding, not to how many places it surfaced. But it is a course policy question, so ask the instructor rather than inventing a rule. Different courses answer it differently and both answers are defensible.</aside>
 </section>
 
-<section class="go" data-obj="1">
-  <span class="tag">Groups of four · 22 min</span>
-  <h2>Rubric swap</h2>
-  <ul>
-    <li>Pick one real assignment from someone's course. No assignment? Use the week 1 let/const/var prompt.</li>
-    <li>Write four yes/no lines for it.</li>
-    <li>Swap rubrics with the group next to you. Grade two submissions using theirs.</li>
-    <li>Find one line that broke.</li>
-  </ul>
-  <div class="timer compact" data-phases="Write:480,Swap and grade:420,Report:420"></div>
-  <aside class="notes">This is the one that gets the time. Let groups argue.
+<section data-obj="3">
+<h2>Then C emails you</h2>
+<p>Read your own rubric as though you had never seen it, and answer one question: can I justify this number?</p>
+<div class="two"><div class="card yes"><h4>If you can</h4><ul><li>Name the line</li><li>Name what their submission did</li><li>Say what earning the point looks like</li></ul></div><div class="card no"><h4>If you cannot</h4><ul><li>Say so and change it</li><li>Then change it for everyone else with the same problem</li></ul></div></div>
+<div class="callout">A student who complains should not get a better outcome than a student who did not. That second step is the one new graders skip.</div>
+<aside class="notes">Put them in the student's seat before they answer. The reply that starts by defending the grader loses the room every time.
 
-Fallback material is the week 1 handout, unit01-grade-these-four.html on the deck site. They graded those four without a rubric in week 1 and their scores spread. Now they write the rubric that would have stopped it, so it is not a repeat.
+If you can justify it, the mail is three sentences and it points at criteria that existed before you read their work. You are not arguing about whether they are clever.
 
-Report: one broken line per group, read aloud, and what broke it. Boming writes them on the board.
+Say the second half twice. Quietly giving points back to the one who asked is the most common thing that goes wrong, and it is invisible until someone compares notes.</aside>
+</section>
 
-Double jeopardy may come up on its own when a group finds one mistake costing points in two lines. If it does, that is the case from the unit page. The answer to give: it is a course policy question, so ask your instructor, and whatever the rule is, apply it to everyone.</aside>
+<section data-obj="2">
+<h2>When no line covers it</h2>
+<p>Submission twelve does something the rubric is silent about. Do not improvise and keep going, because that is how the first eleven get graded against one standard and the last twenty-eight against another.</p>
+<ul><li>Stop. Write the new line, in the same yes-or-no form.</li><li>Ask whether it changes any score you have already given.</li><li>If it does, go back. Twelve is fifteen minutes. Thirty-five is an evening.</li><li>Keep the record of every call like this.</li></ul>
+<aside class="notes">Short. This is the buffer block, so if the grading ran over, this slide alone is the version you keep.
+
+The record is what turns a decision into something you can defend, to a student or to the grader who inherits the stack.</aside>
+</section>
+
+<section data-obj="1" class="go">
+<h2>Different course, same shape</h2>
+<div class="callout">In 100 to 150 words, explain why binary search requires its input to be sorted. Include a short code example showing a case where it returns a wrong answer on unsorted input, and give the running time of the search and of sorting first. (10 points)</div>
+<p>Five minutes. Write the rubric on your own, before you read anything.</p>
+<p class="tiny">The handout: <a href="https://timdrichards.github.io/cs879-decks/unit03-problem-2-algorithms.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 2</a></p>
+<aside class="notes">Alone, not in pairs. The swap only tells them something if the two rubrics were written independently.
+
+The brief here is shorter: the instructor wants the invariant rather than the rule, and the code has to demonstrate the failure rather than assert it.</aside>
+</section>
+
+<section data-obj="2" class="go">
+<h2>Score, swap, score again</h2>
+<ul><li>Score D, E and F against your own rubric.</li><li>Swap rubrics with the person next to you.</li><li>Score the same three again, using theirs.</li><li>Did you get the same totals?</li></ul>
+<div class="callout">Where the totals differ, find the line that caused it and read it aloud. It will be the one that was not yes-or-no.</div>
+<aside class="notes">Twenty minutes including the swap.
+
+F produces the biggest spread, somewhere between 3 and 8. It is correct, well written, has the right running times, and explains why binary search is O(log n) rather than why sortedness is required. Excellent, and off target.
+
+Find the two people who disagree most on F and have each read their own line out. That is the whole lesson in ninety seconds.
+
+The Rubric Builder makes a link that carries a rubric, so they can swap by sending one rather than by handing over a laptop.</aside>
+</section>
+
+<section data-obj="2">
+<h2>So when do you revise a rubric?</h2>
+<ul><li>Best: after a sample read, before you have committed a single score.</li><li>Second best: between batches, with a note about what changed.</li><li>Worst: halfway through, with no record.</li></ul>
+<div class="callout">Once grades are out, revising means regrading everyone, so the bar is higher. Still worth it when the defect is real. "You are right, that line was underspecified, here is the corrected version and I have applied it to the whole section" is a good sentence to be able to write.</div>
+<aside class="notes">Land the point that a regrade request exposing a genuine gap is not an attack. It is the cheapest rubric review they will ever get.</aside>
 </section>
 
 <section data-obj="0">
-  <h2>What came up</h2>
-  <p>Whatever the swap raised, or anything about the practicum.</p>
-  <div class="callout">If nobody has one: you and another TA grade the same assignment, and your averages differ by eight percent. What now?</div>
-  <aside class="notes">This is the buffer. If the swap ran over, skip straight to Friday. If it ends early and the room is quiet, let people go after the exit ticket. Nobody will complain after last week.
-
-For the eight percent case: grade a small shared sample first, compare, write down every judgment call. It is on the unit page.</aside>
-</section>
-
-<section data-obj="0">
-  <h2>This Friday</h2>
-  <p><strong>First half, together.</strong> Pair interviews for your Baseline. Your partner asks the questions and takes the notes.</p>
-  <p><strong>Second half, wherever you like.</strong> Turn those notes into Practicum 2.</p>
-  <div class="callout">Before you grade anything else: write the rubric you are actually using, one yes/no line per point, and ask your instructor "is this what you want?" That is part of your TA job, so it happens on TA time.</div>
-  <aside class="notes">CONFIRM WITH BOMING BEFORE CLASS. This is the proposed Friday, and the Thursday 2:00 meeting comes after this session. If you have not agreed it, say "Boming will post Friday's plan by Thursday night" and skip the first two lines.
-
-Why it fits the hours promise: outside work across the term sits around 1.3 hours against roughly an hour a week, so the last 20 minutes of Friday going home stays well inside it.
-
-Boming's point was that people with long commutes want a reason to come in. The interview is that reason: it needs a partner.</aside>
-</section>
-
-<section data-obj="0">
-  <h2>Where this shows up later</h2>
-  <div class="two"><div class="card"><h4>If you stay in academia</h4><ul><li>A rubric is your values, written down</li><li>You will find you disagree with yourself</li></ul></div><div class="card"><h4>If you go to industry</h4><ul><li>Hiring loops and ship or no-ship calls</li><li>Criteria first is what makes it defensible</li></ul></div></div>
-  <div class="callout">Two TAs, one submission, four points apart. Neither is wrong. The rubric was.</div>
-  <aside class="notes">Thirty seconds, not more. It is here because every deck carries it.</aside>
+<h2>Where this shows up later</h2>
+<div class="two"><div class="card"><h4>If you stay in academia</h4><ul><li>A rubric is your values, written down</li><li>You will find you disagree with yourself</li></ul></div><div class="card"><h4>If you go to industry</h4><ul><li>Hiring loops and ship or no-ship calls</li><li>Criteria first is what makes it defensible</li></ul></div></div>
+<div class="callout">Two TAs, one submission, four points apart. Neither is wrong. The rubric was.</div>
+<aside class="notes">Thirty seconds. Every deck carries this slide.</aside>
 </section>
 
 <section data-obj="0" data-instructor-only>
-  <h3>Wed Sep 23 · last 10 minutes</h3>
-  <h2>Exit ticket</h2>
-  <p>Canvas &rarr; Week 3 &rarr; 🎟️ Exit Ticket: Wed 9/23</p>
-  <div class="callout"><strong>What will you count for your practicum baseline? One sentence.</strong></div>
-  <p class="tiny">Copy the prompt into question two. Closes at 5:20, five minutes after we finish.</p>
-  <div class="timer compact" data-phases="Exit ticket:600"></div>
-  <aside class="notes">Do not post this prompt anywhere. It is what makes the ticket an attendance record.
+<h3>Wed Sep 23 · last 10 minutes</h3>
+<h2>Exit ticket</h2>
+<p>Canvas &rarr; Week 3 &rarr; Exit Ticket: Wed 9/23</p>
+<div class="callout">Which rubric line caused the biggest disagreement, and what would you change about it?</div>
+<p class="tiny">Copy the prompt into question two. Closes at 5:20, five minutes after we finish.</p>
+<aside class="notes">Press T and set it to 10.
 
-They said this out loud in the threes, so it takes a minute to write. The answers also tell you who still has no baseline plan going into Friday.
+Do not post this prompt anywhere. Being in the room is what makes the ticket an attendance record rather than a form.
 
-This block does not move. Start it at 5:05 whatever else is happening.</aside>
+They argued about exactly this ten minutes ago, so it is a minute of writing. The answers tell you which lines the room found hardest, which is what Unit 4's peer evaluation work builds on.
+
+This block does not move. Start it at 5:05 whatever else is happening.
+
+Friday: only announce the plan if you and Boming settled it. If not, say he will post it by Thursday night.</aside>
 </section>
 
 <section data-obj="0">
-  <h3>Resources</h3>
-  <h2>Links from this session</h2>
-  <p>The unit page covers everything we skipped today, including the GenAI rules for your TA work. Read that part before you paste student work into any tool.</p>
-  <ul><li><a href="https://tatp.utoronto.ca/resources/effective-rubric-design/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Effective Rubric Design</a></li><li><a href="https://www.umass.edu/senate/sites/default/files/Guidelines_for_Assigning_Grades.pdf" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Guidelines for Assigning Grades, UMass Faculty Senate</a></li><li><a href="https://www.umass.edu/ai" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">AI at UMass, for the TA-facing GenAI rules</a></li></ul>
-  <p class="tiny">All optional.</p>
+<h3>Resources</h3>
+<h2>Links from this session</h2>
+<ul><li><a href="https://timdrichards.github.io/cs879-decks/unit03-problem-1-data-structures.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 1: data structures</a></li><li><a href="https://timdrichards.github.io/cs879-decks/unit03-problem-2-algorithms.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 2: algorithms</a></li><li><a href="https://timdrichards.github.io/cs879-decks/rubric-builder.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Rubric Builder</a></li></ul>
+<p>Worth reading, and optional:</p>
+<ul><li><a href="https://tatp.utoronto.ca/resources/effective-rubric-design/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Effective Rubric Design</a></li><li><a href="https://www.umass.edu/senate/sites/default/files/Guidelines_for_Assigning_Grades.pdf" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Guidelines for Assigning Grades, UMass Faculty Senate</a></li><li><a href="https://www.umass.edu/ai" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">AI at UMass, for the TA-facing GenAI rules</a></li></ul>
+<p class="tiny">The unit page covers everything we skipped, including the GenAI rules for your TA work. Read that part before you paste student work into any tool.</p>
 </section>
 
 </div></div>
@@ -294,10 +463,32 @@ function placeStrip(){
   el.querySelectorAll('.obj').forEach(function(n){
     n.style.marginBottom=(18*k)+'px'; n.style.gap=(9*k)+'px'; });
 }
+// An objective is "on" while the deck is on a slide that teaches it, and stays
+// "done" once the deck has moved past the last slide that carries it. Without the
+// done half the strip only ever shows a single lit box, which reads as a location
+// marker rather than progress through the session.
+var LAST_FOR_OBJ = null;
+function objIndex(){
+  if(LAST_FOR_OBJ) return LAST_FOR_OBJ;
+  LAST_FOR_OBJ = {};
+  var all = [].slice.call(document.querySelectorAll('.reveal .slides > section'));
+  all.forEach(function(s,i){
+    var o = s.getAttribute('data-obj');
+    if(o && o !== '0') LAST_FOR_OBJ[o] = i;
+  });
+  return LAST_FOR_OBJ;
+}
 function syncStrip(){
-  var cur=Reveal.getCurrentSlide(); var n=cur?(cur.getAttribute('data-obj')||'0'):'0';
+  var all = [].slice.call(document.querySelectorAll('.reveal .slides > section'));
+  var cur = Reveal.getCurrentSlide();
+  var here = all.indexOf(cur);
+  var n = cur ? (cur.getAttribute('data-obj')||'0') : '0';
+  var last = objIndex();
   document.querySelectorAll('.strip .obj').forEach(function(o){
-    o.classList.toggle('on', o.getAttribute('data-obj')===n); });
+    var k = o.getAttribute('data-obj');
+    o.classList.toggle('on', k === n);
+    o.classList.toggle('done', last[k] !== undefined && here > last[k]);
+  });
 }
 function refreshStrip(){ placeStrip(); syncStrip(); }
 Reveal.on('ready', refreshStrip);
@@ -318,10 +509,11 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     var i=0, left=spec[0].secs, tick=null, running=false;
     t.innerHTML='<div class="phases"></div><div class="face">'
       +'<span class="clock"></span><button class="btn"></button>'
+      +'<button class="rst" title="Reset this timer">Reset</button>'
       +'<span class="hint"></span></div><div class="track"><span class="fill"></span></div>';
     var chips=t.querySelector('.phases'), clock=t.querySelector('.clock'),
-        btn=t.querySelector('.btn'), fill=t.querySelector('.fill'),
-        hint=t.querySelector('.hint');
+        btn=t.querySelector('.btn'), rst=t.querySelector('.rst'),
+        fill=t.querySelector('.fill'), hint=t.querySelector('.hint');
     if(spec.length>1) t.classList.add('multi');
     spec.forEach(function(p,n){
       var c=document.createElement('span'); c.className='ph'; c.textContent=p.name;
@@ -337,49 +529,343 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
       [].forEach.call(chips.children,function(c,n){
         c.classList.toggle('active',n===i); c.classList.toggle('done',n<i); });
     }
+    // touched separates "never started" from "paused on purpose", which is what lets a
+    // timer auto-start on arrival without overriding a presenter who paused it and
+    // stepped back to the previous slide.
+    var touched=false;
     function stop(){ running=false; clearInterval(tick); tick=null; paint(); }
-    function run(){ if(running) return; running=true;
+    function run(){ if(running) return; running=true; touched=true;
+      // starting the opening timer is how class begins, so the session clock goes with it
+      if(window.__startClass) window.__startClass();
       tick=setInterval(function(){ left--; paint(); },1000); paint(); }
     function go(n){ stop(); i=n; left=spec[i].secs; paint(); }
+    function reset(){ stop(); i=0; left=spec[0].secs; touched=false; paint(); }
     btn.onclick=function(){ running?stop():run(); };
-    t.__timer={run:run, stop:stop, toggle:function(){ running?stop():run(); },
-               next:function(){ if(i<spec.length-1) go(i+1); }};
+    rst.onclick=function(){ reset(); if(window.__paintPill) window.__paintPill(); };
+    function total(){ return spec.reduce(function(a,p){ return a+p.secs; },0); }
+    // What this timer still owes the plan: the current phase's remainder plus every
+    // phase after it. Overrun counts as zero rather than as negative, because time
+    // already spent is the class clock's problem, not the plan's.
+    function remaining(){
+      if(!touched) return total();
+      var r=Math.max(0,left);
+      for(var n=i+1;n<spec.length;n++) r+=spec[n].secs;
+      return r;
+    }
+    t.__timer={run:run, stop:stop, reset:reset, toggle:function(){ running?stop():run(); },
+               next:function(){ if(i<spec.length-1) go(i+1); },
+               isRunning:function(){ return running; },
+               isFresh:function(){ return !touched; },
+               total:total, remaining:remaining,
+               state:function(){ return {left:left, name:spec[i].name, text:fmt(left)}; }};
     paint();
   });
-  // space runs/pauses the timer on the visible slide, without hijacking it elsewhere
+  // A running timer used to stop the moment you advanced, which made it impossible to
+  // show the next slide while the room was still working. Now it follows you: the clock
+  // keeps counting in a corner pill until it is paused or its own slide comes back.
+  var pill=document.createElement('div');
+  pill.className='timer-pill'; pill.hidden=true;
+  pill.innerHTML='<span class="pill-label"></span><span class="pill-clock"></span>';
+  document.body.appendChild(pill);           // outside .slides, so reveal's transform
+  var pillLabel=pill.querySelector('.pill-label');   // and auto-animate leave it alone
+  var pillClock=pill.querySelector('.pill-clock');
+
+  function carried(){
+    // the one timer that is running but not on the slide we are looking at
+    var cur=Reveal.getCurrentSlide();
+    var found=null;
+    document.querySelectorAll('.timer').forEach(function(t){
+      if(t.__timer && t.__timer.isRunning() && !(cur&&cur.contains(t))) found=t; });
+    return found;
+  }
+  function paintPill(){
+    var t=carried();
+    if(!t){ pill.hidden=true; return; }
+    var s=t.__timer.state();
+    pill.hidden=false;
+    pill.classList.toggle('low', s.left<=15 && s.left>0);
+    pill.classList.toggle('over', s.left<=0);
+    pillLabel.textContent=s.name;
+    pillClock.textContent=s.text;
+  }
+  window.__paintPill=paintPill;
+  // Arriving at a slide that has its own timer means the previous activity is over, so
+  // the carried clock stops rather than following you for the rest of the session. The
+  // opening gauge otherwise kept counting in the pill through every later block.
+  Reveal.on('slidechanged', function(){
+    var cur=Reveal.getCurrentSlide();
+    var own=cur && cur.querySelector('.timer');
+    if(own){
+      var c=carried();
+      if(c) c.__timer.stop();
+      // Arriving at an activity starts its clock. Only when the timer has never been
+      // run, so stepping back to a slide you paused on purpose does not restart it.
+      if(own.__timer && !own.__timer.isRunning() && own.__timer.isFresh()) own.__timer.run();
+    }
+    startClassClock();          // the session clock begins when you leave the title slide
+    paintPace();
+    paintPill();
+  });
+  setInterval(paintPill, 500);
+
+  // space toggles the timer on this slide, or the carried one if this slide has none
   document.addEventListener('keydown',function(e){
     if(e.key!==' '&&e.code!=='Space') return;
     var cur=Reveal.getCurrentSlide(); if(!cur) return;
-    var t=cur.querySelector('.timer'); if(!t||!t.__timer) return;
-    e.preventDefault(); e.stopPropagation(); t.__timer.toggle();
+    var t=cur.querySelector('.timer') || carried();
+    if(!t||!t.__timer) return;
+    e.preventDefault(); e.stopPropagation(); t.__timer.toggle(); paintPill();
   },true);
-  // leaving a slide stops its timer
-  Reveal.on('slidechanged',function(ev){
-    document.querySelectorAll('.timer').forEach(function(t){
-      if(t.__timer && !ev.currentSlide.contains(t)) t.__timer.stop(); });
+
+  /* ---- the session clock -------------------------------------------------------
+     One countdown for the whole period, independent of the per-activity timers, so
+     you can see at a glance whether the plan still fits the room you are standing in.
+     Length comes from data-session-minutes on .reveal, which build_deck.py writes from
+     the deck's "minutes" field. No field, no clock. */
+  var sess=document.querySelector('.reveal'),
+      sessMin=sess ? parseInt(sess.dataset.sessionMinutes,10) : 0,
+      sessLeft=(sessMin>0? sessMin*60 : 0), sessTick=null, sessRun=false, sessOn=(sessMin>0);
+  var clk=document.createElement('div');
+  clk.className='class-clock'; clk.hidden=true;
+  clk.innerHTML='<span class="cc-label">Class</span><span class="cc-time"></span>';
+  var hud=document.createElement('div');
+  hud.className='hud';
+  if(sessOn){ document.body.appendChild(hud); hud.appendChild(clk); }
+  var ccTime=clk.querySelector('.cc-time');
+
+  /* Pace. What the rest of the deck still owes, against what the period still has.
+     The difference is the unallocated time: transitions, the talk slides with no timer,
+     and whatever you want to say that is not on a clock. It starts at
+     (period - sum of every timer) and should stay roughly there. When it goes negative
+     the plan no longer fits the room. */
+  var pace=document.createElement('div');
+  pace.className='pace'; pace.hidden=true;
+  pace.innerHTML='<span class="pc-word"></span><span class="pc-time"></span>';
+  if(sessOn) hud.insertBefore(pace, clk);
+  var pcWord=pace.querySelector('.pc-word'), pcTime=pace.querySelector('.pc-time');
+
+  function planRemaining(){
+    var idx=Reveal.getIndices().h, secs=0;
+    var all=document.querySelectorAll('.reveal .slides > section');
+    for(var n=0;n<all.length;n++){
+      if(n<idx) continue;
+      var t=all[n].querySelector('.timer');
+      if(!t||!t.__timer) continue;
+      secs += (n===idx) ? t.__timer.remaining() : t.__timer.total();
+    }
+    return secs;
+  }
+  function paintPace(){
+    if(!sessOn) return;
+    var slack=sessLeft-planRemaining();
+    pace.hidden=false;
+    var word, cls;
+    if(slack <= -60){ word='Speed up'; cls='behind'; }
+    else if(slack >= 180){ word='Ease off'; cls='ahead'; }
+    else { word='On plan'; cls='onplan'; }
+    pace.className='pace '+cls;
+    pcWord.textContent=word;
+    pcTime.textContent=(slack<0?'\u2212':'+')+fmt(Math.abs(slack)).replace('+','');
+    pace.title='Slides still to run need '+fmt(planRemaining())
+      +'. The period has '+fmt(sessLeft)+' left.';
+  }
+
+  function paintClock(){
+    if(!sessOn) return;
+    clk.hidden=false;
+    var neg=sessLeft<0, a=Math.abs(sessLeft);
+    ccTime.textContent=(neg?'+':'')+Math.floor(a/60)+':'+String(a%60).padStart(2,'0');
+    clk.classList.toggle('low', sessLeft<=300 && sessLeft>0);
+    clk.classList.toggle('over', sessLeft<=0);
+    clk.classList.toggle('paused', !sessRun);
+    paintPace();
+  }
+  function runClassClock(){
+    if(!sessOn||sessRun) return;
+    sessRun=true;
+    sessTick=setInterval(function(){ sessLeft--; paintClock(); },1000);
+    paintClock();
+  }
+  function stopClassClock(){ sessRun=false; clearInterval(sessTick); sessTick=null; paintClock(); }
+  function startClassClock(){ runClassClock(); }          // first slide change starts it
+  window.__startClass=startClassClock;
+  function toggleClassClock(){ sessRun?stopClassClock():runClassClock(); }
+  function resetClassClock(){ stopClassClock(); sessLeft=sessMin*60; paintClock(); }
+  clk.onclick=function(){ toggleClassClock(); };
+  clk.ondblclick=function(e){ e.preventDefault(); resetClassClock(); };
+  clk.title='Click to pause or resume, double-click to reset, or press c';
+  paintClock(); paintPace();
+
+  // r resets the timer on this slide, c starts or pauses the class clock
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    var k=(e.key||'').toLowerCase();
+    if(k==='r'){
+      var cur=Reveal.getCurrentSlide(); if(!cur) return;
+      var t=cur.querySelector('.timer') || carried();
+      if(!t||!t.__timer) return;
+      e.preventDefault(); e.stopPropagation(); t.__timer.reset(); paintPill();
+    } else if(k==='c'){
+      e.preventDefault(); e.stopPropagation(); toggleClassClock();
+    }
+  },true);
+})();
+
+// ---- live tally --------------------------------------------------------------
+// Markup:  <div class="tally" data-rows="A,B,C" data-scale="1,2,3,4,5" data-n="28">
+// The presenter counts hands and types the number; bars grow as they type. Tab runs
+// left to right along a row, so you can enter a whole row without looking down.
+// Totals turn amber when a row does not add up to data-n, which is the mistake
+// counting hands in front of thirty people actually produces.
+(function(){
+  document.querySelectorAll('.tally').forEach(function(t){
+    var rows=(t.dataset.rows||'A,B,C').split(',').map(function(s){ return s.trim(); });
+    var scale=(t.dataset.scale||'1,2,3,4,5').split(',').map(function(s){ return s.trim(); });
+    var expect=parseInt(t.dataset.n,10)||0;
+    var counts=rows.map(function(){ return scale.map(function(){ return 0; }); });
+
+    var html='<div class="tally-grid">';
+    rows.forEach(function(r,ri){
+      html+='<div class="tally-row"><span class="tally-label">'+r+'</span><div class="tally-buckets">';
+      scale.forEach(function(s,si){
+        html+='<div class="tally-bucket">'
+           +  '<div class="tally-track"><i data-r="'+ri+'" data-s="'+si+'"></i></div>'
+           +  '<input type="number" min="0" inputmode="numeric" data-r="'+ri+'" data-s="'+si+'" value="">'
+           +  '<span class="tally-score">'+s+'</span></div>';
+      });
+      html+='</div><span class="tally-total" data-r="'+ri+'"></span></div>';
+    });
+    t.innerHTML=html+'</div>';
+
+    function paint(){
+      var max=1;
+      counts.forEach(function(row){ row.forEach(function(v){ if(v>max) max=v; }); });
+      t.querySelectorAll('.tally-track i').forEach(function(bar){
+        var v=counts[+bar.dataset.r][+bar.dataset.s];
+        bar.style.height=(v/max*100)+'%';
+        bar.classList.toggle('zero', v===0);
+      });
+      t.querySelectorAll('.tally-total').forEach(function(el){
+        var ri=+el.dataset.r;
+        var sum=counts[ri].reduce(function(a,b){ return a+b; },0);
+        el.textContent='n = '+sum;
+        el.classList.toggle('off', expect>0 && sum>0 && sum!==expect);
+      });
+    }
+    t.addEventListener('input',function(e){
+      var el=e.target; if(el.tagName!=='INPUT') return;
+      counts[+el.dataset.r][+el.dataset.s]=Math.max(0,parseInt(el.value,10)||0);
+      paint();
+    });
+    paint();
   });
 })();
-// grader calibration simulator
+
+/* ---- the summoned timer ------------------------------------------------------
+   T brings it up on any slide, takes a length, and keeps counting while you move
+   through the deck. It lives on document.body rather than inside a section, which is
+   what makes it survive a slide change: an element inside .slides is fair game for
+   auto-animate and is hidden the moment its own slide leaves the screen.
+
+   Nothing here autostarts and nothing is per-slide, so a deck carries no schedule of
+   its own. What the room is timing is whatever you just said it was. */
 (function(){
-  var spec=document.getElementById('spec'); if(!spec) return;
-  var TRUE_SCORE=7.4;
-  function draw(){
-    var k=spec.value/100;
-    // with no rubric each grader drifts toward their own habit; specificity pulls them in
-    var a=TRUE_SCORE+(1-k)*1.9, b=TRUE_SCORE-(1-k)*2.1;
-    a=Math.min(10,a); b=Math.max(0,b);
-    document.getElementById('barA').style.width=(a*10)+'%';
-    document.getElementById('barB').style.width=(b*10)+'%';
-    document.getElementById('valA').textContent=a.toFixed(1);
-    document.getElementById('valB').textContent=b.toFixed(1);
-    var g=Math.abs(a-b);
-    document.getElementById('gap').textContent=g.toFixed(1)+' points apart';
-    var note=document.getElementById('simnote');
-    if(k<0.25) note.textContent='No written criteria. Each grader applies their own habit, and the student’s grade depends on who opened the file.';
-    else if(k<0.7) note.textContent='Some criteria written down. The spread narrows but judgment calls still differ.';
-    else note.textContent='Yes-or-no lines for every point. Two graders, effectively the same grade.';
+  var box=document.createElement('div');
+  box.className='deck-timer'; box.hidden=true;
+  box.innerHTML=
+      '<input class="dt-in" type="text" inputmode="decimal" placeholder="5" '
+    + 'aria-label="Minutes, or m:ss" title="Minutes, or m:ss">'
+    + '<span class="dt-pre"></span>'
+    + '<span class="dt-clock">0:00</span>'
+    + '<button class="dt-go" type="button">Start</button>'
+    + '<button class="dt-rst" type="button">Reset</button>'
+    + '<button class="dt-x" type="button" title="Hide (T)">&times;</button>';
+  document.body.appendChild(box);
+
+  var input=box.querySelector('.dt-in'), face=box.querySelector('.dt-clock'),
+      go=box.querySelector('.dt-go'), rst=box.querySelector('.dt-rst'),
+      pre=box.querySelector('.dt-pre');
+  var total=0, left=0, tick=null, running=false;
+
+  function fmt(s){
+    var a=Math.abs(s);
+    return (s<0?'+':'')+Math.floor(a/60)+':'+String(a%60).padStart(2,'0');
   }
-  spec.addEventListener('input',draw); draw();
+  // "5" is five minutes, because that is what you say out loud. "1:30" and "45s" are
+  // there for the times you mean something shorter than a minute.
+  function parse(v){
+    v=String(v||'').trim();
+    var m=v.match(/^(\d+):([0-5]?\d)$/);        if(m) return (+m[1])*60+(+m[2]);
+    m=v.match(/^(\d+(?:\.\d+)?)\s*m(?:in)?$/i); if(m) return Math.round(parseFloat(m[1])*60);
+    m=v.match(/^(\d+)\s*s(?:ec)?$/i);           if(m) return +m[1];
+    if(/^\d+(\.\d+)?$/.test(v)) return Math.round(parseFloat(v)*60);
+    return 0;
+  }
+  function paint(){
+    face.textContent=fmt(left);
+    box.classList.toggle('running', running);
+    box.classList.toggle('low', left<=15 && left>0);
+    box.classList.toggle('over', left<=0 && total>0);
+    go.textContent = running ? 'Pause' : (left>0 && left!==total ? 'Resume' : 'Start');
+  }
+  function stop(){ running=false; clearInterval(tick); tick=null; paint(); }
+  function run(){
+    if(running) return;
+    if(left<=0){                       // pressing Start with nothing left reads the box
+      total=parse(input.value); left=total;
+      if(!total){ input.focus(); input.select(); return; }
+    }
+    running=true;
+    tick=setInterval(function(){ left--; paint(); }, 1000);
+    paint();
+  }
+  function set(secs, andRun){
+    stop(); total=secs; left=secs; input.value=Math.round(secs/60*100)/100; paint();
+    if(andRun) run();
+  }
+  function show(yes){
+    box.hidden = !yes;
+    if(yes){ input.focus(); input.select(); }
+  }
+
+  [2,3,5,10].forEach(function(n){
+    var b=document.createElement('button');
+    b.type='button'; b.textContent=n; b.title=n+' minutes';
+    b.onclick=function(){ set(n*60, true); };
+    pre.appendChild(b);
+  });
+
+  go.onclick=function(){ running?stop():run(); };
+  rst.onclick=function(){ stop(); left=total; paint(); };
+  box.querySelector('.dt-x').onclick=function(){ show(false); };
+
+  // Enter in the box starts the length you just typed. Reveal ignores keys aimed at an
+  // input, so the digits never reach the deck's navigation.
+  input.addEventListener('keydown', function(e){
+    if(e.key==='Enter'){ e.preventDefault(); var s=parse(input.value); if(s) set(s, true); }
+    else if(e.key==='Escape'){ e.preventDefault(); input.blur(); }
+  });
+
+  function typing(){
+    var a=document.activeElement;
+    return a && (a.tagName==='INPUT' || a.tagName==='TEXTAREA' || a.isContentEditable);
+  }
+  // T toggles. Opening the panel puts the cursor in the length box, so without the first
+  // test here the very next T would be treated as typing and the panel could never be
+  // closed the way it was opened.
+  document.addEventListener('keydown', function(e){
+    if(e.key!=='t' && e.key!=='T') return;
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    if(document.activeElement===input){
+      e.preventDefault(); e.stopPropagation();
+      input.blur(); show(false); return;
+    }
+    if(typing()) return;
+    e.preventDefault(); e.stopPropagation();
+    show(box.hidden);
+  }, true);
+
+  paint();
 })();
 </script>
 </body>
