@@ -249,6 +249,12 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .deck-timer .dt-x{ border-color:var(--rule); color:var(--slate); font-size:17px; padding:4px 10px;
   line-height:1; }
 .deck-timer .dt-x:hover{ background:var(--slate); border-color:var(--slate); }
+
+/* The exit ticket's word of the day. Lives only on the instructor-only slide, so the
+   only way to know it is to have been in the room when it was on the screen. */
+.ticket-word{ display:inline-block; font-weight:900; color:var(--maroon);
+  background:var(--wash); border:2px dashed var(--maroon); border-radius:6px;
+  padding:.05em .4em; letter-spacing:.01em; }
 </style>
 </head>
 <body>
@@ -321,6 +327,7 @@ Whatever they decide about length, write it down, or write down that there is no
 <h2>Now grade three submissions</h2>
 <p>On your own first, then compare with the person next to you. Use the rubric we just wrote and nothing else.</p>
 <ul><li>A, then B, then C. In that order.</li><li>Write the number down before you talk to anyone.</li></ul>
+<p class="tiny">The three submissions: <a href="https://timdrichards.github.io/cs879-decks/unit03-problem-1-data-structures.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 1</a></p>
 <aside class="notes">Fifteen minutes, five a submission, keep it moving.
 
 The order matters. C is the double jeopardy case and it has to arrive while they are already grading.
@@ -332,7 +339,7 @@ B reads like the strongest writer in the set and says LinkedList get(i) is O(1).
 
 <section data-obj="2">
 <h2>A had no length line to fail</h2>
-<p>The rubric never mentioned length, so there was nothing to deduct against. Half of you deducted anyway.</p>
+<p>The rubric never mentioned length, so there was nothing to deduct against. Is this an important criterion? Why or why not?</p>
 <div class="callout">Practicum 1 asked you for about 300 words. Its rubric had no length criterion either. One of you wrote 204 words, met every line, and said so in the submission. They were right, and it is fixed as of today.</div>
 <aside class="notes">This is the slide where the course admits it made the same mistake. Do not skip it and do not soften it.
 
@@ -356,7 +363,7 @@ The principle is that the cost should be proportional to the size of the misunde
 <section data-obj="3">
 <h2>Then C emails you</h2>
 <p>Read your own rubric as though you had never seen it, and answer one question: can I justify this number?</p>
-<div class="two"><div class="card yes"><h4>If you can</h4><ul><li>Name the line</li><li>Name what their submission did</li><li>Say what earning the point looks like</li></ul></div><div class="card no"><h4>If you cannot</h4><ul><li>Say so and change it</li><li>Then change it for everyone else with the same problem</li></ul></div></div>
+<div class="two"><div class="card yes"><h4>If you can</h4><ul><li>Name the rubric line</li><li>Name what their submission did</li><li>Say what earning the point looks like</li></ul></div><div class="card no"><h4>If you cannot</h4><ul><li>Say so and change it</li><li>Then change it for everyone else with the same problem</li></ul></div></div>
 <div class="callout">A student who complains should not get a better outcome than a student who did not. That second step is the one new graders skip.</div>
 <aside class="notes">Put them in the student's seat before they answer. The reply that starts by defending the grader loses the room every time.
 
@@ -377,24 +384,26 @@ The record is what turns a decision into something you can defend, to a student 
 <section data-obj="1" class="go">
 <h2>Different course, same shape</h2>
 <div class="callout">In 100 to 150 words, explain why binary search requires its input to be sorted. Include a short code example showing a case where it returns a wrong answer on unsorted input, and give the running time of the search and of sorting first. (10 points)</div>
-<p>Five minutes. Write the rubric on your own, before you read anything.</p>
-<p class="tiny">The handout: <a href="https://timdrichards.github.io/cs879-decks/unit03-problem-2-algorithms.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 2</a></p>
-<aside class="notes">Alone, not in pairs. The swap only tells them something if the two rubrics were written independently.
+<p>In groups of two or three. Five minutes to write the rubric, before you read anything.</p>
+<p class="tiny">The handout: <a href="https://timdrichards.github.io/cs879-decks/unit03-problem-2-algorithms.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Problem 2</a> · Write it in the <a href="https://timdrichards.github.io/cs879-decks/rubric-builder.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#7B1416;text-decoration-thickness:2px;">Rubric Builder</a></p>
+<aside class="notes">Groups of two or three, and keep them together for the swap on the next slide.
+
+Five minutes is tight on purpose. A group that argues about one line for five minutes has done the exercise.
 
 The brief here is shorter: the instructor wants the invariant rather than the rule, and the code has to demonstrate the failure rather than assert it.</aside>
 </section>
 
 <section data-obj="2" class="go">
 <h2>Score, swap, score again</h2>
-<ul><li>Score D, E and F against your own rubric.</li><li>Swap rubrics with the person next to you.</li><li>Score the same three again, using theirs.</li><li>Did you get the same totals?</li></ul>
+<ul><li>Score D, E and F against your group's rubric.</li><li>Swap rubrics with the group next to you.</li><li>Score the same three again, using theirs.</li><li>Did the two rubrics give the same totals?</li></ul>
 <div class="callout">Where the totals differ, find the line that caused it and read it aloud. It will be the one that was not yes-or-no.</div>
-<aside class="notes">Twenty minutes including the swap.
+<aside class="notes">Twenty minutes including the swap. Same groups of two or three.
 
 F produces the biggest spread, somewhere between 3 and 8. It is correct, well written, has the right running times, and explains why binary search is O(log n) rather than why sortedness is required. Excellent, and off target.
 
-Find the two people who disagree most on F and have each read their own line out. That is the whole lesson in ninety seconds.
+Find the two groups that disagree most on F and have each read their own line out. That is the whole lesson in ninety seconds.
 
-The Rubric Builder makes a link that carries a rubric, so they can swap by sending one rather than by handing over a laptop.</aside>
+The Rubric Builder makes a link that carries a rubric, so a group can send theirs rather than hand over a laptop.</aside>
 </section>
 
 <section data-obj="2">
@@ -416,12 +425,15 @@ The Rubric Builder makes a link that carries a rubric, so they can swap by sendi
 <h2>Exit ticket</h2>
 <p>Canvas &rarr; Week 3 &rarr; Exit Ticket: Wed 9/23</p>
 <div class="callout">Which rubric line caused the biggest disagreement, and what would you change about it?</div>
+<p>Question 4 asks for today's word. It is: <span class="ticket-word">&hellip;</span></p>
 <p class="tiny">Copy the prompt into question two. Closes at 5:20, five minutes after we finish.</p>
 <aside class="notes">Press T and set it to 10.
 
+The word is generated from today's date, so it is the same all day and survives a reload, and it only exists on this slide, which is not published. Read it out once and leave it up.
+
 Do not post this prompt anywhere. Being in the room is what makes the ticket an attendance record rather than a form.
 
-They argued about exactly this ten minutes ago, so it is a minute of writing. The answers tell you which lines the room found hardest, which is what Unit 4's peer evaluation work builds on.
+They argued about the rubric lines ten minutes ago, so this is a minute of writing. The answers tell you which lines the room found hardest.
 
 This block does not move. Start it at 5:05 whatever else is happening.
 
@@ -868,6 +880,31 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
   }, true);
 
   paint();
+})();
+
+/* ---- word of the day ---------------------------------------------------------
+   Fills any .ticket-word with a word derived from today's date, so it is the same
+   all session and survives a reload, but is not knowable in advance without the
+   deck. The slide carrying it is instructor-only and never published, which is the
+   whole point: the word is proof you were in the room.
+
+   Short, common, unambiguous to hear and to spell. Nothing that sounds like
+   something else when read aloud across a lecture hall. */
+(function(){
+  var marks=document.querySelectorAll('.ticket-word');
+  if(!marks.length) return;
+  var WORDS=['anchor','basket','candle','copper','dolphin','ember','fabric','garden',
+             'harbor','island','jacket','kettle','lantern','marble','needle','orchard',
+             'pepper','quarry','ribbon','saddle','timber','umbrella','velvet','walnut',
+             'yellow','zebra','bridge','compass','driftwood','feather','granite','hollow',
+             'juniper','ladder','meadow','nutmeg','otter','pebble','rooster','satchel'];
+  var d=new Date(), key=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  // a small mixing step, so consecutive days do not land on neighbouring words
+  var h=key%2147483647;
+  h=(h*48271)%2147483647;
+  h=(h*48271)%2147483647;
+  var word=WORDS[h%WORDS.length];
+  marks.forEach(function(el){ el.textContent=word; });
 })();
 </script>
 </body>
