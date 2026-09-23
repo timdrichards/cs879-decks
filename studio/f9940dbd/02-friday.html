@@ -22,17 +22,19 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .reveal h1{ font-size:2.05em; font-weight:900; color:var(--maroon); letter-spacing:-.01em;
   text-transform:none; line-height:1.1; }
 .reveal h2{ font-size:1.42em; font-weight:900; color:var(--maroon); text-transform:none;
-  line-height:1.15; margin-bottom:.5em; letter-spacing:-.005em; }
+  line-height:1.12; margin-bottom:.36em; letter-spacing:-.005em; }
 .reveal h3{ font-size:1.0em; font-weight:700; color:var(--slate); text-transform:uppercase;
-  letter-spacing:.10em; margin-bottom:.7em; }
-.reveal p,.reveal li{ font-size:.82em; line-height:1.45; }
-.reveal ul{ margin-left:.6em; } .reveal li{ margin-bottom:.42em; }
+  letter-spacing:.10em; margin-bottom:.45em; }
+.reveal p,.reveal li{ font-size:.90em; line-height:1.36; }
+.reveal ul{ margin-left:.6em; } .reveal li{ margin-bottom:.30em; }
 .reveal strong{ color:var(--maroon); font-weight:900; }
 .reveal em{ color:var(--slate); font-style:italic; }
 .lede{ font-size:.95em !important; color:var(--slate); }
-.tiny{ font-size:.62em !important; color:var(--slate); line-height:1.4; }
+.tiny{ font-size:.68em !important; color:var(--slate); line-height:1.35; }
 /* signature: the rubric strip. Lives INSIDE each section so reveal's transform scales it. */
-.reveal .slides > section{ box-sizing:border-box; padding:48px 250px 0 40px; height:620px; }
+.reveal .slides > section{ box-sizing:border-box; padding:24px 250px 0 40px; height:620px; }
+/* reveal's theme puts a top margin on headings; at the top of a slide it is dead space */
+.reveal .slides > section > :first-child{ margin-top:0 !important; }
 /* fixed, so auto-animate never touches it. JS scales it to match the deck. */
 .strip{ position:fixed; background:var(--wash); border-left:1px solid var(--rule);
   box-sizing:border-box; color:var(--slate); text-align:left; z-index:30;
@@ -90,13 +92,13 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .go .tag{ display:inline-block; background:var(--go); color:#fff; font-weight:900; font-size:.5em;
   letter-spacing:.14em; text-transform:uppercase; padding:5px 12px; border-radius:3px;
   margin-bottom:.8em; }
-.callout{ background:var(--wash); border-left:5px solid var(--maroon); padding:.8em 1.1em;
-  margin:.7em 0; font-size:.78em; line-height:1.45; }
-.two{ display:grid; grid-template-columns:1fr 1fr; gap:1.6em; }
-.card{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:.9em 1.1em; }
-.card h4{ margin:0 0 .5em; color:var(--maroon); font-size:.78em; font-weight:900;
+.callout{ background:var(--wash); border-left:5px solid var(--maroon); padding:.62em 1em;
+  margin:.5em 0; font-size:.78em; line-height:1.45; }
+.two{ display:grid; grid-template-columns:1fr 1fr; gap:1.25em; }
+.card{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:.75em 1em; }
+.card h4{ margin:0 0 .38em; color:var(--maroon); font-size:.82em; font-weight:900;
   text-transform:uppercase; letter-spacing:.08em; }
-.card ul{ margin:0; } .card li{ font-size:.72em; }
+.card ul{ margin:0; } .card li{ font-size:.80em; }
 .no h4{ color:#8B2E2E; } .yes h4{ color:var(--go); }
 /* simulator */
 #sim{ background:#fff; border:1px solid var(--rule); border-radius:4px; padding:16px 18px; }
@@ -218,6 +220,45 @@ body,.reveal{ background:var(--ground); color:var(--ink); font-size:30px;
 .class-clock.over .cc-time{ color:var(--maroon); }
 .class-clock.paused{ opacity:.55; }
 .class-clock.paused .cc-label::after{ content:" paused"; }
+
+/* ---- the summoned timer ------------------------------------------------------
+   One timer for the whole deck instead of one per slide. It sits outside .slides so
+   reveal's transform and auto-animate both leave it alone, which is also what lets it
+   keep running while you move through the deck. */
+.deck-timer{ position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:60;
+  display:flex; align-items:center; gap:11px; background:#fff; border:2px solid var(--go);
+  border-radius:9px; padding:10px 13px; box-shadow:0 7px 26px rgba(0,0,0,.17); }
+.deck-timer[hidden]{ display:none; }
+.deck-timer .dt-in{ width:66px; font-family:inherit; font-size:16px; font-weight:900;
+  text-align:center; color:var(--ink); background:var(--wash); border:1px solid var(--rule);
+  border-radius:4px; padding:7px 4px; }
+.deck-timer .dt-in:focus{ outline:2px solid var(--go); outline-offset:-1px; background:#fff; }
+.deck-timer .dt-clock{ font-size:46px; font-weight:900; line-height:1; color:var(--ink);
+  font-variant-numeric:tabular-nums; letter-spacing:-.02em; min-width:124px; text-align:center; }
+.deck-timer.running .dt-clock{ color:var(--go); }
+.deck-timer.low .dt-clock,
+.deck-timer.over .dt-clock{ color:var(--maroon); }
+.deck-timer button{ font-family:inherit; font-weight:900; font-size:13px; text-transform:uppercase;
+  letter-spacing:.06em; border:2px solid var(--go); background:#fff; color:var(--go);
+  border-radius:4px; padding:8px 13px; cursor:pointer; }
+.deck-timer button:hover{ background:var(--go); color:#fff; }
+.deck-timer .dt-pre{ display:flex; gap:4px; }
+.deck-timer .dt-pre button{ padding:6px 9px; font-size:12px; border-color:var(--rule);
+  color:var(--slate); }
+.deck-timer .dt-pre button:hover{ border-color:var(--go); background:var(--go); color:#fff; }
+.deck-timer .dt-x{ border-color:var(--rule); color:var(--slate); font-size:17px; padding:4px 10px;
+  line-height:1; }
+.deck-timer .dt-x:hover{ background:var(--slate); border-color:var(--slate); }
+
+/* The exit ticket's word of the day. Lives only on the instructor-only slide, so the
+   only way to know it is to have been in the room when it was on the screen. */
+.ticket-word{ display:inline-block; font-weight:900; color:var(--maroon);
+  background:var(--wash); border:2px dashed var(--maroon); border-radius:6px;
+  padding:.05em .4em; letter-spacing:.01em; }
+.word-again{ font-family:inherit; font-size:.5em; font-weight:900; text-transform:uppercase;
+  letter-spacing:.06em; border:2px solid var(--slate); background:#fff; color:var(--slate);
+  border-radius:4px; padding:.3em .7em; cursor:pointer; vertical-align:middle; margin-left:.5em; }
+.word-again:hover{ border-color:var(--maroon); color:var(--maroon); }
 </style>
 </head>
 <body>
@@ -713,6 +754,113 @@ window.addEventListener('resize', function(){ setTimeout(placeStrip,0); });
     });
     paint();
   });
+})();
+
+/* ---- the summoned timer ------------------------------------------------------
+   T brings it up on any slide, takes a length, and keeps counting while you move
+   through the deck. It lives on document.body rather than inside a section, which is
+   what makes it survive a slide change: an element inside .slides is fair game for
+   auto-animate and is hidden the moment its own slide leaves the screen.
+
+   Nothing here autostarts and nothing is per-slide, so a deck carries no schedule of
+   its own. What the room is timing is whatever you just said it was. */
+(function(){
+  var box=document.createElement('div');
+  box.className='deck-timer'; box.hidden=true;
+  box.innerHTML=
+      '<input class="dt-in" type="text" inputmode="decimal" placeholder="5" '
+    + 'aria-label="Minutes, or m:ss" title="Minutes, or m:ss">'
+    + '<span class="dt-pre"></span>'
+    + '<span class="dt-clock">0:00</span>'
+    + '<button class="dt-go" type="button">Start</button>'
+    + '<button class="dt-rst" type="button">Reset</button>'
+    + '<button class="dt-x" type="button" title="Hide (T)">&times;</button>';
+  document.body.appendChild(box);
+
+  var input=box.querySelector('.dt-in'), face=box.querySelector('.dt-clock'),
+      go=box.querySelector('.dt-go'), rst=box.querySelector('.dt-rst'),
+      pre=box.querySelector('.dt-pre');
+  var total=0, left=0, tick=null, running=false;
+
+  function fmt(s){
+    var a=Math.abs(s);
+    return (s<0?'+':'')+Math.floor(a/60)+':'+String(a%60).padStart(2,'0');
+  }
+  // "5" is five minutes, because that is what you say out loud. "1:30" and "45s" are
+  // there for the times you mean something shorter than a minute.
+  function parse(v){
+    v=String(v||'').trim();
+    var m=v.match(/^(\d+):([0-5]?\d)$/);        if(m) return (+m[1])*60+(+m[2]);
+    m=v.match(/^(\d+(?:\.\d+)?)\s*m(?:in)?$/i); if(m) return Math.round(parseFloat(m[1])*60);
+    m=v.match(/^(\d+)\s*s(?:ec)?$/i);           if(m) return +m[1];
+    if(/^\d+(\.\d+)?$/.test(v)) return Math.round(parseFloat(v)*60);
+    return 0;
+  }
+  function paint(){
+    face.textContent=fmt(left);
+    box.classList.toggle('running', running);
+    box.classList.toggle('low', left<=15 && left>0);
+    box.classList.toggle('over', left<=0 && total>0);
+    go.textContent = running ? 'Pause' : (left>0 && left!==total ? 'Resume' : 'Start');
+  }
+  function stop(){ running=false; clearInterval(tick); tick=null; paint(); }
+  function run(){
+    if(running) return;
+    if(left<=0){                       // pressing Start with nothing left reads the box
+      total=parse(input.value); left=total;
+      if(!total){ input.focus(); input.select(); return; }
+    }
+    running=true;
+    tick=setInterval(function(){ left--; paint(); }, 1000);
+    paint();
+  }
+  function set(secs, andRun){
+    stop(); total=secs; left=secs; input.value=Math.round(secs/60*100)/100; paint();
+    if(andRun) run();
+  }
+  function show(yes){
+    box.hidden = !yes;
+    if(yes){ input.focus(); input.select(); }
+  }
+
+  [2,3,5,10].forEach(function(n){
+    var b=document.createElement('button');
+    b.type='button'; b.textContent=n; b.title=n+' minutes';
+    b.onclick=function(){ set(n*60, true); };
+    pre.appendChild(b);
+  });
+
+  go.onclick=function(){ running?stop():run(); };
+  rst.onclick=function(){ stop(); left=total; paint(); };
+  box.querySelector('.dt-x').onclick=function(){ show(false); };
+
+  // Enter in the box starts the length you just typed. Reveal ignores keys aimed at an
+  // input, so the digits never reach the deck's navigation.
+  input.addEventListener('keydown', function(e){
+    if(e.key==='Enter'){ e.preventDefault(); var s=parse(input.value); if(s) set(s, true); }
+    else if(e.key==='Escape'){ e.preventDefault(); input.blur(); }
+  });
+
+  function typing(){
+    var a=document.activeElement;
+    return a && (a.tagName==='INPUT' || a.tagName==='TEXTAREA' || a.isContentEditable);
+  }
+  // T toggles. Opening the panel puts the cursor in the length box, so without the first
+  // test here the very next T would be treated as typing and the panel could never be
+  // closed the way it was opened.
+  document.addEventListener('keydown', function(e){
+    if(e.key!=='t' && e.key!=='T') return;
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    if(document.activeElement===input){
+      e.preventDefault(); e.stopPropagation();
+      input.blur(); show(false); return;
+    }
+    if(typing()) return;
+    e.preventDefault(); e.stopPropagation();
+    show(box.hidden);
+  }, true);
+
+  paint();
 })();
 </script>
 </body>
